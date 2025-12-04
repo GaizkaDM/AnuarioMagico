@@ -1,0 +1,33 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Java
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Frontend specific
+frontend/target/
+frontend/nbactions.xml
+frontend/output.txt
+
+# Logs
+*.log
+

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.GaizkaFrost.Controlador"
+            prefWidth="1100" prefHeight="700"
+            stylesheets="@../styles/estilos.css">
+
+    <!-- =============== TOP =============== -->
+    <top>
+        <VBox spacing="10">
+            <children>
+
+                <!-- Barra de menú -->
+                <MenuBar>
+                    <menus>
+                        <Menu text="Archivo">
+                            <items>
+                                <MenuItem text="Importar desde API"/>
+                                <MenuItem text="Salir"/>
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+
+                <!-- Hero / encabezado visual -->
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="hero-bar">
+                    <padding>
+                        <Insets top="16" right="16" bottom="16" left="16"/>
+                    </padding>
+                    <children>
+                        <VBox spacing="4">
+                            <children>
+                                <Label text="Explorador de Personajes" styleClass="hero-title"/>
+                                <Label fx:id="lblSubtitulo"
+                                       text="Explora personajes por casa, estado y más"
+                                       styleClass="hero-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Pane HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnImportarAPI" text="Importar desde API" styleClass="primary-button"/>
+                    </children>
+                </HBox>
+
+                <!-- Filtros -->
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="filtros-bar">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <children>
+                        <Label text="Buscar:" styleClass="filtros-label"/>
+                        <TextField fx:id="txtBuscar"
+                                   promptText="Nombre, casa..."
+                                   HBox.hgrow="ALWAYS"/>
+
+                        <Label text="Casa:" styleClass="filtros-label"/>
+                        <ComboBox fx:id="comboCasa" prefWidth="160"/>
+
+                        <Label text="Estado:" styleClass="filtros-label"/>
+                        <ComboBox fx:id="comboEstado" prefWidth="130"/>
+
+                        <Button fx:id="btnLimpiar"
+                                text="Limpiar"
+                                styleClass="secondary-button"/>
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+    </top>
+
+    <!-- =============== CENTER (tabla) =============== -->
+    <center>
+        <VBox spacing="14">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <children>
+
+                <!-- Tarjetas de métricas -->
+                <HBox spacing="12">
+                    <children>
+                        <VBox styleClass="metric-card">
+                            <children>
+                                <Label text="Total" styleClass="metric-title"/>
+                                <Label fx:id="lblTotal" text="0" styleClass="metric-value"/>
+                            </children>
+                        </VBox>
+                        <VBox styleClass="metric-card">
+                            <children>
+                                <Label text="Vivos" styleClass="metric-title"/>
+                                <Label fx:id="lblVivos" text="0" styleClass="metric-value accent-green"/>
+                            </children>
+                        </VBox>
+                        <VBox styleClass="metric-card">
+                            <children>
+                                <Label text="Muertos" styleClass="metric-title"/>
+                                <Label fx:id="lblMuertos" text="0" styleClass="metric-value accent-red"/>
+                            </children>
+                        </VBox>
+                        <VBox styleClass="metric-card">
+                            <children>
+                                <Label text="Casas" styleClass="metric-title"/>
+                                <Label fx:id="lblCasas" text="0" styleClass="metric-value"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Tabla dentro de contenedor card -->
+                <VBox spacing="8" styleClass="table-card" VBox.vgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <children>
+                                <Label text="Listado de personajes" styleClass="titulo-seccion"/>
+                                <Label fx:id="lblInfoTabla"
+                                       text="0 resultados encontrados"
+                                       styleClass="subtitulo-seccion"/>
+                            </children>
+                        </HBox>
+
+                        <TableView fx:id="tablaPersonajes" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colImagen" text=" " prefWidth="80"/>
+                                <TableColumn fx:id="colNombre" text="Nombre" prefWidth="220"/>
+                                <TableColumn fx:id="colCasa" text="Casa" prefWidth="160"/>
+                                <TableColumn fx:id="colEstado" text="Estado" prefWidth="110"/>
+                                <TableColumn fx:id="colPatronus" text="Patronus" prefWidth="180"/>
+                            </columns>
+                        </TableView>
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="btnVerDetalles"
+                                        text="Ver detalles"
+                                        styleClass="primary-button"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
+    </center>
+
+</BorderPane>

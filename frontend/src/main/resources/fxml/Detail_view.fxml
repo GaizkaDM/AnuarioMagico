@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.GaizkaFrost.DetailController"
+            prefWidth="1100" prefHeight="700"
+            stylesheets="@../styles/estilos_slytherin.css">
+
+    <!-- ======= TOP ======= -->
+    <top>
+        <HBox spacing="10">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <children>
+                <Button fx:id="btnVolver" text="← Volver"/>
+                <Label text="Detalles del personaje"
+                       style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+            </children>
+        </HBox>
+    </top>
+
+    <!-- ======= CONTENIDO ======= -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <content>
+
+                <VBox spacing="20">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <children>
+
+                        <!-- TÍTULO -->
+                        <Label fx:id="lblNombre"
+                               style="-fx-font-size: 26; -fx-font-weight: bold;"/>
+
+                        <!-- Imagen grande -->
+                        <HBox alignment="CENTER">
+                            <children>
+                                <ImageView fx:id="imgGrande"
+                                           fitHeight="300"
+                                           preserveRatio="true"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Datos básicos -->
+                        <TitledPane text="Datos básicos" expanded="true">
+                            <content>
+                                <GridPane hgap="10" vgap="10">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10"/>
+                                    </padding>
+
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="30"/>
+                                        <ColumnConstraints percentWidth="70"/>
+                                    </columnConstraints>
+
+                                    <children>
+
+                                        <Label text="Nacimiento:" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblBorn" GridPane.columnIndex="1"/>
+
+                                        <Label text="Muerte:" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblDied" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                        <Label text="Género:" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblGender" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                        <Label text="Especie:" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblSpecies" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                        <Label text="Animagus:" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                        <Label text="Estatus de sangre:" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                    </children>
+                                </GridPane>
+                            </content>
+                        </TitledPane>
+
+                        <!-- Alias y títulos -->
+                        <TitledPane text="Alias y títulos" expanded="false">
+                            <content>
+                                <VBox spacing="10">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="Alias:" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblAlias" wrapText="true"/>
+
+                                        <Label text="Rol:" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblTitles" wrapText="true"/>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </TitledPane>
+
+                        <!-- Varita -->
+                        <TitledPane text="Varita" expanded="false">
+                            <content>
+                                <VBox spacing="10">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="Descripción de la varita:" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblWand" wrapText="true"/>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </TitledPane>
+                    </children>
+                </VBox>
+
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

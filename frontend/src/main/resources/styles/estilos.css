@@ -1,0 +1,215 @@
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
+    -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4a8);
+}
+
+/* Hero */
+.hero-bar {
+    -fx-background-color: transparent;
+}
+
+.hero-title {
+    -fx-text-fill: #8B2500;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.hero-subtitle {
+    -fx-text-fill: #5a3825;
+    -fx-font-size: 12px;
+}
+
+/* Filtros */
+.filtros-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(139, 37, 0, 0.3);
+    -fx-border-width: 2;
+}
+
+.filtros-label {
+    -fx-text-fill: #8B2500;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Métricas */
+.metric-card {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-padding: 12 16 12 16;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(139, 37, 0, 0.4);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.3), 18, 0.3, 0, 4);
+}
+
+.metric-title {
+    -fx-text-fill: #5a3825;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.metric-value {
+    -fx-text-fill: #8B2500;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.accent-green {
+    -fx-text-fill: #2d7a2d;
+}
+
+.accent-red {
+    -fx-text-fill: #c41e3a;
+}
+
+/* Tarjeta tabla */
+.table-card {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 16;
+    -fx-padding: 12 14 14 14;
+    -fx-border-color: rgba(139, 37, 0, 0.4);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.3), 22, 0.3, 0, 6);
+}
+
+/* Títulos de sección */
+.titulo-seccion {
+    -fx-text-fill: #8B2500;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.subtitulo-seccion {
+    -fx-text-fill: #5a3825;
+    -fx-font-size: 12px;
+}
+
+/* Botones */
+.primary-button {
+    -fx-background-color: linear-gradient(to right, #8B2500, #A52A2A);
+    -fx-text-fill: white;
+    -fx-padding: 8 18 8 18;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+}
+
+.primary-button:hover {
+    -fx-background-color: linear-gradient(to right, #A52A2A, #c41e3a);
+    -fx-cursor: hand;
+}
+
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8B2500;
+    -fx-border-color: #8B2500;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-padding: 6 14 6 14;
+}
+
+.secondary-button:hover {
+    -fx-background-color: rgba(139, 37, 0, 0.15);
+    -fx-cursor: hand;
+}
+
+/* Tabla más limpia */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-table-cell-border-color: rgba(139, 37, 0, 0.2);
+    -fx-padding: 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: rgba(139, 37, 0, 0.15);
+    -fx-text-fill: #8B2500;
+    -fx-font-weight: bold;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(139, 37, 0, 0.1);
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #2a1810;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(139, 37, 0, 0.05);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: rgba(139, 37, 0, 0.3);
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #ffffff;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgba(139, 37, 0, 0.15);
+}
+
+/* ComboBox y TextField */
+.combo-box {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-border-color: rgba(139, 37, 0, 0.4);
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #2a1810;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: rgba(139, 37, 0, 0.2);
+}
+
+.text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-text-fill: #2a1810;
+    -fx-border-color: rgba(139, 37, 0, 0.4);
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-prompt-text-fill: #8B2500;
+}
+
+.text-field:focused {
+    -fx-border-color: #8B2500;
+    -fx-border-width: 2;
+}
+
+/* MenuBar */
+.menu-bar {
+    -fx-background-color: rgba(139, 37, 0, 0.2);
+}
+
+.menu-bar .label {
+    -fx-text-fill: #8B2500;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-background-color: rgba(245, 230, 211, 0.98);
+}
+
+.menu-item .label {
+    -fx-text-fill: #2a1810;
+}
+
+.menu-item:focused {
+    -fx-background-color: rgba(139, 37, 0, 0.3);
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: #ffffff;
+}
