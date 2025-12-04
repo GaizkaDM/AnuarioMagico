@@ -8,32 +8,25 @@ import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 
+/**
+ * Controller for the character detail view.
+ */
 public class DetailController {
 
-    @FXML
-    private Button btnVolver;
-    @FXML
-    private Label lblNombre;
-    @FXML
-    private ImageView imgGrande;
-    @FXML
-    private Label lblBorn;
-    @FXML
-    private Label lblDied;
-    @FXML
-    private Label lblGender;
-    @FXML
-    private Label lblSpecies;
-    @FXML
-    private Label lblAnimagus;
-    @FXML
-    private Label lblNationality;
-    @FXML
-    private Label lblAlias;
-    @FXML
-    private Label lblTitles;
-    @FXML
-    private Label lblWand;
+    @FXML private Button btnVolver;
+    @FXML private Label lblNombre;
+    @FXML private ImageView imgGrande;
+
+    @FXML private Label lblBorn;
+    @FXML private Label lblDied;
+    @FXML private Label lblGender;
+    @FXML private Label lblSpecies;
+    @FXML private Label lblAnimagus;
+    @FXML private Label lblNationality;
+
+    @FXML private Label lblAlias;
+    @FXML private Label lblTitles;
+    @FXML private Label lblWand;
 
     @FXML
     public void initialize() {
@@ -46,24 +39,34 @@ public class DetailController {
         });
     }
 
+    /**
+     * Receives a character and fills the detail screen.
+     *
+     * @param p character to display
+     */
     public void setPersonaje(Personaje p) {
+
         lblNombre.setText(p.getNombre());
+
         if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
             try {
-                imgGrande.setImage(new Image(p.getImagenUrl()));
-            } catch (Exception e) {
-                // Ignore image load error
-            }
+                imgGrande.setImage(new Image(p.getImagenUrl(), true));
+            } catch (Exception ignored) {}
         }
 
-        lblBorn.setText(p.getBorn());
-        lblDied.setText(p.getDied());
-        lblGender.setText(p.getGender());
-        lblSpecies.setText(p.getSpecies());
-        lblAnimagus.setText(""); // Field not available
-        lblNationality.setText(p.getBloodStatus()); // Showing Blood Status in Nationality label for now
-        lblAlias.setText(""); // Field not available
-        lblTitles.setText(p.getRole());
-        lblWand.setText(""); // Field not available
+        lblBorn.setText(nullToDash(p.getBorn()));
+        lblDied.setText(nullToDash(p.getDied()));
+        lblGender.setText(nullToDash(p.getGender()));
+        lblSpecies.setText(nullToDash(p.getSpecies()));
+        lblAnimagus.setText(nullToDash(p.getAnimagus()));
+        lblNationality.setText(nullToDash(p.getNationality()));
+
+        lblAlias.setText(nullToDash(p.getAlias()));
+        lblTitles.setText(nullToDash(p.getTitles()));
+        lblWand.setText(nullToDash(p.getWand()));
+    }
+
+    private String nullToDash(String s) {
+        return (s == null || s.isEmpty()) ? "-" : s;
     }
 }

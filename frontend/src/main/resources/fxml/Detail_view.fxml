@@ -8,8 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/24.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.GaizkaFrost.DetailController"
-            prefWidth="1100" prefHeight="700"
-            stylesheets="@../styles/estilos_slytherin.css">
+            prefWidth="900" prefHeight="650">
 
     <!-- ======= TOP ======= -->
     <top>
@@ -36,7 +35,7 @@
                     </padding>
                     <children>
 
-                        <!-- TÍTULO -->
+                        <!-- Nombre -->
                         <Label fx:id="lblNombre"
                                style="-fx-font-size: 26; -fx-font-weight: bold;"/>
 
@@ -44,7 +43,7 @@
                         <HBox alignment="CENTER">
                             <children>
                                 <ImageView fx:id="imgGrande"
-                                           fitHeight="300"
+                                           fitHeight="260"
                                            preserveRatio="true"/>
                             </children>
                         </HBox>
@@ -56,14 +55,12 @@
                                     <padding>
                                         <Insets top="10" right="10" bottom="10" left="10"/>
                                     </padding>
-
                                     <columnConstraints>
                                         <ColumnConstraints percentWidth="30"/>
                                         <ColumnConstraints percentWidth="70"/>
                                     </columnConstraints>
 
                                     <children>
-
                                         <Label text="Nacimiento:" style="-fx-font-weight: bold;"/>
                                         <Label fx:id="lblBorn" GridPane.columnIndex="1"/>
 
@@ -79,9 +76,8 @@
                                         <Label text="Animagus:" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
                                         <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                                        <Label text="Estatus de sangre:" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
+                                        <Label text="Nacionalidad:" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
                                         <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-
                                     </children>
                                 </GridPane>
                             </content>
@@ -98,7 +94,7 @@
                                         <Label text="Alias:" style="-fx-font-weight: bold;"/>
                                         <Label fx:id="lblAlias" wrapText="true"/>
 
-                                        <Label text="Rol:" style="-fx-font-weight: bold;"/>
+                                        <Label text="Títulos:" style="-fx-font-weight: bold;"/>
                                         <Label fx:id="lblTitles" wrapText="true"/>
                                     </children>
                                 </VBox>
@@ -119,10 +115,12 @@
                                 </VBox>
                             </content>
                         </TitledPane>
+
                     </children>
                 </VBox>
 
             </content>
         </ScrollPane>
     </center>
+
 </BorderPane>

@@ -1,236 +1,280 @@
 package org.GaizkaFrost;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class Controlador implements javafx.fxml.Initializable {
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
 
-    @FXML
-    private Button btnLimpiar;
-    @FXML
-    private Button btnVerDetalles;
-    @FXML
-    private TableColumn<Personaje, String> colCasa;
-    @FXML
-    private TableColumn<Personaje, String> colEstado;
-    @FXML
-    private TableColumn<Personaje, String> colImagen; // We might want to show an image view here, but for now string
-                                                      // url or simple cell factory
-    @FXML
-    private TableColumn<Personaje, String> colNombre;
-    @FXML
-    private TableColumn<Personaje, String> colPatronus;
-    @FXML
-    private ComboBox<String> comboCasa;
-    @FXML
-    private ComboBox<String> comboEstado;
-    @FXML
-    private Label lblTotal;
-    @FXML
-    private Label lblVivos;
-    @FXML
-    private Label lblMuertos;
-    @FXML
-    private Label lblCasas;
-    @FXML
-    private Label lblInfoTabla;
-    @FXML
-    private Label lblSubtitulo;
-    @FXML
-    private Button btnImportarAPI;
-    @FXML
-    private TableView<Personaje> tablaPersonajes;
-    @FXML
-    private TextField txtBuscar;
+/**
+ * Main controller: shows characters as cards with pagination.
+ */
+public class Controlador implements Initializable {
 
-    private javafx.collections.ObservableList<Personaje> masterData = javafx.collections.FXCollections
-            .observableArrayList();
+    @FXML private TextField txtBuscar;
+    @FXML private ComboBox<String> comboCasa;
+    @FXML private ComboBox<String> comboEstado;
+    @FXML private Button btnLimpiar;
+    @FXML private Button btnImportarAPI;
+
+    @FXML private FlowPane contenedorTarjetas;
+
+    @FXML private Button btnPaginaAnterior;
+    @FXML private Button btnPaginaSiguiente;
+    @FXML private Label lblPagina;
+    @FXML private Label statusBar;
+
+    private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
+    private List<Personaje> listaFiltrada = new ArrayList<>();
+
+    private int paginaActual = 0;
+    private static final int PERSONAJES_POR_PAGINA = 20;
 
     @Override
-    public void initialize(java.net.URL location, java.util.ResourceBundle resources) {
-        // Setup columns
-        colNombre.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nombre"));
-        colCasa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("casa"));
-        colEstado.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("estado"));
-        colPatronus.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("patronus"));
-        // colImagen could be a custom cell factory to show image, but let's stick to
-        // simple property for now or skip
-        colImagen.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("imagenUrl"));
+    public void initialize(URL location, ResourceBundle resources) {
 
-        tablaPersonajes.setItems(masterData);
-        updateCount();
-
-        // Filters
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
-        comboEstado.getItems().addAll("Vivo", "Fallecido");
+        comboEstado.getItems().addAll("Vivo", "Muerto", "Fallecido");
 
-        // Listeners
-        txtBuscar.textProperty().addListener((obs, oldVal, newVal) -> filter());
-        comboCasa.valueProperty().addListener((obs, oldVal, newVal) -> filter());
-        comboEstado.valueProperty().addListener((obs, oldVal, newVal) -> filter());
+        // Datos de prueba iniciales (puedes quitarlo si solo quieres API/BD)
+        initMockData();
+
+        listaFiltrada = new ArrayList<>(masterData);
+        actualizarPagina();
+
+        // Filtros
+        txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
+        comboCasa.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
+        comboEstado.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
 
         btnLimpiar.setOnAction(e -> {
             txtBuscar.clear();
-            comboCasa.setValue(null);
-            comboEstado.setValue(null);
+            comboCasa.getSelectionModel().clearSelection();
+            comboEstado.getSelectionModel().clearSelection();
+            aplicarFiltros();
         });
 
-        btnVerDetalles.setOnAction(e -> {
-            Personaje selected = tablaPersonajes.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                try {
-                    showDetails(selected);
-                } catch (java.io.IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
+        // Paginación
+        btnPaginaAnterior.setOnAction(e -> {
+            paginaActual--;
+            actualizarPagina();
         });
 
-        btnImportarAPI.setOnAction(e -> loadData());
+        btnPaginaSiguiente.setOnAction(e -> {
+            paginaActual++;
+            actualizarPagina();
+        });
 
-        // Auto-load data on startup (since we have local persistence now)
-        loadData();
+        // Importar desde API (si falla la conexión, simplemente no remplaza los datos)
+        btnImportarAPI.setOnAction(e -> importarDesdeAPI());
     }
 
-    private void loadData() {
-        btnImportarAPI.setDisable(true);
-        btnImportarAPI.setText("Cargando...");
+    /**
+     * Applies search, house and status filters to the full list.
+     */
+    private void aplicarFiltros() {
+        String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
+        String casa = comboCasa.getValue();
+        String estado = comboEstado.getValue();
 
-        // Ejecutar en un hilo separado para no bloquear la UI
+        List<Personaje> filtrados = new ArrayList<>();
+
+        for (Personaje p : masterData) {
+            boolean coincideTexto =
+                    texto.isEmpty()
+                            || p.getNombre().toLowerCase().contains(texto)
+                            || (p.getCasa() != null && p.getCasa().toLowerCase().contains(texto))
+                            || (p.getPatronus() != null && p.getPatronus().toLowerCase().contains(texto));
+
+            boolean coincideCasa =
+                    casa == null || casa.isEmpty()
+                            || (p.getCasa() != null && p.getCasa().equalsIgnoreCase(casa));
+
+            boolean coincideEstado =
+                    estado == null || estado.isEmpty()
+                            || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estado));
+
+            if (coincideTexto && coincideCasa && coincideEstado) {
+                filtrados.add(p);
+            }
+        }
+
+        listaFiltrada = filtrados;
+        paginaActual = 0;
+        actualizarPagina();
+    }
+
+    /**
+     * Updates the card view for the current page.
+     */
+    private void actualizarPagina() {
+        contenedorTarjetas.getChildren().clear();
+
+        int total = listaFiltrada.size();
+        if (total == 0) {
+            lblPagina.setText("Página 0 de 0");
+            btnPaginaAnterior.setDisable(true);
+            btnPaginaSiguiente.setDisable(true);
+            statusBar.setText("No se han encontrado personajes.");
+            return;
+        }
+
+        int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
+
+        if (paginaActual < 0) paginaActual = 0;
+        if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
+
+        int inicio = paginaActual * PERSONAJES_POR_PAGINA;
+        int fin = Math.min(inicio + PERSONAJES_POR_PAGINA, total);
+
+        List<Personaje> pagina = listaFiltrada.subList(inicio, fin);
+
+        for (Personaje p : pagina) {
+            contenedorTarjetas.getChildren().add(crearTarjeta(p));
+        }
+
+        lblPagina.setText("Página " + (paginaActual + 1) + " de " + totalPaginas);
+        btnPaginaAnterior.setDisable(paginaActual == 0);
+        btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas - 1);
+
+        statusBar.setText("Mostrando " + pagina.size() + " de " + total + " personajes filtrados.");
+    }
+
+    /**
+     * Creates a visual card for a character.
+     *
+     * @param p character to display
+     * @return VBox node representing the card
+     */
+    private VBox crearTarjeta(Personaje p) {
+        VBox tarjeta = new VBox();
+        tarjeta.setSpacing(6);
+        tarjeta.setPrefWidth(200);
+        tarjeta.setStyle(
+                "-fx-padding: 10;" +
+                "-fx-background-color: rgba(255,255,255,0.9);" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-radius: 10;" +
+                "-fx-border-color: #cccccc;" +
+                "-fx-border-width: 1;"
+        );
+
+        ImageView img = new ImageView();
+        img.setFitWidth(160);
+        img.setPreserveRatio(true);
+
+        try {
+            if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
+                img.setImage(new Image(p.getImagenUrl(), true));
+            }
+        } catch (Exception ignored) {}
+
+        Label lblNombre = new Label(p.getNombre());
+        lblNombre.setStyle("-fx-font-weight: bold;");
+
+        Label lblCasa = new Label("Casa: " + (p.getCasa() == null ? "-" : p.getCasa()));
+        Label lblEstado = new Label("Estado: " + (p.getEstado() == null ? "-" : p.getEstado()));
+        Label lblPatronus = new Label("Patronus: " + (p.getPatronus() == null ? "-" : p.getPatronus()));
+
+        Button btnDetalles = new Button("Ver detalles");
+        btnDetalles.setOnAction(e -> abrirDetalles(p));
+
+        tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, btnDetalles);
+
+        return tarjeta;
+    }
+
+    /**
+     * Opens the detail view for the given character.
+     *
+     * @param p character to show
+     */
+    private void abrirDetalles(Personaje p) {
+        try {
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/Detail_view.fxml"));
+            Parent root = loader.load();
+
+            DetailController controller = loader.getController();
+            controller.setPersonaje(p);
+
+            Stage stage = (Stage) contenedorTarjetas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle(p.getNombre());
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Imports characters from the Harry Potter API in a background thread.
+     */
+    private void importarDesdeAPI() {
+        btnImportarAPI.setDisable(true);
+        statusBar.setText("Importando personajes desde la API...");
+
         new Thread(() -> {
             try {
-                java.util.List<Personaje> personajes = HarryPotterAPI.fetchCharacters();
+                List<Personaje> personajesAPI = HarryPotterAPI.fetchCharacters();
 
-                // Actualizar la UI en el hilo de JavaFX
-                javafx.application.Platform.runLater(() -> {
-                    masterData.clear();
-                    masterData.addAll(personajes);
-                    tablaPersonajes.setItems(masterData);
-                    updateCount();
-                    btnImportarAPI.setText("Cargar Personajes");
+                Platform.runLater(() -> {
+                    masterData.setAll(personajesAPI);
+                    listaFiltrada = new ArrayList<>(masterData);
+                    paginaActual = 0;
+                    actualizarPagina();
+                    statusBar.setText("Personajes importados desde la API.");
                     btnImportarAPI.setDisable(false);
-                    lblSubtitulo.setText("Cargados " + personajes.size() + " personajes");
                 });
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                javafx.application.Platform.runLater(() -> {
-                    btnImportarAPI.setText("Error - Reintentar");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    statusBar.setText("Error al importar datos desde la API.");
                     btnImportarAPI.setDisable(false);
-                    lblSubtitulo.setText("Error al cargar: " + ex.getMessage());
                 });
             }
         }).start();
     }
 
     /**
-     * Helper method to toggle favorite status for a character via the API
+     * Sample data for testing before using the real API or DB.
      */
-    public void toggleFavorite(Personaje personaje) {
-        if (personaje == null || personaje.getId() == null) {
-            return;
-        }
+    private void initMockData() {
+        Personaje p1 = new Personaje();
+        p1.setNombre("Harry Potter");
+        p1.setCasa("Gryffindor");
+        p1.setEstado("Vivo");
+        p1.setPatronus("Ciervo");
+        p1.setImagenUrl("https://ik.imagekit.io/hpapi/harry.jpg");
 
-        new Thread(() -> {
-            try {
-                // Toggle the state (we'll send the new state to backend)
-                boolean newFavoriteState = !personaje.isFavorite();
+        Personaje p2 = new Personaje();
+        p2.setNombre("Hermione Granger");
+        p2.setCasa("Gryffindor");
+        p2.setEstado("Vivo");
+        p2.setPatronus("Nutria");
+        p2.setImagenUrl("https://ik.imagekit.io/hpapi/hermione.jpg");
 
-                java.net.URL url = new java.net.URL(
-                        "http://localhost:8000/characters/" + personaje.getId() + "/favorite");
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
-                conn.setConnectTimeout(5000);
-                conn.setReadTimeout(5000);
+        Personaje p3 = new Personaje();
+        p3.setNombre("Draco Malfoy");
+        p3.setCasa("Slytherin");
+        p3.setEstado("Vivo");
+        p3.setPatronus("");
+        p3.setImagenUrl("https://ik.imagekit.io/hpapi/draco.jpg");
 
-                // Send JSON body
-                String jsonBody = "{\"is_favorite\": " + newFavoriteState + "}";
-                try (java.io.OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonBody.getBytes("utf-8");
-                    os.write(input, 0, input.length);
-                }
-
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 200) {
-                    // Update the local state
-                    javafx.application.Platform.runLater(() -> {
-                        personaje.setFavorite(newFavoriteState);
-                        tablaPersonajes.refresh(); // Refresh table to show updated data
-                    });
-                }
-                conn.disconnect();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }).start();
+        masterData.addAll(p1, p2, p3);
     }
-
-    private void filter() {
-        javafx.collections.transformation.FilteredList<Personaje> filtered = new javafx.collections.transformation.FilteredList<>(
-                masterData, p -> true);
-
-        filtered.setPredicate(personaje -> {
-            String search = txtBuscar.getText().toLowerCase();
-            String casa = comboCasa.getValue();
-            String estado = comboEstado.getValue();
-
-            boolean matchSearch = search.isEmpty() ||
-                    personaje.getNombre().toLowerCase().contains(search) ||
-                    personaje.getCasa().toLowerCase().contains(search);
-            boolean matchCasa = casa == null || personaje.getCasa().equalsIgnoreCase(casa);
-            boolean matchEstado = estado == null ||
-                    (estado.equals("Vivo") && "Vivo".equalsIgnoreCase(personaje.getEstado())) ||
-                    (estado.equals("Fallecido") && !"Vivo".equalsIgnoreCase(personaje.getEstado()));
-
-            return matchSearch && matchCasa && matchEstado;
-        });
-
-        tablaPersonajes.setItems(filtered);
-        updateCount();
-    }
-
-    private void updateCount() {
-        int total = tablaPersonajes.getItems().size();
-        long vivos = tablaPersonajes.getItems().stream()
-                .filter(p -> "Vivo".equalsIgnoreCase(p.getEstado()))
-                .count();
-        long muertos = total - vivos;
-        long casas = tablaPersonajes.getItems().stream()
-                .map(Personaje::getCasa)
-                .filter(c -> c != null && !c.isEmpty())
-                .distinct()
-                .count();
-
-        lblTotal.setText(String.valueOf(total));
-        lblVivos.setText(String.valueOf(vivos));
-        lblMuertos.setText(String.valueOf(muertos));
-        lblCasas.setText(String.valueOf(casas));
-        lblInfoTabla.setText(total + " resultados encontrados");
-    }
-
-    private void showDetails(Personaje p) throws java.io.IOException {
-        // We need to load the detail view and pass the character
-        // Since App.setRoot just replaces the scene, we need a way to get the
-        // controller of the new view
-        // We will modify App to help us or do it manually here.
-        // Let's do it manually here for simplicity of not changing App too much yet,
-        // OR we can use a static holder in App or here.
-        // Actually, let's use the FXMLLoader manually here to get the controller.
-
-        javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(App.class.getResource("/fxml/Detail_view.fxml"));
-        javafx.scene.Parent root = loader.load();
-        DetailController controller = loader.getController();
-        controller.setPersonaje(p);
-
-        // Get current stage from a node
-        javafx.stage.Stage stage = (javafx.stage.Stage) btnVerDetalles.getScene().getWindow();
-        stage.getScene().setRoot(root);
-    }
-
 }
