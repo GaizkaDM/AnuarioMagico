@@ -24,18 +24,28 @@ import java.util.*;
  */
 public class Controlador implements Initializable {
 
-    @FXML private TextField txtBuscar;
-    @FXML private ComboBox<String> comboCasa;
-    @FXML private ComboBox<String> comboEstado;
-    @FXML private Button btnLimpiar;
-    @FXML private Button btnImportarAPI;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private ComboBox<String> comboCasa;
+    @FXML
+    private ComboBox<String> comboEstado;
+    @FXML
+    private Button btnLimpiar;
+    @FXML
+    private Button btnImportarAPI;
 
-    @FXML private FlowPane contenedorTarjetas;
+    @FXML
+    private FlowPane contenedorTarjetas;
 
-    @FXML private Button btnPaginaAnterior;
-    @FXML private Button btnPaginaSiguiente;
-    @FXML private Label lblPagina;
-    @FXML private Label statusBar;
+    @FXML
+    private Button btnPaginaAnterior;
+    @FXML
+    private Button btnPaginaSiguiente;
+    @FXML
+    private Label lblPagina;
+    @FXML
+    private Label statusBar;
 
     private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
     private List<Personaje> listaFiltrada = new ArrayList<>();
@@ -49,11 +59,8 @@ public class Controlador implements Initializable {
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
         comboEstado.getItems().addAll("Vivo", "Muerto", "Fallecido");
 
-        // Datos de prueba iniciales (puedes quitarlo si solo quieres API/BD)
-        initMockData();
-
-        listaFiltrada = new ArrayList<>(masterData);
-        actualizarPagina();
+        // Cargar datos automáticamente desde la API al inicio
+        importarDesdeAPI();
 
         // Filtros
         txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
@@ -78,7 +85,7 @@ public class Controlador implements Initializable {
             actualizarPagina();
         });
 
-        // Importar desde API (si falla la conexión, simplemente no remplaza los datos)
+        // Importar desde API (botón manual por si acaso)
         btnImportarAPI.setOnAction(e -> importarDesdeAPI());
     }
 
@@ -93,19 +100,16 @@ public class Controlador implements Initializable {
         List<Personaje> filtrados = new ArrayList<>();
 
         for (Personaje p : masterData) {
-            boolean coincideTexto =
-                    texto.isEmpty()
-                            || p.getNombre().toLowerCase().contains(texto)
-                            || (p.getCasa() != null && p.getCasa().toLowerCase().contains(texto))
-                            || (p.getPatronus() != null && p.getPatronus().toLowerCase().contains(texto));
+            boolean coincideTexto = texto.isEmpty()
+                    || p.getNombre().toLowerCase().contains(texto)
+                    || (p.getCasa() != null && p.getCasa().toLowerCase().contains(texto))
+                    || (p.getPatronus() != null && p.getPatronus().toLowerCase().contains(texto));
 
-            boolean coincideCasa =
-                    casa == null || casa.isEmpty()
-                            || (p.getCasa() != null && p.getCasa().equalsIgnoreCase(casa));
+            boolean coincideCasa = casa == null || casa.isEmpty()
+                    || (p.getCasa() != null && p.getCasa().equalsIgnoreCase(casa));
 
-            boolean coincideEstado =
-                    estado == null || estado.isEmpty()
-                            || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estado));
+            boolean coincideEstado = estado == null || estado.isEmpty()
+                    || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estado));
 
             if (coincideTexto && coincideCasa && coincideEstado) {
                 filtrados.add(p);
@@ -128,14 +132,19 @@ public class Controlador implements Initializable {
             lblPagina.setText("Página 0 de 0");
             btnPaginaAnterior.setDisable(true);
             btnPaginaSiguiente.setDisable(true);
-            statusBar.setText("No se han encontrado personajes.");
+            // Solo mostrar mensaje si no se está cargando
+            if (!btnImportarAPI.isDisabled()) {
+                statusBar.setText("No se han encontrado personajes.");
+            }
             return;
         }
 
         int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
 
-        if (paginaActual < 0) paginaActual = 0;
-        if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
+        if (paginaActual < 0)
+            paginaActual = 0;
+        if (paginaActual >= totalPaginas)
+            paginaActual = totalPaginas - 1;
 
         int inicio = paginaActual * PERSONAJES_POR_PAGINA;
         int fin = Math.min(inicio + PERSONAJES_POR_PAGINA, total);
@@ -165,12 +174,11 @@ public class Controlador implements Initializable {
         tarjeta.setPrefWidth(200);
         tarjeta.setStyle(
                 "-fx-padding: 10;" +
-                "-fx-background-color: rgba(255,255,255,0.9);" +
-                "-fx-background-radius: 10;" +
-                "-fx-border-radius: 10;" +
-                "-fx-border-color: #cccccc;" +
-                "-fx-border-width: 1;"
-        );
+                        "-fx-background-color: rgba(255,255,255,0.9);" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-border-radius: 10;" +
+                        "-fx-border-color: #cccccc;" +
+                        "-fx-border-width: 1;");
 
         ImageView img = new ImageView();
         img.setFitWidth(160);
@@ -178,9 +186,22 @@ public class Controlador implements Initializable {
 
         try {
             if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
-                img.setImage(new Image(p.getImagenUrl(), true));
+                System.out.println("DEBUG: Cargando imagen para " + p.getNombre() + ": " + p.getImagenUrl());
+                Image image = new Image(p.getImagenUrl(), true);
+                image.errorProperty().addListener((obs, err, hasErr) -> {
+                    if (hasErr) {
+                        System.err.println(
+                                "DEBUG: Error cargando imagen para " + p.getNombre() + ": " + image.getException());
+                    }
+                });
+                img.setImage(image);
+            } else {
+                System.out.println("DEBUG: URL nula para " + p.getNombre());
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            System.err.println("DEBUG: Excepción cargando imagen: " + e.getMessage());
+            e.printStackTrace();
+        }
 
         Label lblNombre = new Label(p.getNombre());
         lblNombre.setStyle("-fx-font-weight: bold;");
@@ -225,7 +246,7 @@ public class Controlador implements Initializable {
      */
     private void importarDesdeAPI() {
         btnImportarAPI.setDisable(true);
-        statusBar.setText("Importando personajes desde la API...");
+        statusBar.setText("Cargando personajes...");
 
         new Thread(() -> {
             try {
@@ -236,45 +257,17 @@ public class Controlador implements Initializable {
                     listaFiltrada = new ArrayList<>(masterData);
                     paginaActual = 0;
                     actualizarPagina();
-                    statusBar.setText("Personajes importados desde la API.");
+                    statusBar.setText("Personajes cargados.");
                     btnImportarAPI.setDisable(false);
                 });
 
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
-                    statusBar.setText("Error al importar datos desde la API.");
+                    statusBar.setText("Error al cargar datos.");
                     btnImportarAPI.setDisable(false);
                 });
             }
         }).start();
-    }
-
-    /**
-     * Sample data for testing before using the real API or DB.
-     */
-    private void initMockData() {
-        Personaje p1 = new Personaje();
-        p1.setNombre("Harry Potter");
-        p1.setCasa("Gryffindor");
-        p1.setEstado("Vivo");
-        p1.setPatronus("Ciervo");
-        p1.setImagenUrl("https://ik.imagekit.io/hpapi/harry.jpg");
-
-        Personaje p2 = new Personaje();
-        p2.setNombre("Hermione Granger");
-        p2.setCasa("Gryffindor");
-        p2.setEstado("Vivo");
-        p2.setPatronus("Nutria");
-        p2.setImagenUrl("https://ik.imagekit.io/hpapi/hermione.jpg");
-
-        Personaje p3 = new Personaje();
-        p3.setNombre("Draco Malfoy");
-        p3.setCasa("Slytherin");
-        p3.setEstado("Vivo");
-        p3.setPatronus("");
-        p3.setImagenUrl("https://ik.imagekit.io/hpapi/draco.jpg");
-
-        masterData.addAll(p1, p2, p3);
     }
 }

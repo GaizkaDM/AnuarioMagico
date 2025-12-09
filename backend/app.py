@@ -1,9 +1,12 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 import requests
 import sqlite3
 import hashlib
 from datetime import datetime, timedelta
+import io
+import threading
+from PIL import Image
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for JavaFX client
@@ -46,6 +49,13 @@ def init_db():
         )
     ''')
     
+    # Migration: check if image_blob exists
+    try:
+        cursor.execute("SELECT image_blob FROM characters LIMIT 1")
+    except sqlite3.OperationalError:
+        print("⚠ Migrating database: Adding image_blob column...")
+        cursor.execute("ALTER TABLE characters ADD COLUMN image_blob BLOB")
+    
     conn.commit()
     conn.close()
 
@@ -78,16 +88,30 @@ def save_characters_to_db(characters):
     cursor = conn.cursor()
     
     for char in characters:
+        # Check if we already have the blob, don't overwrite it with NULL if we do
+        cursor.execute('SELECT image_blob FROM characters WHERE id = ?', (char['id'],))
+        existing_blob = cursor.fetchone()
+        
+        # We only update non-blob fields, or insert if new. 
+        # But for simplicity, we can use the ON CONFLICT clause or a check.
+        # Here we just re-insert. Ideally we should merge.
+        # A simpler way without losing blob:
+        
+        image_blob = None
+        if existing_blob and existing_blob[0]:
+            image_blob = existing_blob[0]
+
         cursor.execute('''
             INSERT OR REPLACE INTO characters (
                 id, name, house, image, died, born, patronus, 
-                gender, species, blood_status, role, wiki, slug
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                gender, species, blood_status, role, wiki, slug, image_blob
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             char['id'], char['name'], char['house'], char['image'], 
             char['died'], char['born'], char['patronus'],
             char['gender'], char['species'], char['blood_status'], 
-            char['role'], char['wiki'], char.get('slug', '')
+            char['role'], char['wiki'], char.get('slug', ''),
+            image_blob
         ))
         
     conn.commit()
@@ -106,6 +130,13 @@ def load_characters_from_db():
     characters = []
     for row in rows:
         char_dict = dict(row)
+        # Quitar el blob del listado general para no saturar la respuesta JSON
+        if 'image_blob' in char_dict:
+            del char_dict['image_blob']
+            
+        # Modificar URL de imagen para apuntar a local
+        char_dict['image'] = f"http://localhost:8000/characters/{char_dict['id']}/image"
+            
         # Añadir estado de favorito
         char_dict['is_favorite'] = get_favorite_status(char_dict['id'])
         characters.append(char_dict)
@@ -173,7 +204,7 @@ def get_characters():
         
         # Filter and transform data
         filtered_characters = []
-        exclude_keywords = ['Unidentified', 'Unknown', 'Student']
+        exclude_keywords = ['Unidentified', 'Unknown', 'Student','Boy','Girl','Headed','House',]
         
         for character in all_characters:
             attributes = character.get('attributes', {})
@@ -214,25 +245,84 @@ def get_characters():
         save_characters_to_db(filtered_characters)
         print(f"✓ Saved {len(filtered_characters)} characters to SQLite DB")
         
-        # 4. Añadir estado de favoritos para la respuesta
-        final_characters = []
-        filter_favorites = request.args.get('filter') == 'favorites'
-        
-        for char in filtered_characters:
-            is_fav = get_favorite_status(char['id'])
-            char['is_favorite'] = is_fav
-            
-            if filter_favorites:
-                if is_fav:
-                    final_characters.append(char)
-            else:
-                final_characters.append(char)
-            
-        return jsonify(final_characters)
+        # 4. Recargar desde DB para tener las URLs locales correctas
+        return get_characters()
     
     except Exception as e:
         print(f"✗ Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/characters/<character_id>/image', methods=['GET'])
+def get_character_image(character_id):
+    """
+    Get character image. 
+    Serve from BLOB if exists, otherwise download, cache and serve.
+    """
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Buscar blob y url original
+        cursor.execute('SELECT image_blob, image FROM characters WHERE id = ?', (character_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            return jsonify({'error': 'Character not found'}), 404
+            
+        blob_data, original_url = row
+        
+        # Si tenemos blob, servirlo
+        if blob_data:
+            conn.close()
+            return Response(blob_data, mimetype='image/jpeg')
+            
+        # Si no hay blob, descargar
+        if not original_url:
+            conn.close()
+            return jsonify({'error': 'No image URL for this character'}), 404
+            
+        print(f"⬇ Downloading image for {character_id}...")
+        image_response = requests.get(original_url)
+        
+        if image_response.status_code == 200:
+            image_raw_data = image_response.content
+            
+            # Convert to JPEG using Pillow
+            try:
+                img = Image.open(io.BytesIO(image_raw_data))
+                
+                # Convert RGBA to RGB if necessary (e.g. for PNG/WebP with transparency)
+                if img.mode in ('RGBA', 'LA'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    background.paste(img, mask=img.split()[-1])
+                    img = background
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                
+                output_buffer = io.BytesIO()
+                img.save(output_buffer, format='JPEG', quality=90)
+                final_image_data = output_buffer.getvalue()
+                
+                print(f"✓ Converted image to JPEG for {character_id}")
+            except Exception as e:
+                print(f"⚠ Failed to convert image: {e}. Saving raw data which might fail in JavaFX 11.")
+                final_image_data = image_raw_data
+
+            # Guardar en blob
+            cursor.execute('UPDATE characters SET image_blob = ? WHERE id = ?', (final_image_data, character_id))
+            conn.commit()
+            print(f"✓ Image cached for {character_id}")
+            
+            conn.close()
+            return Response(final_image_data, mimetype='image/jpeg')
+        else:
+            conn.close()
+            return jsonify({'error': 'Failed to download image'}), 502
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/characters/<character_id>/favorite', methods=['POST'])
@@ -266,18 +356,97 @@ def health():
         cursor = conn.cursor()
         cursor.execute('SELECT COUNT(*) FROM characters')
         count = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT COUNT(*) FROM characters WHERE image_blob IS NOT NULL')
+        cached_images = cursor.fetchone()[0]
+        
         conn.close()
         db_status = "connected"
     except Exception as e:
         db_status = f"error: {str(e)}"
         count = 0
+        cached_images = 0
 
     return jsonify({
         "status": "ok",
         "message": "Backend is running on port 8000",
         "db_status": db_status,
-        "cached_characters": count
+        "cached_characters": count,
+        "cached_images": cached_images
     })
+
+
+def cache_all_images_background():
+    """Background task to download and cache all images"""
+    print("⚡ Starting background image sync...")
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    
+    # Get all characters with an image URL but NO blob
+    cursor.execute("SELECT id, image FROM characters WHERE image IS NOT NULL AND image_blob IS NULL")
+    rows = cursor.fetchall()
+    conn.close() 
+    
+    total = len(rows)
+    print(f"⚡ Found {total} images to cache.")
+    
+    count = 0
+    errors = 0
+    
+    for row in rows:
+        char_id, original_url = row
+        if not original_url: 
+            continue
+            
+        try:
+            # Download
+            resp = requests.get(original_url, timeout=10)
+            if resp.status_code == 200:
+                raw_data = resp.content
+                final_data = raw_data
+                
+                # Convert
+                try:
+                    img = Image.open(io.BytesIO(raw_data))
+                    if img.mode in ('RGBA', 'LA'):
+                        bg = Image.new('RGB', img.size, (255, 255, 255))
+                        bg.paste(img, mask=img.split()[-1])
+                        img = bg
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                        
+                    buf = io.BytesIO()
+                    img.save(buf, format='JPEG', quality=85)
+                    final_data = buf.getvalue()
+                except Exception as e:
+                    print(f"  ⚠ Conversion failed for {char_id}: {e}")
+                
+                # Save
+                t_conn = sqlite3.connect(DB_FILE)
+                t_cur = t_conn.cursor()
+                t_cur.execute("UPDATE characters SET image_blob = ? WHERE id = ?", (final_data, char_id))
+                t_conn.commit()
+                t_conn.close()
+                count += 1
+                if count % 10 == 0:
+                    print(f"  ⚡ Cached {count}/{total} images...")
+            else:
+                errors += 1
+        except Exception as e:
+            errors += 1
+            print(f"  ✗ Failed to download {char_id}: {e}")
+            
+    print(f"⚡ Background sync complete. Cached: {count}, Errors: {errors}")
+
+
+@app.route('/admin/sync-images', methods=['POST'])
+def trigger_image_sync():
+    """Trigger background image download for offline support"""
+    thread = threading.Thread(target=cache_all_images_background)
+    thread.daemon = True
+    thread.start()
+    return jsonify({"message": "Background image sync started", "status": "started"})
+
 
 
 # Legacy endpoint for backwards compatibility
@@ -294,7 +463,8 @@ if __name__ == '__main__':
     print("Backend will be available at: http://localhost:8000")
     print("Endpoints:")
     print("  - GET  /characters              : Get all filtered characters")
+    print("  - GET  /characters/<id>/image   : Get character image (lazy cache)")
     print("  - POST /characters/<id>/favorite : Toggle favorite status")
+    print("  - POST /admin/sync-images       : Trigger full image cache (OFFLINE MODE)")
     print("  - GET  /health                  : Health check")
-    print("  - GET  /personajes              : Legacy endpoint (compatibility)")
     app.run(debug=True, port=8000, host='0.0.0.0')
