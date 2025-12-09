@@ -204,7 +204,7 @@ def get_characters():
         
         # Filter and transform data
         filtered_characters = []
-        exclude_keywords = ['Unidentified', 'Unknown', 'Student','Boy','Girl','Headed','House',]
+        exclude_keywords = ['Unidentified', 'Unknown', 'Student', 'Girl', 'Boy', 'Man', 'Woman', 'Baby', 'Child', 'Spectator', 'Team', 'Gang', 'Group', 'Troll', 'Portrait','house-elf']
         
         for character in all_characters:
             attributes = character.get('attributes', {})
