@@ -17,7 +17,22 @@
     -fx-font-weight: bold;
 }
 
-/* Labels generales */
+.detail-subtitle {
+    -fx-text-fill: #2d5a2d;
+    -fx-font-size: 12px;
+}
+
+/* Imagen grande en detalle */
+.detail-image-container {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(45, 90, 45, 0.5);
+    -fx-border-width: 2;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 18, 0.3, 0, 4);
+}
+
+/* Labels generales en vista Slytherin */
 .label {
     -fx-text-fill: #1a3d1a;
 }
@@ -32,64 +47,236 @@
     -fx-background-color: rgba(255, 255, 255, 0.85);
     -fx-border-color: rgba(45, 90, 45, 0.4);
     -fx-border-width: 2;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
 }
 
 .titled-pane>.title {
-    -fx-background-color: rgba(45, 90, 45, 0.2);
-    -fx-text-fill: #1a4d1a;
-    -fx-font-size: 14px;
+    -fx-background-color: rgba(212, 228, 212, 0.9);
+    -fx-background-radius: 14 14 0 0;
+}
+
+.titled-pane>.title>.text {
+    -fx-fill: #2d5a2d;
     -fx-font-weight: bold;
-    -fx-background-radius: 12 12 0 0;
 }
 
-.titled-pane>.content {
-    -fx-background-color: rgba(255, 255, 255, 0.7);
-    -fx-border-color: rgba(45, 90, 45, 0.2);
-    -fx-background-radius: 0 0 12 12;
+.titled-pane>*.content {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 0 0 14 14;
 }
 
-/* Botones */
-.button {
-    -fx-background-color: linear-gradient(to right, #2d5a2d, #3d7a3d);
+/* Botón de volver en detalle Slytherin */
+.detail-back-button {
+    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
     -fx-text-fill: white;
-    -fx-padding: 8 18 8 18;
     -fx-background-radius: 20;
+    -fx-padding: 6 14 6 14;
     -fx-font-weight: bold;
 }
 
-.button:hover {
-    -fx-background-color: linear-gradient(to right, #3d7a3d, #4d9a4d);
-    -fx-cursor: hand;
+.detail-back-button:hover {
+    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
 }
 
-/* ScrollPane */
+/* ScrollPane detalle */
 .scroll-pane {
     -fx-background-color: transparent;
-    -fx-background: transparent;
 }
 
 .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 
-/* VBox contenedor principal */
-.vbox {
-    -fx-background-color: transparent;
+/* Grids de detalle */
+.grid-detail {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+    -fx-border-color: rgba(45, 90, 45, 0.35);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
 }
 
-/* ImageView container */
-.image-container {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
+/* TextArea para JSON (si se usa también aquí) */
+.json-area {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
     -fx-background-radius: 12;
     -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-width: 2;
     -fx-border-radius: 12;
-    -fx-padding: 10;
+    -fx-border-width: 1;
 }
 
-/* HBox en top */
-.hbox {
+/* === Tarjetas de personajes y paginación (añadido) === */
+
+#contenedorTarjetas {
     -fx-background-color: transparent;
+}
+
+.scroll-pane>.viewport {
+    -fx-background-color: transparent;
+}
+
+#btnPaginaAnterior,
+#btnPaginaSiguiente {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 4 12 4 12;
+}
+
+#btnVolver {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 4 12 4 12;
+}
+
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
+    -fx-background-color: linear-gradient(to bottom, #d4e4d4, #c8dcc8);
+}
+
+/* Encabezado */
+.detail-header {
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+    -fx-border-color: rgba(45, 90, 45, 0.4);
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Títulos */
+.detail-title {
+    -fx-text-fill: #1a4d1a;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.detail-subtitle {
+    -fx-text-fill: #2d5a2d;
+    -fx-font-size: 12px;
+}
+
+/* Imagen grande en detalle */
+.detail-image-container {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(45, 90, 45, 0.5);
+    -fx-border-width: 2;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 18, 0.3, 0, 4);
+}
+
+/* Labels generales en vista Slytherin */
+.label {
+    -fx-text-fill: #1a3d1a;
+}
+
+/* Labels en negrita (títulos de campos) */
+.label[style*="bold"] {
+    -fx-text-fill: #2d5a2d;
+}
+
+/* TitledPane - Secciones expandibles */
+.titled-pane {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-border-color: rgba(45, 90, 45, 0.4);
+    -fx-border-width: 2;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+}
+
+.titled-pane>.title {
+    -fx-background-color: rgba(212, 228, 212, 0.9);
+    -fx-background-radius: 14 14 0 0;
+}
+
+.titled-pane>.title>.text {
+    -fx-fill: #2d5a2d;
+    -fx-font-weight: bold;
+}
+
+.titled-pane>*.content {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 0 0 14 14;
+}
+
+/* Botón de volver en detalle Slytherin */
+.detail-back-button {
+    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 6 14 6 14;
+    -fx-font-weight: bold;
+}
+
+.detail-back-button:hover {
+    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
+}
+
+/* ScrollPane detalle */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Grids de detalle */
+.grid-detail {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+    -fx-border-color: rgba(45, 90, 45, 0.35);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
+/* TextArea para JSON (si se usa también aquí) */
+.json-area {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(45, 90, 45, 0.4);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
+/* === Tarjetas de personajes y paginación (añadido) === */
+
+#contenedorTarjetas {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane>.viewport {
+    -fx-background-color: transparent;
+}
+
+#btnPaginaAnterior,
+#btnPaginaSiguiente {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 4 12 4 12;
+}
+
+#btnVolver {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 4 12 4 12;
+}
+
+/* ==== Additional visual enhancements for Slytherin view ==== */
+.glass-pane {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 10, 0.2, 0, 2);
+}
+
+.secondary-button {
+    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 6 14 6 14;
+    -fx-font-weight: bold;
+}
+
+.secondary-button:hover {
+    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
 }
