@@ -6,7 +6,10 @@ import hashlib
 from datetime import datetime, timedelta
 import io
 import threading
+import json
 from PIL import Image
+import mysql.connector
+from mysql.connector import Error
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for JavaFX client
@@ -16,6 +19,15 @@ POTTERDB_API = "https://api.potterdb.com/v1/characters"
 
 # Database file
 DB_FILE = 'favorites.db'
+
+# MySQL Configuration
+MYSQL_CONFIG = {
+    'host': '127.0.0.1',
+    'port': 3309,
+    'database': 'hogwarts',
+    'user': 'appuser',
+    'password': 'appPass123'
+}
 
 def init_db():
     """Initialize SQLite database for favorites and characters"""
@@ -31,6 +43,7 @@ def init_db():
     ''')
     
     # Tabla de personajes (caché persistente)
+    # Tabla de personajes (caché persistente)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS characters (
             id TEXT PRIMARY KEY,
@@ -45,16 +58,51 @@ def init_db():
             blood_status TEXT,
             role TEXT,
             wiki TEXT,
-            slug TEXT
+            slug TEXT,
+            image_blob BLOB,
+            alias_names TEXT,
+            animagus TEXT,
+            boggart TEXT,
+            eye_color TEXT,
+            family_member TEXT,
+            hair_color TEXT,
+            height TEXT,
+            jobs TEXT,
+            nationality TEXT,
+            romances TEXT,
+            skin_color TEXT,
+            titles TEXT,
+            wand TEXT,
+            weight TEXT
         )
     ''')
     
-    # Migration: check if image_blob exists
-    try:
-        cursor.execute("SELECT image_blob FROM characters LIMIT 1")
-    except sqlite3.OperationalError:
-        print("⚠ Migrating database: Adding image_blob column...")
-        cursor.execute("ALTER TABLE characters ADD COLUMN image_blob BLOB")
+    # Migration: Check for new columns and add them if missing
+    cursor.execute("PRAGMA table_info(characters)")
+    existing_columns = [info[1] for info in cursor.fetchall()]
+    
+    columns_to_add = {
+        'image_blob': 'BLOB',
+        'alias_names': 'TEXT',
+        'animagus': 'TEXT',
+        'boggart': 'TEXT',
+        'eye_color': 'TEXT',
+        'family_member': 'TEXT',
+        'hair_color': 'TEXT',
+        'height': 'TEXT',
+        'jobs': 'TEXT',
+        'nationality': 'TEXT',
+        'romances': 'TEXT',
+        'skin_color': 'TEXT',
+        'titles': 'TEXT',
+        'wand': 'TEXT',
+        'weight': 'TEXT'
+    }
+    
+    for col_name, col_type in columns_to_add.items():
+        if col_name not in existing_columns:
+            print(f"⚠ Migrating database: Adding {col_name} column...")
+            cursor.execute(f"ALTER TABLE characters ADD COLUMN {col_name} {col_type}")
     
     conn.commit()
     conn.close()
@@ -64,20 +112,25 @@ def get_favorite_status(character_id):
     """Get favorite status for a character"""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute('SELECT is_favorite FROM favorites WHERE character_id = ?', (character_id,))
+    cursor.execute('SELECT 1 FROM favorites WHERE character_id = ?', (character_id,))
     result = cursor.fetchone()
     conn.close()
-    return result[0] == 1 if result else False
+    return True if result else False
 
 
 def set_favorite_status(character_id, is_favorite):
     """Set favorite status for a character"""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute('''
-        INSERT OR REPLACE INTO favorites (character_id, is_favorite)
-        VALUES (?, ?)
-    ''', (character_id, 1 if is_favorite else 0))
+    
+    if is_favorite:
+        cursor.execute('''
+            INSERT OR IGNORE INTO favorites (character_id, is_favorite)
+            VALUES (?, 1)
+        ''', (character_id,))
+    else:
+        cursor.execute('DELETE FROM favorites WHERE character_id = ?', (character_id,))
+        
     conn.commit()
     conn.close()
 
@@ -104,14 +157,31 @@ def save_characters_to_db(characters):
         cursor.execute('''
             INSERT OR REPLACE INTO characters (
                 id, name, house, image, died, born, patronus, 
-                gender, species, blood_status, role, wiki, slug, image_blob
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                gender, species, blood_status, role, wiki, slug, image_blob,
+                alias_names, animagus, boggart, eye_color, family_member,
+                hair_color, height, jobs, nationality, romances,
+                skin_color, titles, wand, weight
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             char['id'], char['name'], char['house'], char['image'], 
             char['died'], char['born'], char['patronus'],
             char['gender'], char['species'], char['blood_status'], 
             char['role'], char['wiki'], char.get('slug', ''),
-            image_blob
+            image_blob,
+            json.dumps(char.get('alias_names', [])),
+            char.get('animagus', ''),
+            char.get('boggart', ''),
+            char.get('eye_color', ''),
+            json.dumps(char.get('family_member', [])),
+            char.get('hair_color', ''),
+            char.get('height', ''),
+            json.dumps(char.get('jobs', [])),
+            char.get('nationality', ''),
+            json.dumps(char.get('romances', [])),
+            char.get('skin_color', ''),
+            json.dumps(char.get('titles', [])),
+            json.dumps(char.get('wand', [])),
+            char.get('weight', '')
         ))
         
     conn.commit()
@@ -137,6 +207,17 @@ def load_characters_from_db():
         # Modificar URL de imagen para apuntar a local
         char_dict['image'] = f"http://localhost:8000/characters/{char_dict['id']}/image"
             
+        # Parse JSON fields back to lists
+        json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
+        for field in json_fields:
+            if field in char_dict and char_dict[field]:
+                try:
+                    char_dict[field] = json.loads(char_dict[field])
+                except json.JSONDecodeError:
+                    char_dict[field] = []
+            else:
+                 char_dict[field] = []
+
         # Añadir estado de favorito
         char_dict['is_favorite'] = get_favorite_status(char_dict['id'])
         characters.append(char_dict)
@@ -204,7 +285,7 @@ def get_characters():
         
         # Filter and transform data
         filtered_characters = []
-        exclude_keywords = ['Unidentified', 'Unknown', 'Student', 'Girl', 'Boy', 'Man', 'Woman', 'Baby', 'Child', 'Spectator', 'Team', 'Gang', 'Group', 'Troll', 'Portrait','house-elf']
+        exclude_keywords = ['unidentified', 'unknown', 'student', 'girl', 'boy', 'man', 'woman', 'baby', 'child', 'spectator', 'team', 'gang', 'group', 'troll', 'portrait', 'house-elf', 'ghost', 'ghosts', 'champion', 'mentor', 'creature', 'abraxan', 'actor', 'announcer', 'cat', 'killer', 'enemy', 'antipodean', 'shopkeeper', 'ashwinder', 'reserve', 'augurey', 'aunt', 'mascot', 'grandmother', 'beggar', 'bespectacled', 'corridor', 'boa constrictor', 'ministry', 'hagrid\'s', 'enthusiast', 'fiancee', 'fianceé', 'friends', 'chief', 'victim', 'guard', 'guards', 'witch', 'wizard', 'waiter', 'deer', 'cousin', 'cousins', 'sister', 'sisters', 'brother', 'brothers', 'father', 'grandfather', 'parents', 'great-grandmother']
         
         for character in all_characters:
             attributes = character.get('attributes', {})
@@ -224,6 +305,7 @@ def get_characters():
             character_id = generate_id(slug)
             
             # Build complete response object
+            # Build complete response object
             char_obj = {
                 'id': character_id,
                 'name': name,
@@ -237,7 +319,21 @@ def get_characters():
                 'blood_status': attributes.get('blood_status') or '',
                 'role': attributes.get('role') or '',
                 'wiki': attributes.get('wiki') or '',
-                'slug': slug
+                'slug': slug,
+                'alias_names': attributes.get('alias_names', []),
+                'animagus': attributes.get('animagus') or '',
+                'boggart': attributes.get('boggart') or '',
+                'eye_color': attributes.get('eye_color') or '',
+                'family_member': attributes.get('family_members', []),
+                'hair_color': attributes.get('hair_color') or '',
+                'height': attributes.get('height') or '',
+                'jobs': attributes.get('jobs', []),
+                'nationality': attributes.get('nationality') or '',
+                'romances': attributes.get('romances', []),
+                'skin_color': attributes.get('skin_color') or '',
+                'titles': attributes.get('titles', []),
+                'wand': attributes.get('wands', []),
+                'weight': attributes.get('weight') or ''
             }
             filtered_characters.append(char_obj)
         
@@ -328,20 +424,28 @@ def get_character_image(character_id):
 @app.route('/characters/<character_id>/favorite', methods=['POST'])
 def toggle_favorite(character_id):
     """
-    Toggle favorite status for a character
-    
-    Expected JSON body: {"is_favorite": true/false}
+    Toggle favorite status for a character.
+    If 'is_favorite' is provided in JSON, set to that value.
+    Otherwise, flip current status.
     """
     try:
-        data = request.get_json()
-        is_favorite = data.get('is_favorite', False)
+        # Check current status
+        current_status = get_favorite_status(character_id)
         
-        set_favorite_status(character_id, is_favorite)
+        # Determine new status
+        data = request.get_json(silent=True)
+        if data and 'is_favorite' in data:
+            new_status = data['is_favorite']
+        else:
+            new_status = not current_status
+        
+        set_favorite_status(character_id, new_status)
         
         return jsonify({
             'success': True,
             'character_id': character_id,
-            'is_favorite': is_favorite
+            'is_favorite': new_status,
+            'action': 'toggled' if data is None or 'is_favorite' not in data else 'set'
         })
     
     except Exception as e:
@@ -446,6 +550,118 @@ def trigger_image_sync():
     thread.daemon = True
     thread.start()
     return jsonify({"message": "Background image sync started", "status": "started"})
+
+
+@app.route('/admin/sync-mysql', methods=['POST'])
+def sync_mysql():
+    """Trigger synchronization to MySQL"""
+    try:
+        # SQLite connection
+        sqlite_conn = sqlite3.connect(DB_FILE)
+        sqlite_conn.row_factory = sqlite3.Row
+        sqlite_cursor = sqlite_conn.cursor()
+        
+        # MySQL connection
+        try:
+            mysql_conn = mysql.connector.connect(**MYSQL_CONFIG)
+        except Error as e:
+            return jsonify({"error": f"MySQL Connection failed: {str(e)}"}), 502
+            
+        mysql_cursor = mysql_conn.cursor()
+        
+        # 1. Create Tables
+        mysql_cursor.execute("""
+        CREATE TABLE IF NOT EXISTS characters (
+            id VARCHAR(255) PRIMARY KEY,
+            name VARCHAR(255),
+            house VARCHAR(255),
+            image TEXT,
+            died TEXT,
+            born TEXT,
+            patronus TEXT,
+            gender VARCHAR(50),
+            species VARCHAR(100),
+            blood_status VARCHAR(100),
+            role TEXT,
+            wiki TEXT,
+            slug TEXT,
+            image_blob MEDIUMBLOB,
+            alias_names TEXT,
+            animagus TEXT,
+            boggart TEXT,
+            eye_color TEXT,
+            family_member TEXT,
+            hair_color TEXT,
+            height TEXT,
+            jobs TEXT,
+            nationality TEXT,
+            romances TEXT,
+            skin_color TEXT,
+            titles TEXT,
+            wand TEXT,
+            weight TEXT,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+        """)
+        
+        mysql_cursor.execute("""
+        CREATE TABLE IF NOT EXISTS favorites (
+            character_id VARCHAR(255) PRIMARY KEY,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+        """)
+        
+        # 2. Sync Characters
+        # Clear existing data to ensure we match the local filter exactly
+        mysql_cursor.execute("DELETE FROM characters")
+        
+        sqlite_cursor.execute("SELECT * FROM characters")
+        characters = sqlite_cursor.fetchall()
+        
+        count = 0
+        for char in characters:
+            char_dict = dict(char)
+            # Remove keys that might not exist in target if schema differs, but here we aligned them.
+            # Convert dict to keys/values for SQL
+            columns = ', '.join(char_dict.keys())
+            placeholders = ', '.join(['%s'] * len(char_dict))
+            update_clause = ', '.join([f"{k}=new.{k}" for k in char_dict.keys() if k != 'id'])
+            
+            sql = f"INSERT INTO characters ({columns}) VALUES ({placeholders}) AS new ON DUPLICATE KEY UPDATE {update_clause}"
+            mysql_cursor.execute(sql, list(char_dict.values()))
+            count += 1
+            
+        # 3. Sync Favorites
+        # Truncate favorites in MySQL first to mirror deletions
+        mysql_cursor.execute("DELETE FROM favorites")
+        
+        sqlite_cursor.execute("SELECT character_id FROM favorites")
+        favorites = sqlite_cursor.fetchall()
+        
+        fav_count = 0
+        for fav in favorites:
+            # fav is Row object, access by index or key
+            c_id = fav['character_id']
+            
+            mysql_cursor.execute("""
+                INSERT IGNORE INTO favorites (character_id, is_favorite) 
+                VALUES (%s, 1)
+            """, (c_id,))
+            fav_count += 1
+            
+        mysql_conn.commit()
+        mysql_conn.close()
+        sqlite_conn.close()
+        
+        return jsonify({
+            "success": True, 
+            "message": f"Synced {count} characters and {fav_count} favorites to MySQL",
+            "mysql_status": "connected"
+        })
+        
+    except Exception as e:
+        print(f"Sync error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 

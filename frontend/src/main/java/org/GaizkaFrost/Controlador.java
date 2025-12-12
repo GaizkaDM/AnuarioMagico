@@ -31,6 +31,8 @@ public class Controlador implements Initializable {
     @FXML
     private ComboBox<String> comboEstado;
     @FXML
+    private CheckBox checkFavoritos;
+    @FXML
     private Button btnLimpiar;
     @FXML
     private Button btnImportarAPI;
@@ -66,11 +68,13 @@ public class Controlador implements Initializable {
         txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
         comboCasa.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
         comboEstado.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
+        checkFavoritos.selectedProperty().addListener((obs, o, n) -> aplicarFiltros());
 
         btnLimpiar.setOnAction(e -> {
             txtBuscar.clear();
             comboCasa.getSelectionModel().clearSelection();
             comboEstado.getSelectionModel().clearSelection();
+            checkFavoritos.setSelected(false);
             aplicarFiltros();
         });
 
@@ -96,6 +100,7 @@ public class Controlador implements Initializable {
         String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
         String casa = comboCasa.getValue();
         String estado = comboEstado.getValue();
+        boolean soloFavoritos = checkFavoritos.isSelected();
 
         List<Personaje> filtrados = new ArrayList<>();
 
@@ -111,7 +116,9 @@ public class Controlador implements Initializable {
             boolean coincideEstado = estado == null || estado.isEmpty()
                     || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estado));
 
-            if (coincideTexto && coincideCasa && coincideEstado) {
+            boolean coincideFavorito = !soloFavoritos || p.isFavorite();
+
+            if (coincideTexto && coincideCasa && coincideEstado && coincideFavorito) {
                 filtrados.add(p);
             }
         }

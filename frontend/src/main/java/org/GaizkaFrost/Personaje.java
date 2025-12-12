@@ -26,6 +26,15 @@ public class Personaje {
     private String titles;
     private String wand;
     private String slug;
+    private String eyeColor;
+    private String hairColor;
+    private String skinColor;
+    private String height;
+    private String weight;
+    private String boggart;
+    private String romances;
+    private String family;
+    private String jobs;
 
     // --- JSON original de la API ---
     private String rawJson;
@@ -250,5 +259,77 @@ public class Personaje {
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    public String getEyeColor() {
+        return eyeColor;
+    }
+
+    public void setEyeColor(String eyeColor) {
+        this.eyeColor = eyeColor;
+    }
+
+    public String getHairColor() {
+        return hairColor;
+    }
+
+    public void setHairColor(String hairColor) {
+        this.hairColor = hairColor;
+    }
+
+    public String getSkinColor() {
+        return skinColor;
+    }
+
+    public void setSkinColor(String skinColor) {
+        this.skinColor = skinColor;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+
+    public String getBoggart() {
+        return boggart;
+    }
+
+    public void setBoggart(String boggart) {
+        this.boggart = boggart;
+    }
+
+    public String getRomances() {
+        return romances;
+    }
+
+    public void setRomances(String romances) {
+        this.romances = romances;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
+    public String getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(String jobs) {
+        this.jobs = jobs;
     }
 }
