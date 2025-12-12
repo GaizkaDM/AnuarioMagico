@@ -607,9 +607,21 @@ def sync_mysql():
         mysql_cursor.execute("""
         CREATE TABLE IF NOT EXISTS favorites (
             character_id VARCHAR(255) PRIMARY KEY,
+            is_favorite BOOLEAN DEFAULT 1,
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
         """)
+        
+        # Migration for favorites table in MySQL: Add is_favorite if missing
+        try:
+            mysql_cursor.execute("SELECT is_favorite FROM favorites LIMIT 1")
+            mysql_cursor.fetchall()
+        except Error:
+            print("⚠ Migrating MySQL DB: Adding is_favorite column to favorites...")
+            try:
+                mysql_cursor.execute("ALTER TABLE favorites ADD COLUMN is_favorite BOOLEAN DEFAULT 1")
+            except Error as e:
+                print(f"Could not add column: {e}")
         
         # 2. Sync Characters
         # Clear existing data to ensure we match the local filter exactly
