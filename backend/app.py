@@ -10,6 +10,8 @@ import json
 from PIL import Image
 import mysql.connector
 from mysql.connector import Error
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for JavaFX client
@@ -29,6 +31,10 @@ MYSQL_CONFIG = {
     'password': 'appPass123'
 }
 
+# Auth Configuration
+MASTER_PASSWORD = "HogwartsMaster"
+SESSIONS = {} # Simple in-memory session store: token -> username
+
 def init_db():
     """Initialize SQLite database for favorites and characters"""
     conn = sqlite3.connect(DB_FILE)
@@ -39,6 +45,15 @@ def init_db():
         CREATE TABLE IF NOT EXISTS favorites (
             character_id TEXT PRIMARY KEY,
             is_favorite INTEGER DEFAULT 0
+        )
+    ''')
+    
+    # Tabla de usuarios
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password_hash TEXT,
+            created_at TEXT
         )
     ''')
     
@@ -224,6 +239,87 @@ def load_characters_from_db():
         
     conn.close()
     return characters
+
+
+
+# --- AUTHENTICATION ENDPOINTS ---
+
+@app.route('/auth/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        master_password = data.get('master_password')
+        
+        if not username or not password or not master_password:
+            return jsonify({'error': 'Missing fields'}), 400
+            
+        if master_password != MASTER_PASSWORD:
+            return jsonify({'error': 'Invalid Master Password'}), 403
+            
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Check if user exists
+        cursor.execute('SELECT 1 FROM users WHERE username = ?', (username,))
+        if cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'User already exists'}), 409
+            
+        # Create user
+        pw_hash = generate_password_hash(password)
+        created_at = datetime.now().isoformat()
+        
+        cursor.execute('INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)', 
+                       (username, pw_hash, created_at))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'User registered successfully'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/auth/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({'error': 'Missing fields'}), 400
+            
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT password_hash FROM users WHERE username = ?', (username,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if not row or not check_password_hash(row[0], password):
+            return jsonify({'error': 'Invalid credentials'}), 401
+            
+        # Generate simple token
+        token = str(uuid.uuid4())
+        SESSIONS[token] = username
+        
+        return jsonify({
+            'success': True, 
+            'token': token,
+            'username': username
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+    token = request.headers.get('Authorization')
+    if token and token in SESSIONS:
+        del SESSIONS[token]
+    return jsonify({'success': True})
 
 
 def generate_id(slug):
@@ -612,17 +708,18 @@ def sync_mysql():
         )
         """)
         
-        # Migration for favorites table in MySQL: Add is_favorite if missing
-        try:
-            mysql_cursor.execute("SELECT is_favorite FROM favorites LIMIT 1")
-            mysql_cursor.fetchall()
-        except Error:
-            print("⚠ Migrating MySQL DB: Adding is_favorite column to favorites...")
-            try:
-                mysql_cursor.execute("ALTER TABLE favorites ADD COLUMN is_favorite BOOLEAN DEFAULT 1")
-            except Error as e:
-                print(f"Could not add column: {e}")
+        mysql_cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username VARCHAR(255) PRIMARY KEY,
+            password_hash VARCHAR(255),
+            created_at VARCHAR(100),
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+        """)
         
+        # Migration for users table
+        # (This is implicitly handled by CREATE TABLE IF NOT EXISTS, but if schema changes we'd need ALTER)
+
         # 2. Sync Characters
         # Clear existing data to ensure we match the local filter exactly
         mysql_cursor.execute("DELETE FROM characters")
@@ -661,13 +758,33 @@ def sync_mysql():
             """, (c_id,))
             fav_count += 1
             
+        # 4. Sync Users
+        # We merge users, assuming MySQL is the aggregator.
+        # However, for simplicity/consistency with above, we might overwrite?
+        # IMPORTANT: If we overwrite, we lose users registered on other devices if we don't pull first.
+        # But this function is "Sync TO MySQL". Let's do INSERT IGNORE or ON DUPLICATE KEY UPDATE.
+        
+        sqlite_cursor.execute("SELECT * FROM users")
+        users = sqlite_cursor.fetchall()
+        user_count = 0
+        
+        for user in users:
+            u_dict = dict(user)
+            # We want to preserve whoever has the latest password ideally, but here we just push local to remote.
+            mysql_cursor.execute("""
+                INSERT INTO users (username, password_hash, created_at)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash)
+            """, (u_dict['username'], u_dict['password_hash'], u_dict['created_at']))
+            user_count += 1
+            
         mysql_conn.commit()
         mysql_conn.close()
         sqlite_conn.close()
         
         return jsonify({
             "success": True, 
-            "message": f"Synced {count} characters and {fav_count} favorites to MySQL",
+            "message": f"Synced {count} characters, {fav_count} favorites, and {user_count} users to MySQL",
             "mysql_status": "connected"
         })
         

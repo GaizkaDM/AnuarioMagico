@@ -55,8 +55,37 @@ public class Controlador implements Initializable {
     private int paginaActual = 0;
     private static final int PERSONAJES_POR_PAGINA = 20;
 
+    @FXML
+    private MenuItem menuLogin;
+    @FXML
+    private Label lblUsuario;
+    @FXML
+    private ScrollPane scrollPane;
+
+    private boolean isLoggedIn = false;
+    private String currentUser = null;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        // Increase scroll speed
+        if (scrollPane != null) {
+            scrollPane.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+                if (event.getDeltaY() != 0) {
+                    double delta = event.getDeltaY() * 3.0; // 3x faster
+                    double height = scrollPane.getContent().getBoundsInLocal().getHeight();
+                    double vValue = scrollPane.getVvalue();
+                    // Prevent division by zero
+                    if (height > 0) {
+                        scrollPane.setVvalue(vValue + -delta / height);
+                        event.consume(); // Consume event to prevent default slow scrolling
+                    }
+                }
+            });
+        }
+
+        // Setup Login Menu
+        menuLogin.setOnAction(e -> mostrarLogin());
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
         comboEstado.getItems().addAll("Vivo", "Muerto", "Fallecido");
@@ -91,6 +120,45 @@ public class Controlador implements Initializable {
 
         // Importar desde API (botón manual por si acaso)
         btnImportarAPI.setOnAction(e -> importarDesdeAPI());
+    }
+
+    private void mostrarLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"));
+            Parent root = loader.load();
+
+            LoginController loginCtrl = loader.getController();
+            loginCtrl.setOnSuccessCallback(this::onLoginRealizado);
+
+            Stage stage = new Stage();
+            stage.setTitle("Login / Registro");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onLoginRealizado(String username) {
+        isLoggedIn = true;
+        currentUser = username;
+        Platform.runLater(() -> {
+            menuLogin.setText("Cerrar Sesión");
+            menuLogin.setOnAction(e -> cerrarSesion());
+            lblUsuario.setText("Usuario: " + username);
+            statusBar.setText("Sesión iniciada como " + username + ". Acceso completo habilitado.");
+            // Aquí se activarían los botones de edición si existieran
+        });
+    }
+
+    private void cerrarSesion() {
+        isLoggedIn = false;
+        currentUser = null;
+        menuLogin.setText("Iniciar Sesión");
+        menuLogin.setOnAction(e -> mostrarLogin());
+        lblUsuario.setText("");
+        statusBar.setText("Sesión cerrada.");
+        // Aquí se desactivarían los botones de edición
     }
 
     /**

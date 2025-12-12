@@ -15,6 +15,57 @@ import java.util.List;
 public class HarryPotterAPI {
 
     private static final String API_URL = "http://localhost:8000/characters";
+    private static final String AUTH_URL = "http://localhost:8000/auth";
+
+    public static String login(String username, String password) throws Exception {
+        URL url = new URL(AUTH_URL + "/login");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+        json.addProperty("password", password);
+
+        try (java.io.OutputStream os = conn.getOutputStream()) {
+            byte[] input = json.toString().getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        if (conn.getResponseCode() == 200) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null)
+                response.append(line);
+            in.close();
+
+            JsonObject res = new Gson().fromJson(response.toString(), JsonObject.class);
+            return res.has("token") ? res.get("token").getAsString() : null;
+        }
+        return null;
+    }
+
+    public static boolean register(String username, String password, String masterPassword) throws Exception {
+        URL url = new URL(AUTH_URL + "/register");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+        json.addProperty("password", password);
+        json.addProperty("master_password", masterPassword);
+
+        try (java.io.OutputStream os = conn.getOutputStream()) {
+            byte[] input = json.toString().getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        return conn.getResponseCode() == 200;
+    }
 
     public static boolean toggleFavorite(String characterId) throws Exception {
         URL url = new URL("http://localhost:8000/characters/" + characterId + "/favorite");

@@ -30,7 +30,7 @@
 
     <!-- ======= CONTENIDO ======= -->
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true">
+        <ScrollPane fx:id="detailScrollPane" fitToWidth="true" fitToHeight="true">
             <content>
 
                 <VBox spacing="20">

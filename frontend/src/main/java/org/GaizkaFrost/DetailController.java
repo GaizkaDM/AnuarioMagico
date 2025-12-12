@@ -45,6 +45,8 @@ public class DetailController {
     private Label lblTitles;
     @FXML
     private Label lblWand;
+    @FXML
+    private javafx.scene.control.ScrollPane detailScrollPane;
 
     private Personaje currentPersonaje;
 
@@ -59,6 +61,22 @@ public class DetailController {
         });
 
         btnFavorite.setOnAction(event -> toggleFavorite());
+
+        // Increase scroll speed
+        if (detailScrollPane != null) {
+            detailScrollPane.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+                if (event.getDeltaY() != 0) {
+                    double delta = event.getDeltaY() * 3.0; // 3x faster
+                    double height = detailScrollPane.getContent().getBoundsInLocal().getHeight();
+                    double vValue = detailScrollPane.getVvalue();
+                    // Prevent division by zero
+                    if (height > 0) {
+                        detailScrollPane.setVvalue(vValue + -delta / height);
+                        event.consume();
+                    }
+                }
+            });
+        }
     }
 
     private void toggleFavorite() {

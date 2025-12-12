@@ -21,6 +21,7 @@
                     <menus>
                         <Menu text="Archivo">
                             <items>
+                                <MenuItem fx:id="menuLogin" text="Iniciar Sesión"/>
                                 <MenuItem fx:id="menuImportar" text="Importar desde API"/>
                                 <MenuItem fx:id="menuSalir" text="Salir"/>
                             </items>
@@ -49,6 +50,8 @@
 
                         <Pane HBox.hgrow="ALWAYS"/>
 
+                        <Label fx:id="lblUsuario" text="" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
                         <Button fx:id="btnImportarAPI" text="Importar desde API" styleClass="primary-button"/>
                     </children>
                 </HBox>
@@ -63,7 +66,7 @@
 
             <!-- TARJETAS -->
             <center>
-                <ScrollPane fitToWidth="true" fitToHeight="true">
+                <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
                     <content>
                         <FlowPane fx:id="contenedorTarjetas"
                                   hgap="15" vgap="15"
