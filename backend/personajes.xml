@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<personajes>
+  <personaje>
+    <id>albus-dumbledore</id>
+    <name>Albus Dumbledore</name>
+    <house>Gryffindor</house>
+    <image/>
+    <died>1997</died>
+    <born>1881</born>
+    <patronus>Fénix</patronus>
+    <gender>Male</gender>
+    <species>Human</species>
+    <blood_status>Half-blood</blood_status>
+    <role>Headmaster</role>
+    <wiki/>
+    <slug>albus-dumbledore</slug>
+    <alias_names>
+      <item>Profesor Dumbledore</item>
+    </alias_names>
+    <animagus/>
+    <boggart/>
+    <eye_color>Azul</eye_color>
+    <family_member/>
+    <hair_color>Plateado</hair_color>
+    <height/>
+    <jobs>
+      <item>Director de Hogwarts</item>
+    </jobs>
+    <nationality>Británico</nationality>
+    <romances/>
+    <skin_color/>
+    <titles>
+      <item>Jefe Supremo</item>
+    </titles>
+    <wand>
+      <item>{"wood": "Saúco", "core": "Pelo de Thestral", "length": "15\""}</item>
+    </wand>
+    <weight/>
+  </personaje>
+</personajes>
