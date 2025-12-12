@@ -41,6 +41,8 @@
                         <Label text="Estado:"/>
                         <ComboBox fx:id="comboEstado" prefWidth="120"/>
 
+                        <CheckBox fx:id="checkFavoritos" text="Solo Favoritos"/>
+
                         <Button fx:id="btnLimpiar" text="Limpiar filtros"/>
 
                         <Pane HBox.hgrow="ALWAYS"/>

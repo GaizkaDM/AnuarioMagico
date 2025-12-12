@@ -16,6 +16,18 @@ public class HarryPotterAPI {
 
     private static final String API_URL = "http://localhost:8000/characters";
 
+    public static boolean toggleFavorite(String characterId) throws Exception {
+        URL url = new URL("http://localhost:8000/characters/" + characterId + "/favorite");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setConnectTimeout(5000);
+
+        int responseCode = conn.getResponseCode();
+        conn.disconnect();
+
+        return responseCode == 200;
+    }
+
     public static List<Personaje> fetchCharacters() throws Exception {
         List<Personaje> personajes = new ArrayList<>();
 

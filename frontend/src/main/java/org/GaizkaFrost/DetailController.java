@@ -16,6 +16,8 @@ public class DetailController {
     @FXML
     private Button btnVolver;
     @FXML
+    private Button btnFavorite;
+    @FXML
     private Label lblNombre;
     @FXML
     private ImageView imgGrande;
@@ -44,6 +46,8 @@ public class DetailController {
     @FXML
     private Label lblWand;
 
+    private Personaje currentPersonaje;
+
     @FXML
     public void initialize() {
         btnVolver.setOnAction(event -> {
@@ -53,6 +57,45 @@ public class DetailController {
                 e.printStackTrace();
             }
         });
+
+        btnFavorite.setOnAction(event -> toggleFavorite());
+    }
+
+    private void toggleFavorite() {
+        if (currentPersonaje == null) {
+            System.out.println("DEBUG: currentPersonaje is null");
+            return;
+        }
+
+        System.out.println("DEBUG: Toggling favorite for ID: " + currentPersonaje.getApiId());
+
+        try {
+            boolean success = HarryPotterAPI.toggleFavorite(currentPersonaje.getApiId());
+            System.out.println("DEBUG: API call success? " + success);
+
+            if (success) {
+                boolean oldState = currentPersonaje.isFavorite();
+                currentPersonaje.setFavorite(!oldState);
+                System.out.println("DEBUG: Toggled state from " + oldState + " to " + !oldState);
+                updateFavoriteUI();
+            } else {
+                System.out.println("DEBUG: Request failed with non-200 code");
+            }
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in toggleFavorite: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void updateFavoriteUI() {
+        if (currentPersonaje.isFavorite()) {
+            btnFavorite.setText("★ Favorito");
+            btnFavorite.setStyle(
+                    "-fx-font-size: 14; -fx-background-color: gold; -fx-text-fill: black; -fx-font-weight: bold;");
+        } else {
+            btnFavorite.setText("☆ Marcar como Favorito");
+            btnFavorite.setStyle("-fx-font-size: 14; -fx-background-color: #e0e0e0; -fx-text-fill: black;");
+        }
     }
 
     /**
@@ -61,6 +104,8 @@ public class DetailController {
      * @param p character to display
      */
     public void setPersonaje(Personaje p) {
+        this.currentPersonaje = p;
+        updateFavoriteUI();
 
         lblNombre.setText(p.getNombre());
 
