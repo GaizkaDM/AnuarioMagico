@@ -6,6 +6,7 @@ import hashlib
 from datetime import datetime, timedelta
 import io
 import threading
+import json
 from PIL import Image
 
 app = Flask(__name__)
@@ -31,6 +32,7 @@ def init_db():
     ''')
     
     # Tabla de personajes (caché persistente)
+    # Tabla de personajes (caché persistente)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS characters (
             id TEXT PRIMARY KEY,
@@ -45,16 +47,51 @@ def init_db():
             blood_status TEXT,
             role TEXT,
             wiki TEXT,
-            slug TEXT
+            slug TEXT,
+            image_blob BLOB,
+            alias_names TEXT,
+            animagus TEXT,
+            boggart TEXT,
+            eye_color TEXT,
+            family_member TEXT,
+            hair_color TEXT,
+            height TEXT,
+            jobs TEXT,
+            nationality TEXT,
+            romances TEXT,
+            skin_color TEXT,
+            titles TEXT,
+            wand TEXT,
+            weight TEXT
         )
     ''')
     
-    # Migration: check if image_blob exists
-    try:
-        cursor.execute("SELECT image_blob FROM characters LIMIT 1")
-    except sqlite3.OperationalError:
-        print("⚠ Migrating database: Adding image_blob column...")
-        cursor.execute("ALTER TABLE characters ADD COLUMN image_blob BLOB")
+    # Migration: Check for new columns and add them if missing
+    cursor.execute("PRAGMA table_info(characters)")
+    existing_columns = [info[1] for info in cursor.fetchall()]
+    
+    columns_to_add = {
+        'image_blob': 'BLOB',
+        'alias_names': 'TEXT',
+        'animagus': 'TEXT',
+        'boggart': 'TEXT',
+        'eye_color': 'TEXT',
+        'family_member': 'TEXT',
+        'hair_color': 'TEXT',
+        'height': 'TEXT',
+        'jobs': 'TEXT',
+        'nationality': 'TEXT',
+        'romances': 'TEXT',
+        'skin_color': 'TEXT',
+        'titles': 'TEXT',
+        'wand': 'TEXT',
+        'weight': 'TEXT'
+    }
+    
+    for col_name, col_type in columns_to_add.items():
+        if col_name not in existing_columns:
+            print(f"⚠ Migrating database: Adding {col_name} column...")
+            cursor.execute(f"ALTER TABLE characters ADD COLUMN {col_name} {col_type}")
     
     conn.commit()
     conn.close()
@@ -104,14 +141,31 @@ def save_characters_to_db(characters):
         cursor.execute('''
             INSERT OR REPLACE INTO characters (
                 id, name, house, image, died, born, patronus, 
-                gender, species, blood_status, role, wiki, slug, image_blob
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                gender, species, blood_status, role, wiki, slug, image_blob,
+                alias_names, animagus, boggart, eye_color, family_member,
+                hair_color, height, jobs, nationality, romances,
+                skin_color, titles, wand, weight
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             char['id'], char['name'], char['house'], char['image'], 
             char['died'], char['born'], char['patronus'],
             char['gender'], char['species'], char['blood_status'], 
             char['role'], char['wiki'], char.get('slug', ''),
-            image_blob
+            image_blob,
+            json.dumps(char.get('alias_names', [])),
+            char.get('animagus', ''),
+            char.get('boggart', ''),
+            char.get('eye_color', ''),
+            json.dumps(char.get('family_member', [])),
+            char.get('hair_color', ''),
+            char.get('height', ''),
+            json.dumps(char.get('jobs', [])),
+            char.get('nationality', ''),
+            json.dumps(char.get('romances', [])),
+            char.get('skin_color', ''),
+            json.dumps(char.get('titles', [])),
+            json.dumps(char.get('wand', [])),
+            char.get('weight', '')
         ))
         
     conn.commit()
@@ -137,6 +191,17 @@ def load_characters_from_db():
         # Modificar URL de imagen para apuntar a local
         char_dict['image'] = f"http://localhost:8000/characters/{char_dict['id']}/image"
             
+        # Parse JSON fields back to lists
+        json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
+        for field in json_fields:
+            if field in char_dict and char_dict[field]:
+                try:
+                    char_dict[field] = json.loads(char_dict[field])
+                except json.JSONDecodeError:
+                    char_dict[field] = []
+            else:
+                 char_dict[field] = []
+
         # Añadir estado de favorito
         char_dict['is_favorite'] = get_favorite_status(char_dict['id'])
         characters.append(char_dict)
@@ -224,6 +289,7 @@ def get_characters():
             character_id = generate_id(slug)
             
             # Build complete response object
+            # Build complete response object
             char_obj = {
                 'id': character_id,
                 'name': name,
@@ -237,7 +303,21 @@ def get_characters():
                 'blood_status': attributes.get('blood_status') or '',
                 'role': attributes.get('role') or '',
                 'wiki': attributes.get('wiki') or '',
-                'slug': slug
+                'slug': slug,
+                'alias_names': attributes.get('alias_names', []),
+                'animagus': attributes.get('animagus') or '',
+                'boggart': attributes.get('boggart') or '',
+                'eye_color': attributes.get('eye_color') or '',
+                'family_member': attributes.get('family_members', []),
+                'hair_color': attributes.get('hair_color') or '',
+                'height': attributes.get('height') or '',
+                'jobs': attributes.get('jobs', []),
+                'nationality': attributes.get('nationality') or '',
+                'romances': attributes.get('romances', []),
+                'skin_color': attributes.get('skin_color') or '',
+                'titles': attributes.get('titles', []),
+                'wand': attributes.get('wands', []),
+                'weight': attributes.get('weight') or ''
             }
             filtered_characters.append(char_obj)
         

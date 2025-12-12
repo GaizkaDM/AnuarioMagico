@@ -61,23 +61,29 @@
                                     </columnConstraints>
 
                                     <children>
-                                        <Label text="Nacimiento:" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblBorn" GridPane.columnIndex="1"/>
+                                        <Label text="Casa:" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblHouse" GridPane.columnIndex="1"/>
 
-                                        <Label text="Muerte:" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblDied" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                        <Label text="Patronus:" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblPatronus" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                                        <Label text="Género:" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblGender" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                        <Label text="Nacimiento:" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblBorn" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                                        <Label text="Especie:" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblSpecies" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                        <Label text="Muerte:" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblDied" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                                        <Label text="Animagus:" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                        <Label text="Género:" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblGender" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                                        <Label text="Nacionalidad:" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
-                                        <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                        <Label text="Especie:" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblSpecies" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                        <Label text="Animagus:" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblAnimagus" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                                        <Label text="Nacionalidad:" GridPane.rowIndex="7" style="-fx-font-weight: bold;"/>
+                                        <Label fx:id="lblNationality" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
                                     </children>
                                 </GridPane>
                             </content>

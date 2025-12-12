@@ -68,8 +68,23 @@ public class HarryPotterAPI {
                 p.setRole(getStringOrEmpty(obj, "role"));
                 p.setWiki(getStringOrEmpty(obj, "wiki"));
 
-                // Removed parsing of fields not present in the current API response:
-                // wands, alias_names, titles, nationality
+                // Nuevos campos
+                p.setAlias(getListAsString(obj, "alias_names"));
+                p.setTitles(getListAsString(obj, "titles"));
+                p.setWand(getListAsString(obj, "wand")); // sometimes "wands" in api, check backend: app.py uses 'wand':
+                                                         // attributes.get('wands', [])
+                p.setRomances(getListAsString(obj, "romances"));
+                p.setFamily(getListAsString(obj, "family_member"));
+                p.setJobs(getListAsString(obj, "jobs"));
+
+                p.setAnimagus(getStringOrEmpty(obj, "animagus"));
+                p.setBoggart(getStringOrEmpty(obj, "boggart"));
+                p.setEyeColor(getStringOrEmpty(obj, "eye_color"));
+                p.setHairColor(getStringOrEmpty(obj, "hair_color"));
+                p.setSkinColor(getStringOrEmpty(obj, "skin_color"));
+                p.setHeight(getStringOrEmpty(obj, "height"));
+                p.setWeight(getStringOrEmpty(obj, "weight"));
+                p.setNationality(getStringOrEmpty(obj, "nationality"));
 
                 personajes.add(p);
             }
@@ -81,8 +96,24 @@ public class HarryPotterAPI {
 
     private static String getStringOrEmpty(JsonObject obj, String key) {
         if (obj.has(key) && !obj.get(key).isJsonNull()) {
-            String value = obj.get(key).getAsString();
-            return value.isEmpty() ? "" : value;
+            return obj.get(key).getAsString();
+        }
+        return "";
+    }
+
+    private static String getListAsString(JsonObject obj, String key) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            JsonElement el = obj.get(key);
+            if (el.isJsonArray()) {
+                JsonArray arr = el.getAsJsonArray();
+                List<String> items = new ArrayList<>();
+                for (JsonElement e : arr) {
+                    items.add(e.getAsString());
+                }
+                return String.join(", ", items);
+            } else if (el.isJsonPrimitive()) {
+                return el.getAsString();
+            }
         }
         return "";
     }

@@ -13,20 +13,36 @@ import java.io.IOException;
  */
 public class DetailController {
 
-    @FXML private Button btnVolver;
-    @FXML private Label lblNombre;
-    @FXML private ImageView imgGrande;
+    @FXML
+    private Button btnVolver;
+    @FXML
+    private Label lblNombre;
+    @FXML
+    private ImageView imgGrande;
 
-    @FXML private Label lblBorn;
-    @FXML private Label lblDied;
-    @FXML private Label lblGender;
-    @FXML private Label lblSpecies;
-    @FXML private Label lblAnimagus;
-    @FXML private Label lblNationality;
+    @FXML
+    private Label lblBorn;
+    @FXML
+    private Label lblDied;
+    @FXML
+    private Label lblGender;
+    @FXML
+    private Label lblSpecies;
+    @FXML
+    private Label lblAnimagus;
+    @FXML
+    private Label lblNationality;
+    @FXML
+    private Label lblHouse;
+    @FXML
+    private Label lblPatronus;
 
-    @FXML private Label lblAlias;
-    @FXML private Label lblTitles;
-    @FXML private Label lblWand;
+    @FXML
+    private Label lblAlias;
+    @FXML
+    private Label lblTitles;
+    @FXML
+    private Label lblWand;
 
     @FXML
     public void initialize() {
@@ -51,7 +67,8 @@ public class DetailController {
         if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
             try {
                 imgGrande.setImage(new Image(p.getImagenUrl(), true));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         lblBorn.setText(nullToDash(p.getBorn()));
@@ -60,6 +77,8 @@ public class DetailController {
         lblSpecies.setText(nullToDash(p.getSpecies()));
         lblAnimagus.setText(nullToDash(p.getAnimagus()));
         lblNationality.setText(nullToDash(p.getNationality()));
+        lblHouse.setText(nullToDash(p.getCasa()));
+        lblPatronus.setText(nullToDash(p.getPatronus()));
 
         lblAlias.setText(nullToDash(p.getAlias()));
         lblTitles.setText(nullToDash(p.getTitles()));
