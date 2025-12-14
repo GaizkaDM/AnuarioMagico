@@ -20,7 +20,13 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Main controller: shows characters as cards with pagination.
+ * Controlador principal: muestra los personajes como tarjetas con paginación y
+ * filtros.
+ * Gestiona la interacción principal del usuario con el anuario.
+ *
+ * @author GaizkaFrost
+ * @version 1.0
+ * @since 2025-12-14
  */
 public class Controlador implements Initializable {
 
@@ -65,33 +71,57 @@ public class Controlador implements Initializable {
     private boolean isLoggedIn = false;
     private String currentUser = null;
 
+    /**
+     * Inicializa el controlador. Configura listeners, carga datos iniciales y
+     * configura la UI.
+     *
+     * @param location  La ubicación utilizada para resolver rutas relativas para el
+     *                  objeto raíz, o null si no se conoce.
+     * @param resources Los recursos utilizados para localizar el objeto raíz, o
+     *                  null si no se conoce.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        // Increase scroll speed
+        // Aumentar velocidad de desplazamiento
         if (scrollPane != null) {
             scrollPane.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
                 if (event.getDeltaY() != 0) {
-                    double delta = event.getDeltaY() * 3.0; // 3x faster
+                    double delta = event.getDeltaY() * 3.0; // 3x más rápido
                     double height = scrollPane.getContent().getBoundsInLocal().getHeight();
                     double vValue = scrollPane.getVvalue();
-                    // Prevent division by zero
+                    // Prevenir división por cero
                     if (height > 0) {
                         scrollPane.setVvalue(vValue + -delta / height);
-                        event.consume(); // Consume event to prevent default slow scrolling
+                        event.consume(); // Consumir evento para prevenir desplazamiento lento por defecto
                     }
                 }
             });
         }
 
-        // Setup Login Menu
+        // Configurar menú de inicio de sesión
         menuLogin.setOnAction(e -> mostrarLogin());
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
         comboEstado.getItems().addAll("Vivo", "Muerto", "Fallecido");
 
-        // Cargar datos automáticamente desde la API al inicio
-        importarDesdeAPI();
+        // Intentar sincronizar datos de la nube al inicio (Pull)
+        new Thread(() -> {
+            System.out.println("Intentando sincronización inicial (Pull)...");
+            boolean synced = HarryPotterAPI.syncPull();
+            if (synced) {
+                System.out.println("Sincronización completada. Recargando datos locales...");
+                Platform.runLater(this::importarDesdeAPI);
+            } else {
+                System.out.println("No se pudo sincronizar (¿Offline?). Cargando local...");
+                Platform.runLater(this::importarDesdeAPI);
+            }
+        }).start();
+
+        // Cargar datos automáticamente desde la API al inicio (esto se llama arriba
+        // tras sync, o aquí si quitamos la llamada directa)
+        // Lo dejamos comentado porque lo llamamos en el Thread
+        // importarDesdeAPI();
 
         // Filtros
         txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
@@ -122,6 +152,9 @@ public class Controlador implements Initializable {
         btnImportarAPI.setOnAction(e -> importarDesdeAPI());
     }
 
+    /**
+     * Muestra la ventana modal de inicio de sesión o registro.
+     */
     private void mostrarLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"));
@@ -139,6 +172,12 @@ public class Controlador implements Initializable {
         }
     }
 
+    /**
+     * Callback ejecutado cuando el inicio de sesión es exitoso.
+     * Actualiza la interfaz para reflejar el estado de usuario autenticado.
+     *
+     * @param username El nombre del usuario que ha iniciado sesión.
+     */
     private void onLoginRealizado(String username) {
         isLoggedIn = true;
         currentUser = username;
@@ -151,6 +190,9 @@ public class Controlador implements Initializable {
         });
     }
 
+    /**
+     * Cierra la sesión del usuario actual y restaura el estado de la interfaz.
+     */
     private void cerrarSesion() {
         isLoggedIn = false;
         currentUser = null;
@@ -162,7 +204,9 @@ public class Controlador implements Initializable {
     }
 
     /**
-     * Applies search, house and status filters to the full list.
+     * Aplica los filtros (búsqueda, casa, estado, favoritos) a la lista maestra de
+     * personajes.
+     * Actualiza `listaFiltrada` y reinicia la paginación.
      */
     private void aplicarFiltros() {
         String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
@@ -197,7 +241,7 @@ public class Controlador implements Initializable {
     }
 
     /**
-     * Updates the card view for the current page.
+     * Actualiza la vista de tarjetas para mostrar la página actual de resultados.
      */
     private void actualizarPagina() {
         contenedorTarjetas.getChildren().clear();
@@ -238,10 +282,10 @@ public class Controlador implements Initializable {
     }
 
     /**
-     * Creates a visual card for a character.
+     * Crea un componente visual (tarjeta) para un personaje.
      *
-     * @param p character to display
-     * @return VBox node representing the card
+     * @param p El personaje a mostrar.
+     * @return Un objeto VBox que contiene la representación visual del personaje.
      */
     private VBox crearTarjeta(Personaje p) {
         VBox tarjeta = new VBox();
@@ -294,9 +338,9 @@ public class Controlador implements Initializable {
     }
 
     /**
-     * Opens the detail view for the given character.
+     * Abre la vista detallada para el personaje seleccionado.
      *
-     * @param p character to show
+     * @param p El personaje cuyos detalles se mostrarán.
      */
     private void abrirDetalles(Personaje p) {
         try {
@@ -317,7 +361,8 @@ public class Controlador implements Initializable {
     }
 
     /**
-     * Imports characters from the Harry Potter API in a background thread.
+     * Importa personajes desde la API de Harry Potter en un hilo en segundo plano.
+     * Actualiza la interfaz gráfica una vez completada la carga.
      */
     private void importarDesdeAPI() {
         btnImportarAPI.setDisable(true);

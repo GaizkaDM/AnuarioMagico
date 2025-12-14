@@ -5,6 +5,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * Controlador para la vista de inicio de sesión y registro.
+ * Gestiona la autenticación de usuarios contra el backend.
+ *
+ * @author GaizkaFrost
+ * @version 1.0
+ * @since 2025-12-14
+ */
 public class LoginController {
 
     @FXML
@@ -24,10 +32,19 @@ public class LoginController {
 
     private java.util.function.Consumer<String> onSuccessCallback;
 
+    /**
+     * Establece el callback que se ejecutará tras un inicio de sesión exitoso.
+     *
+     * @param callback Función que recibe el nombre de usuario autenticado.
+     */
     public void setOnSuccessCallback(java.util.function.Consumer<String> callback) {
         this.onSuccessCallback = callback;
     }
 
+    /**
+     * Inicializa el controlador.
+     * Configura la lógica de alternancia entre modo Login y Registro.
+     */
     @FXML
     public void initialize() {
         chkRegistro.selectedProperty().addListener((obs, oldVal, newVal) -> {
@@ -40,6 +57,11 @@ public class LoginController {
         btnAccion.setOnAction(e -> handleAction());
     }
 
+    /**
+     * Maneja la acción del botón principal (Entrar o Registrarse).
+     * Valida entradas y realiza la llamada a la API correspondiente en un hilo
+     * separado.
+     */
     private void handleAction() {
         String user = txtUsuario.getText();
         String pass = txtPassword.getText();
@@ -90,6 +112,11 @@ public class LoginController {
         }).start();
     }
 
+    /**
+     * Actualiza el mensaje de estado en la interfaz (hilo UI).
+     *
+     * @param msg Mensaje a mostrar.
+     */
     private void updateStatus(String msg) {
         javafx.application.Platform.runLater(() -> {
             lblStatus.setText(msg);
@@ -97,6 +124,11 @@ public class LoginController {
         });
     }
 
+    /**
+     * Ejecuta una tarea en el hilo de la interfaz de usuario (Platform.runLater).
+     *
+     * @param r Runnable a ejecutar.
+     */
     private void updateIO(Runnable r) {
         javafx.application.Platform.runLater(() -> {
             r.run();
