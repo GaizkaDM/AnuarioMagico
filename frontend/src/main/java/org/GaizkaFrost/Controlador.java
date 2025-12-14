@@ -41,7 +41,7 @@ public class Controlador implements Initializable {
     @FXML
     private Button btnLimpiar;
     @FXML
-    private Button btnImportarAPI;
+    private Button btnSincronizar;
 
     @FXML
     private FlowPane contenedorTarjetas;
@@ -103,7 +103,7 @@ public class Controlador implements Initializable {
         menuLogin.setOnAction(e -> mostrarLogin());
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
-        comboEstado.getItems().addAll("Vivo", "Muerto", "Fallecido");
+        comboEstado.getItems().addAll("Vivo", "Fallecido");
 
         // Intentar sincronizar datos de la nube al inicio (Pull)
         new Thread(() -> {
@@ -148,8 +148,7 @@ public class Controlador implements Initializable {
             actualizarPagina();
         });
 
-        // Importar desde API (botón manual por si acaso)
-        btnImportarAPI.setOnAction(e -> importarDesdeAPI());
+        btnSincronizar.setOnAction(e -> sincronizar());
     }
 
     /**
@@ -252,7 +251,7 @@ public class Controlador implements Initializable {
             btnPaginaAnterior.setDisable(true);
             btnPaginaSiguiente.setDisable(true);
             // Solo mostrar mensaje si no se está cargando
-            if (!btnImportarAPI.isDisabled()) {
+            if (!btnSincronizar.isDisabled()) {
                 statusBar.setText("No se han encontrado personajes.");
             }
             return;
@@ -289,15 +288,8 @@ public class Controlador implements Initializable {
      */
     private VBox crearTarjeta(Personaje p) {
         VBox tarjeta = new VBox();
-        tarjeta.setSpacing(6);
         tarjeta.setPrefWidth(200);
-        tarjeta.setStyle(
-                "-fx-padding: 10;" +
-                        "-fx-background-color: rgba(255,255,255,0.9);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-radius: 10;" +
-                        "-fx-border-color: #cccccc;" +
-                        "-fx-border-width: 1;");
+        tarjeta.getStyleClass().add("card");
 
         ImageView img = new ImageView();
         img.setFitWidth(160);
@@ -305,35 +297,30 @@ public class Controlador implements Initializable {
 
         try {
             if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
-                System.out.println("DEBUG: Cargando imagen para " + p.getNombre() + ": " + p.getImagenUrl());
                 Image image = new Image(p.getImagenUrl(), true);
-                image.errorProperty().addListener((obs, err, hasErr) -> {
-                    if (hasErr) {
-                        System.err.println(
-                                "DEBUG: Error cargando imagen para " + p.getNombre() + ": " + image.getException());
-                    }
-                });
                 img.setImage(image);
-            } else {
-                System.out.println("DEBUG: URL nula para " + p.getNombre());
             }
         } catch (Exception e) {
-            System.err.println("DEBUG: Excepción cargando imagen: " + e.getMessage());
             e.printStackTrace();
         }
 
         Label lblNombre = new Label(p.getNombre());
-        lblNombre.setStyle("-fx-font-weight: bold;");
+        lblNombre.getStyleClass().add("card-title");
 
         Label lblCasa = new Label("Casa: " + (p.getCasa() == null ? "-" : p.getCasa()));
+        lblCasa.getStyleClass().add("card-meta");
+
         Label lblEstado = new Label("Estado: " + (p.getEstado() == null ? "-" : p.getEstado()));
+        lblEstado.getStyleClass().add("card-meta");
+
         Label lblPatronus = new Label("Patronus: " + (p.getPatronus() == null ? "-" : p.getPatronus()));
+        lblPatronus.getStyleClass().add("card-meta");
 
         Button btnDetalles = new Button("Ver detalles");
+        btnDetalles.getStyleClass().add("card-button");
         btnDetalles.setOnAction(e -> abrirDetalles(p));
 
         tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, btnDetalles);
-
         return tarjeta;
     }
 
@@ -344,17 +331,8 @@ public class Controlador implements Initializable {
      */
     private void abrirDetalles(Personaje p) {
         try {
-            FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/Detail_view.fxml"));
-            Parent root = loader.load();
-
-            DetailController controller = loader.getController();
+            DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
             controller.setPersonaje(p);
-
-            Stage stage = (Stage) contenedorTarjetas.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle(p.getNombre());
-            stage.show();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -364,8 +342,8 @@ public class Controlador implements Initializable {
      * Importa personajes desde la API de Harry Potter en un hilo en segundo plano.
      * Actualiza la interfaz gráfica una vez completada la carga.
      */
-    private void importarDesdeAPI() {
-        btnImportarAPI.setDisable(true);
+    private void sincronizar() {
+        btnSincronizar.setDisable(true);
         statusBar.setText("Cargando personajes...");
 
         new Thread(() -> {
@@ -378,14 +356,14 @@ public class Controlador implements Initializable {
                     paginaActual = 0;
                     actualizarPagina();
                     statusBar.setText("Personajes cargados.");
-                    btnImportarAPI.setDisable(false);
+                    btnSincronizar.setDisable(false);
                 });
 
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
                     statusBar.setText("Error al cargar datos.");
-                    btnImportarAPI.setDisable(false);
+                    btnSincronizar.setDisable(false);
                 });
             }
         }).start();

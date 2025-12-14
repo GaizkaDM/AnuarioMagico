@@ -19,7 +19,9 @@ import java.io.IOException;
 public class App extends Application {
 
     /** El escenario principal de la aplicación. */
+
     private static Stage stage;
+    private static Scene scene;
 
     /**
      * Punto de entrada principal para la aplicación JavaFX.
@@ -28,9 +30,21 @@ public class App extends Application {
      * @throws IOException Si falla la carga del archivo FXML.
      */
     @Override
-    public void start(@SuppressWarnings("exports") Stage s) throws IOException {
+    public void start(Stage s) throws IOException {
         stage = s;
-        setRoot("Main_view", "Anuario Hogwarts");
+
+        Parent root = loadFXML("Main_view");
+        scene = new Scene(root);
+
+        // CSS global una sola vez
+        scene.getStylesheets().add(
+                App.class.getResource("/styles/estilos.css").toExternalForm()
+        );
+
+        stage.setTitle("Anuario Hogwarts");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.show();
     }
 
     /**
@@ -52,10 +66,24 @@ public class App extends Application {
      * @throws IOException Si no se puede cargar el archivo.
      */
     static void setRoot(String fxml, String title) throws IOException {
-        Scene scene = new Scene(loadFXML(fxml));
+        Parent root = loadFXML(fxml);
+        scene.setRoot(root);
+
         stage.setTitle(title);
-        stage.setScene(scene);
-        stage.show();
+
+        // Mantén maximizado siempre (sin recrear Scene)
+        stage.setMaximized(true);
+    }
+
+    static <T> T setRootAndGetController(String fxml, String title) throws IOException {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
+        Parent root = loader.load();
+
+        scene.setRoot(root);
+        stage.setTitle(title);
+        stage.setMaximized(true);
+
+        return loader.getController();
     }
 
     /**
@@ -78,5 +106,4 @@ public class App extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }

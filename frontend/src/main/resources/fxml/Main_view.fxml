@@ -1,107 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/24.0.1"
+<BorderPane fx:id="root"
+            xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.GaizkaFrost.Controlador"
-            stylesheets="@../styles/estilos.css"
-            prefWidth="1100" prefHeight="700"
-            styleClass="glass-pane">
+            fx:controller="org.GaizkaFrost.Controlador">
 
-    <!-- ===================== TOP ===================== -->
     <top>
-        <VBox spacing="10" styleClass="glass-pane">
-            <children>
+        <VBox fx:id="topContainer" spacing="10">
+            <padding>
+                <Insets top="12" right="12" bottom="12" left="12"/>
+            </padding>
 
-                <!-- Menú superior sencillo -->
-                <MenuBar>
-                    <menus>
-                        <Menu text="Archivo">
-                            <items>
+            <MenuBar>
+                <menus>
+                    <Menu text="Archivo">
+                        <items>
                                 <MenuItem fx:id="menuLogin" text="Iniciar Sesión"/>
-                                <MenuItem fx:id="menuImportar" text="Importar desde API"/>
-                                <MenuItem fx:id="menuSalir" text="Salir"/>
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
+                            <MenuItem text="Salir"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Ayuda">
+                        <items>
+                            <MenuItem text="Acerca de"/>
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
 
-                <!-- Filtros + botón importar -->
-                <HBox spacing="10">
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-                    <children>
-                        <Label text="Buscar:"/>
-                        <TextField fx:id="txtBuscar" promptText="Nombre, casa, patronus..."/>
+            <HBox fx:id="filtersBar" spacing="10" alignment="CENTER_LEFT">
+                <Label text="Buscar:"/>
+                <TextField fx:id="txtBuscar" promptText="Nombre, casa o patronus..."/>
 
-                        <Label text="Casa:"/>
-                        <ComboBox fx:id="comboCasa" prefWidth="150"/>
+                <Label text="Casa:"/>
+                <ComboBox fx:id="comboCasa" prefWidth="160"/>
 
-                        <Label text="Estado:"/>
-                        <ComboBox fx:id="comboEstado" prefWidth="120"/>
+                <Label text="Estado:"/>
+                <ComboBox fx:id="comboEstado" prefWidth="160"/>
 
-                        <CheckBox fx:id="checkFavoritos" text="Solo Favoritos"/>
+                <CheckBox fx:id="checkFavoritos" text="Solo favoritos"/>
 
-                        <Button fx:id="btnLimpiar" text="Limpiar filtros"/>
-
-                        <Pane HBox.hgrow="ALWAYS"/>
+                <Pane HBox.hgrow="ALWAYS"/>
 
                         <Label fx:id="lblUsuario" text="" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
-                        <Button fx:id="btnImportarAPI" text="Importar desde API" styleClass="primary-button"/>
-                    </children>
-                </HBox>
-
-            </children>
+                <Button fx:id="btnLimpiar" text="Limpiar"/>
+                <Button fx:id="btnSincronizar" text="Sincronizar"/>
+                <Button fx:id="btnAnadir" text="Añadir"/>
+            </HBox>
         </VBox>
     </top>
 
-    <!-- ===================== CENTRO (tarjetas + paginación) ===================== -->
     <center>
-        <BorderPane>
-
-            <!-- TARJETAS -->
-            <center>
-                <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
-                    <content>
-                        <FlowPane fx:id="contenedorTarjetas"
-                                  hgap="15" vgap="15"
-                                  prefWrapLength="950"
-                                  styleClass="glass-pane">
-                            <padding>
-                                <Insets top="10" right="10" bottom="10" left="10"/>
-                            </padding>
-                        </FlowPane>
-                    </content>
-                </ScrollPane>
-            </center>
-
-            <!-- PAGINACIÓN -->
-            <bottom>
-                <HBox spacing="10" alignment="CENTER">
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
+            <content>
+                <FlowPane fx:id="contenedorTarjetas" hgap="12" vgap="12" alignment="CENTER">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets top="12" right="12" bottom="12" left="12"/>
                     </padding>
-                    <children>
-                        <Button fx:id="btnPaginaAnterior" text="Anterior" styleClass="secondary-button"/>
-                        <Label fx:id="lblPagina" text="Página 1 de 1"/>
-                        <Button fx:id="btnPaginaSiguiente" text="Siguiente" styleClass="secondary-button"/>
-                    </children>
-                </HBox>
-            </bottom>
-
-        </BorderPane>
+                </FlowPane>
+            </content>
+        </ScrollPane>
     </center>
 
-    <!-- ===================== BOTTOM ===================== -->
     <bottom>
-        <Label fx:id="statusBar"
-               text="Listo para usar magia..."
-               style="-fx-padding: 5; -fx-background-color: #eeeeee;"/>
+        <VBox>
+            <HBox fx:id="paginationBar" spacing="10" alignment="CENTER">
+                <padding>
+                    <Insets top="10" right="12" bottom="10" left="12"/>
+                </padding>
+
+                <Button fx:id="btnPaginaAnterior" text="Anterior"/>
+                <Label fx:id="lblPagina" text="Página 0 de 0"/>
+                <Button fx:id="btnPaginaSiguiente" text="Siguiente"/>
+            </HBox>
+
+            <Label fx:id="statusBar" text="Listo">
+                <padding>
+                    <Insets top="8" right="12" bottom="8" left="12"/>
+                </padding>
+            </Label>
+        </VBox>
     </bottom>
 
 </BorderPane>

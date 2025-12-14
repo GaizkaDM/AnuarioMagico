@@ -26,6 +26,12 @@ public class DetailController {
     private Label lblNombre;
     @FXML
     private ImageView imgGrande;
+    @FXML
+    private Button btnGenerarPDF;
+    @FXML
+    private Button btnEditar;
+    @FXML
+    private Button btnEliminar;
 
     @FXML
     private Label lblBorn;
@@ -62,13 +68,20 @@ public class DetailController {
     public void initialize() {
         btnVolver.setOnAction(event -> {
             try {
-                App.setRoot("Main_view");
+                App.setRoot("Main_view", "Anuario Hogwarts");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         btnFavorite.setOnAction(event -> toggleFavorite());
+
+        if (btnGenerarPDF != null) {
+            btnGenerarPDF.setOnAction(event -> {
+                System.out.println("Generar PDF solicitado para: "
+                        + (currentPersonaje != null ? currentPersonaje.getNombre() : "Unknown"));
+            });
+        }
 
         // Aumentar velocidad de desplazamiento
         if (detailScrollPane != null) {
