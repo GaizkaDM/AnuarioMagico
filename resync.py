@@ -6,7 +6,7 @@ import sys
 # 1. Clear current character data to force re-fetch with new filters
 print("1️⃣  Clearing local database...")
 try:
-    conn = sqlite3.connect('favorites.db')
+    conn = sqlite3.connect('anuario.db')
     cursor = conn.cursor()
     cursor.execute("DELETE FROM characters") # Keep table, remove rows
     conn.commit()

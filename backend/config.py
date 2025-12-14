@@ -1,8 +1,11 @@
 
-# Configuración Centralizada
+import os
 
-# Archivo de base de datos SQLite
-DB_FILE = 'anuario.db'
+# Directorio base del proyecto (un nivel arriba de config.py)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Archivo de base de datos SQLite (ruta absoluta)
+DB_FILE = os.path.join(BASE_DIR, 'anuario.db')
 
 # Configuración de base de datos MySQL
 MYSQL_CONFIG = {

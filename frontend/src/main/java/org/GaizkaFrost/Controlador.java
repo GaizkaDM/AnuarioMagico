@@ -111,10 +111,10 @@ public class Controlador implements Initializable {
             boolean synced = HarryPotterAPI.syncPull();
             if (synced) {
                 System.out.println("Sincronización completada. Recargando datos locales...");
-                Platform.runLater(this::importarDesdeAPI);
+                Platform.runLater(this::sincronizar);
             } else {
                 System.out.println("No se pudo sincronizar (¿Offline?). Cargando local...");
-                Platform.runLater(this::importarDesdeAPI);
+                Platform.runLater(this::sincronizar);
             }
         }).start();
 
