@@ -633,4 +633,30 @@ public class Controlador implements Initializable {
         helpStage.setScene(scene);
         helpStage.show();
     }
+
+    /**
+     * Muestra u oculta el indicador de carga.
+     *
+     * @param cargando true para mostrar el indicador, false para ocultarlo.
+     */
+    private void setCargando(boolean cargando) {
+        if (loadingBox != null) {
+            loadingBox.setVisible(cargando);
+            loadingBox.setManaged(cargando);
+        }
+        if (contenedorTarjetas != null) {
+            // Opcional: ocultar el contenido mientras carga para que sea más limpio
+            // contenedorTarjetas.setVisible(!cargando);
+        }
+
+        // Deshabilitar controles mientras carga
+        if (btnSincronizar != null)
+            btnSincronizar.setDisable(cargando);
+        if (txtBuscar != null)
+            txtBuscar.setDisable(cargando);
+        if (comboCasa != null)
+            comboCasa.setDisable(cargando);
+        if (comboEstado != null)
+            comboEstado.setDisable(cargando);
+    }
 }
