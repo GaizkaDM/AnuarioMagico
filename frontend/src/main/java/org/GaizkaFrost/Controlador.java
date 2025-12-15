@@ -61,6 +61,13 @@ public class Controlador implements Initializable {
     private List<Personaje> listaFiltrada = new ArrayList<>();
 
     private int paginaActual = 0;
+    private static int savedPage = -1;
+    // Estado de filtros guardado
+    private static String savedSearch = "";
+    private static String savedHouse = null;
+    private static String savedStatus = null;
+    private static boolean savedFavorite = false;
+
     private static final int PERSONAJES_POR_PAGINA = 20;
 
     @FXML
@@ -130,6 +137,15 @@ public class Controlador implements Initializable {
         comboCasa.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
         comboEstado.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
         checkFavoritos.selectedProperty().addListener((obs, o, n) -> aplicarFiltros());
+
+        // Restaurar estado de filtros si existe
+        if (savedSearch != null)
+            txtBuscar.setText(savedSearch);
+        if (savedHouse != null)
+            comboCasa.setValue(savedHouse);
+        if (savedStatus != null)
+            comboEstado.setValue(savedStatus);
+        checkFavoritos.setSelected(savedFavorite);
 
         btnLimpiar.setOnAction(e -> {
             txtBuscar.clear();
@@ -336,6 +352,13 @@ public class Controlador implements Initializable {
      * @param p El personaje cuyos detalles se mostrarán.
      */
     private void abrirDetalles(Personaje p) {
+        // Guardar estado
+        savedPage = paginaActual;
+        savedSearch = txtBuscar.getText();
+        savedHouse = comboCasa.getValue();
+        savedStatus = comboEstado.getValue();
+        savedFavorite = checkFavoritos.isSelected();
+
         try {
             DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
             controller.setPersonaje(p);
@@ -358,8 +381,16 @@ public class Controlador implements Initializable {
 
                 Platform.runLater(() -> {
                     masterData.setAll(personajesAPI);
-                    listaFiltrada = new ArrayList<>(masterData);
-                    paginaActual = 0;
+                    // Aplicar filtros actuales a los nuevos datos (esto repuebla listaFiltrada)
+                    aplicarFiltros();
+
+                    // Restaurar página si corresponde (aplicarFiltros la habrá reseteado a 0)
+                    if (savedPage != -1) {
+                        paginaActual = savedPage;
+                        savedPage = -1;
+                    }
+                    // Si no hay pagina guardada, aplicarFiltros ya la dejó en 0, correcto.
+
                     actualizarPagina();
                     statusBar.setText("Personajes cargados.");
                     btnSincronizar.setDisable(false);
