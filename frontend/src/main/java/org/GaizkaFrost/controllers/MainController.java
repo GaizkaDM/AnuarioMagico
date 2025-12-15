@@ -256,8 +256,15 @@ public class MainController implements Initializable {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.setResizable(false);
 
-            // Tamaño fijo un poco más grande
-            stage.setScene(new Scene(root, 400, 550));
+            // Crear escena y aplicar tema correcto
+            Scene loginScene = new Scene(root, 400, 550);
+            if (isDarkMode) {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
+            } else {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
+            }
+
+            stage.setScene(loginScene);
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
