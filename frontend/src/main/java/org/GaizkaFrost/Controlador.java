@@ -53,7 +53,9 @@ public class Controlador implements Initializable {
     @FXML
     private Button btnPaginaSiguiente;
     @FXML
-    private Label lblPagina;
+    private TextField txtPagina;
+    @FXML
+    private Label lblTotalPaginas;
     @FXML
     private Label statusBar;
 
@@ -183,7 +185,39 @@ public class Controlador implements Initializable {
             actualizarPagina();
         });
 
+        // Listener para el campo de número de página
+        txtPagina.setOnAction(e -> manejarCambioPagina());
+        txtPagina.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) { // Si pierde el foco
+                manejarCambioPagina();
+            }
+        });
+
         btnSincronizar.setOnAction(e -> sincronizar());
+    }
+
+    /**
+     * Maneja el cambio manual de página desde el TextField.
+     */
+    private void manejarCambioPagina() {
+        try {
+            int targetPage = Integer.parseInt(txtPagina.getText());
+            int total = listaFiltrada.size();
+            int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
+            if (totalPaginas == 0)
+                totalPaginas = 1;
+
+            if (targetPage < 1)
+                targetPage = 1;
+            if (targetPage > totalPaginas)
+                targetPage = totalPaginas;
+
+            paginaActual = targetPage - 1;
+            actualizarPagina();
+        } catch (NumberFormatException ex) {
+            // Si el usuario escribe texto inválido, restaurar valor actual
+            txtPagina.setText(String.valueOf(paginaActual + 1));
+        }
     }
 
     /**
@@ -289,7 +323,8 @@ public class Controlador implements Initializable {
 
         int total = listaFiltrada.size();
         if (total == 0) {
-            lblPagina.setText("Página 0 de 0");
+            txtPagina.setText("1");
+            lblTotalPaginas.setText("de 1");
             btnPaginaAnterior.setDisable(true);
             btnPaginaSiguiente.setDisable(true);
             // Solo mostrar mensaje si no se está cargando
@@ -315,7 +350,8 @@ public class Controlador implements Initializable {
             contenedorTarjetas.getChildren().add(crearTarjeta(p));
         }
 
-        lblPagina.setText("Página " + (paginaActual + 1) + " de " + totalPaginas);
+        txtPagina.setText(String.valueOf(paginaActual + 1));
+        lblTotalPaginas.setText("de " + totalPaginas);
         btnPaginaAnterior.setDisable(paginaActual == 0);
         btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas - 1);
 
