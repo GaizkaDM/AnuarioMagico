@@ -1,0 +1,72 @@
+/* login.css - Hufflepuff Edition */
+
+.root {
+    /* Earthy tones: Deep Brown/Black gradient */
+    -fx-background-color: linear-gradient(to bottom, #372e29, #1a1612);
+    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+    -fx-padding: 30;
+}
+
+.label {
+    -fx-text-fill: #ecb939;
+    /* Hufflepuff Yellow */
+    -fx-font-weight: bold;
+}
+
+.text-field,
+.password-field {
+    -fx-background-color: #1f1a17;
+    /* Very dark earth */
+    -fx-background-radius: 4;
+    -fx-border-color: #e0b135;
+    /* Gold/Yellow Border */
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-text-fill: #f0e6d2;
+    -fx-prompt-text-fill: rgba(240, 230, 210, 0.4);
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #ffd700;
+    /* Brighter gold on focus */
+    -fx-effect: dropshadow(three-pass-box, rgba(236, 185, 57, 0.4), 5, 0, 0, 0);
+}
+
+.primary-button {
+    -fx-background-color: #ecb939;
+    /* Hufflepuff Yellow */
+    -fx-text-fill: #1a1612;
+    /* Dark text for contrast */
+    -fx-border-color: #1a1612;
+    -fx-border-width: 1;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.primary-button:hover {
+    -fx-background-color: #f0c75e;
+    /* Lighter yellow */
+}
+
+.check-box {
+    -fx-text-fill: #ecb939;
+}
+
+.check-box .box {
+    -fx-background-color: #1f1a17;
+    -fx-border-color: #ecb939;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #ecb939;
+}
+
+/* Title specific style */
+.title-label {
+    -fx-font-size: 24px;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
+    -fx-padding: 0 0 20 0;
+}
