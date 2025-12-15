@@ -7,9 +7,13 @@ Autores: Xiker, Gaizka
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
+import sys
 import sqlite3
 import logging
 from logging.handlers import RotatingFileHandler
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import Extensions and Config
 from backend.config import DB_FILE

@@ -25,7 +25,9 @@ import org.GaizkaFrost.services.HarryPotterAPI;
 
 /**
  * Controlador principal de la aplicación.
- * Gestiona la interfaz principal, listado de personajes, filtrado y navegación a detalles.
+ * Gestiona la interfaz principal, listado de personajes, filtrado y navegación
+ * 
+ * a detalles.
  * 
  * @author Gaizka
  * @author Diego
@@ -263,7 +265,7 @@ public class MainController implements Initializable {
 
             // Crear escena y aplicar tema correcto
             Scene loginScene = new Scene(root, 400, 550);
-            if (isDarkMode) {
+            if (App.isDarkMode()) {
                 loginScene.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
             } else {
                 loginScene.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
