@@ -27,7 +27,7 @@ public class DetailController {
     @FXML
     private ImageView imgGrande;
     @FXML
-    private Button btnGenerarPDF;
+    private Button btnGenerarPDFDetail;
     @FXML
     private Button btnEditar;
     @FXML

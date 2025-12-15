@@ -7,15 +7,13 @@
 }
 
 /* Contenedor superior - Framed */
-#topContainer {
-    -fx-background-color: rgba(40, 10, 10, 0.7);
-    -fx-background-radius: 4;
-    -fx-border-color: #d4af37;
-    -fx-border-width: 2;
-    -fx-border-style: solid;
-    /* Could simulate double with padding if needed, but solid bold is good */
-    -fx-border-radius: 4;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 12, 0, 0, 4);
+/* Contenedor lateral - Seamless Sidebar */
+#filtersBar {
+    -fx-background-color: transparent;
+    -fx-padding: 20 15 20 15;
+    /* Optional: Add a subtle right separator line if desired, but user asked for "same screen" look */
+    /* -fx-border-color: rgba(212, 175, 55, 0.1); */
+    /* -fx-border-width: 0 1 0 0; */
 }
 
 /* Menu */
@@ -126,12 +124,14 @@
 }
 
 /* Contenedor de tarjetas */
+/* Contenedor de tarjetas - Transparent */
 #contenedorTarjetas {
-    -fx-background-color: rgba(0, 0, 0, 0.2);
-    -fx-border-color: rgba(212, 175, 55, 0.2);
-    -fx-border-width: 1;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+    /* -fx-border-color: rgba(212, 175, 55, 0.2); */
+    /* -fx-border-width: 1; */
+    /* -fx-background-radius: 8; */
+    /* -fx-border-radius: 8; */
 }
 
 /* Botones base */
@@ -159,15 +159,17 @@
     -fx-border-color: #f0d46e;
 }
 
-/* Botón Limpiar */
-#btnLimpiar {
+/* Botón Limpiar y Generar PDF */
+#btnLimpiar,
+#btnGenerarPDF {
     -fx-background-color: rgba(43, 10, 13, 0.8);
     -fx-text-fill: #d4af37;
     -fx-border-color: #d4af37;
     -fx-border-width: 1;
 }
 
-#btnLimpiar:hover {
+#btnLimpiar:hover,
+#btnGenerarPDF:hover {
     -fx-background-color: rgba(212, 175, 55, 0.2);
 }
 

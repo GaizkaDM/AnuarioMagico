@@ -42,6 +42,8 @@ public class Controlador implements Initializable {
     private Button btnLimpiar;
     @FXML
     private Button btnSincronizar;
+    @FXML
+    private Button btnGenerarPDF;
 
     @FXML
     private FlowPane contenedorTarjetas;
@@ -338,7 +340,11 @@ public class Controlador implements Initializable {
         btnDetalles.getStyleClass().add("card-button");
         btnDetalles.setOnAction(e -> abrirDetalles(p));
 
-        tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, btnDetalles);
+        // Espaciador para empujar el botón al fondo
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        javafx.scene.layout.VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, spacer, btnDetalles);
         return tarjeta;
     }
 
