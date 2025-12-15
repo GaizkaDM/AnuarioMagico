@@ -9,7 +9,12 @@ import javafx.scene.image.ImageView;
 import java.io.IOException;
 
 /**
- * Controller for the character detail view.
+ * Controlador para la vista de detalle de un personaje.
+ * Muestra información extendida y permite marcar como favorito.
+ *
+ * @author GaizkaFrost
+ * @version 1.0
+ * @since 2025-12-14
  */
 public class DetailController {
 
@@ -21,6 +26,12 @@ public class DetailController {
     private Label lblNombre;
     @FXML
     private ImageView imgGrande;
+    @FXML
+    private Button btnGenerarPDF;
+    @FXML
+    private Button btnEditar;
+    @FXML
+    private Button btnEliminar;
 
     @FXML
     private Label lblBorn;
@@ -45,22 +56,54 @@ public class DetailController {
     private Label lblTitles;
     @FXML
     private Label lblWand;
+    @FXML
+    private javafx.scene.control.ScrollPane detailScrollPane;
 
     private Personaje currentPersonaje;
 
+    /**
+     * Inicializa el controlador configuando los eventos de los botones.
+     */
     @FXML
     public void initialize() {
         btnVolver.setOnAction(event -> {
             try {
-                App.setRoot("Main_view");
+                App.setRoot("Main_view", "Anuario Hogwarts");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         btnFavorite.setOnAction(event -> toggleFavorite());
+
+        if (btnGenerarPDF != null) {
+            btnGenerarPDF.setOnAction(event -> {
+                System.out.println("Generar PDF solicitado para: "
+                        + (currentPersonaje != null ? currentPersonaje.getNombre() : "Unknown"));
+            });
+        }
+
+        // Aumentar velocidad de desplazamiento
+        if (detailScrollPane != null) {
+            detailScrollPane.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+                if (event.getDeltaY() != 0) {
+                    double delta = event.getDeltaY() * 3.0; // 3x más rápido
+                    double height = detailScrollPane.getContent().getBoundsInLocal().getHeight();
+                    double vValue = detailScrollPane.getVvalue();
+                    // Prevenir división por cero
+                    if (height > 0) {
+                        detailScrollPane.setVvalue(vValue + -delta / height);
+                        event.consume();
+                    }
+                }
+            });
+        }
     }
 
+    /**
+     * Alterna el estado de favorito del personaje actual llamando a la API.
+     * Actualiza la interfaz según el resultado.
+     */
     private void toggleFavorite() {
         if (currentPersonaje == null) {
             System.out.println("DEBUG: currentPersonaje is null");
@@ -87,6 +130,9 @@ public class DetailController {
         }
     }
 
+    /**
+     * Actualiza la apariencia del botón de favoritos según el estado del personaje.
+     */
     private void updateFavoriteUI() {
         if (currentPersonaje.isFavorite()) {
             btnFavorite.setText("★ Favorito");
@@ -99,9 +145,9 @@ public class DetailController {
     }
 
     /**
-     * Receives a character and fills the detail screen.
+     * Recibe un objeto Personaje y rellena los campos de la interfaz con sus datos.
      *
-     * @param p character to display
+     * @param p El personaje a mostrar.
      */
     public void setPersonaje(Personaje p) {
         this.currentPersonaje = p;
@@ -130,6 +176,12 @@ public class DetailController {
         lblWand.setText(nullToDash(p.getWand()));
     }
 
+    /**
+     * Convierte valores nulos o vacíos en un guion "-" para su visualización.
+     *
+     * @param s La cadena a verificar.
+     * @return La cadena original o "-".
+     */
     private String nullToDash(String s) {
         return (s == null || s.isEmpty()) ? "-" : s;
     }

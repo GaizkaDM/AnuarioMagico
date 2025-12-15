@@ -12,121 +12,151 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase de utilidad para interactuar con la API Backend.
+ * Maneja solicitudes HTTP para autenticación, obtención de personajes y gestión
+ * de favoritos.
+ *
+ * @author GaizkaFrost
+ * @version 1.0
+ * @since 2025-12-14
+ */
 public class HarryPotterAPI {
 
     private static final String API_URL = "http://localhost:8000/characters";
+    private static final String AUTH_URL = "http://localhost:8000/auth";
 
-    public static boolean toggleFavorite(String characterId) throws Exception {
-        URL url = new URL("http://localhost:8000/characters/" + characterId + "/favorite");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setConnectTimeout(5000);
+    /**
+     * Realiza el inicio de sesión del usuario.
+     */
+    public static String login(String username, String password) throws Exception {
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+        json.addProperty("password", password);
 
-        int responseCode = conn.getResponseCode();
-        conn.disconnect();
+        HttpURLConnection conn = createConnection(AUTH_URL + "/login", "POST");
+        sendJson(conn, json);
 
-        return responseCode == 200;
+        if (conn.getResponseCode() == 200) {
+            String response = readResponse(conn);
+            JsonObject res = new Gson().fromJson(response, JsonObject.class);
+            return res.has("token") ? res.get("token").getAsString() : null;
+        }
+        return null;
     }
 
+    /**
+     * Registra un nuevo usuario en el sistema.
+     */
+    public static boolean register(String username, String password, String masterPassword) throws Exception {
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+        json.addProperty("password", password);
+        json.addProperty("master_password", masterPassword);
+
+        HttpURLConnection conn = createConnection(AUTH_URL + "/register", "POST");
+        sendJson(conn, json);
+        return conn.getResponseCode() == 200;
+    }
+
+    /**
+     * Alterna el estado de favorito de un personaje.
+     */
+    public static boolean toggleFavorite(String characterId) throws Exception {
+        HttpURLConnection conn = createConnection("http://localhost:8000/characters/" + characterId + "/favorite",
+                "POST");
+        return conn.getResponseCode() == 200;
+    }
+
+    /**
+     * Sincroniza datos desde MySQL (Pull).
+     */
+    public static boolean syncPull() {
+        return executeSyncRequest("http://localhost:8000/admin/sync-pull");
+    }
+
+    /**
+     * Sincroniza datos hacia MySQL (Push).
+     */
+    public static boolean syncPush() {
+        return executeSyncRequest("http://localhost:8000/admin/sync-mysql");
+    }
+
+    private static boolean executeSyncRequest(String url) {
+        try {
+            HttpURLConnection conn = createConnection(url, "POST");
+            return conn.getResponseCode() == 200;
+        } catch (Exception e) {
+            System.err.println("Sync Error (" + url + "): " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sincronización completa (Push + Pull).
+     */
+    public static boolean fullSync() {
+        System.out.println("Iniciando Full Sync...");
+        boolean pushOk = syncPush();
+        System.out.println("Push status: " + pushOk);
+        boolean pullOk = syncPull();
+        System.out.println("Pull status: " + pullOk);
+        return pushOk && pullOk;
+    }
+
+    /**
+     * Obtiene la lista de personajes.
+     */
     public static List<Personaje> fetchCharacters() throws Exception {
         List<Personaje> personajes = new ArrayList<>();
+        HttpURLConnection conn = createConnection(API_URL, "GET");
+        conn.setConnectTimeout(120000); // 2 minutos para conexión inicial (DB fría)
+        conn.setReadTimeout(120000); // 2 minutos para lectura
 
-        URL url = new URL(API_URL);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(120000); // 2 minutes for connection
-        conn.setReadTimeout(120000); // 2 minutes for reading data
-
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 200) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            // Parse JSON
-            Gson gson = new Gson();
-            JsonArray jsonArray = gson.fromJson(response.toString(), JsonArray.class);
-
+        if (conn.getResponseCode() == 200) {
+            String response = readResponse(conn);
+            JsonArray jsonArray = new Gson().fromJson(response, JsonArray.class);
             for (JsonElement element : jsonArray) {
-                JsonObject obj = element.getAsJsonObject();
-
-                String id = getStringOrEmpty(obj, "id");
-                String nombre = getStringOrEmpty(obj, "name");
-                String casa = getStringOrEmpty(obj, "house");
-                // If "died" field exists and has value, character is dead
-                String died = getStringOrEmpty(obj, "died");
-                String estado = (died != null && !died.isEmpty()) ? "Fallecido" : "Vivo";
-                String patronus = getStringOrEmpty(obj, "patronus");
-                String imagen = getStringOrEmpty(obj, "image");
-
-                Personaje p = new Personaje(id, nombre, casa, estado, patronus, imagen);
-
-                // Set favorite status
-                if (obj.has("is_favorite") && !obj.get("is_favorite").isJsonNull()) {
-                    p.setFavorite(obj.get("is_favorite").getAsBoolean());
-                }
-
-                // Campos adicionales
-                p.setBorn(getStringOrEmpty(obj, "born"));
-                p.setDied(died);
-                p.setGender(getStringOrEmpty(obj, "gender"));
-                p.setSpecies(getStringOrEmpty(obj, "species"));
-                p.setBloodStatus(getStringOrEmpty(obj, "blood_status"));
-                p.setRole(getStringOrEmpty(obj, "role"));
-                p.setWiki(getStringOrEmpty(obj, "wiki"));
-
-                // Nuevos campos
-                p.setAlias(getListAsString(obj, "alias_names"));
-                p.setTitles(getListAsString(obj, "titles"));
-                p.setWand(getListAsString(obj, "wand")); // sometimes "wands" in api, check backend: app.py uses 'wand':
-                                                         // attributes.get('wands', [])
-                p.setRomances(getListAsString(obj, "romances"));
-                p.setFamily(getListAsString(obj, "family_member"));
-                p.setJobs(getListAsString(obj, "jobs"));
-
-                p.setAnimagus(getStringOrEmpty(obj, "animagus"));
-                p.setBoggart(getStringOrEmpty(obj, "boggart"));
-                p.setEyeColor(getStringOrEmpty(obj, "eye_color"));
-                p.setHairColor(getStringOrEmpty(obj, "hair_color"));
-                p.setSkinColor(getStringOrEmpty(obj, "skin_color"));
-                p.setHeight(getStringOrEmpty(obj, "height"));
-                p.setWeight(getStringOrEmpty(obj, "weight"));
-                p.setNationality(getStringOrEmpty(obj, "nationality"));
-
-                personajes.add(p);
+                personajes.add(Personaje.fromJson(element.getAsJsonObject()));
             }
         }
-
         conn.disconnect();
         return personajes;
     }
 
-    private static String getStringOrEmpty(JsonObject obj, String key) {
-        if (obj.has(key) && !obj.get(key).isJsonNull()) {
-            return obj.get(key).getAsString();
+    // ==========================================
+    // MÉTODOS AUXILIARES PRIVADOS (HELPERS)
+    // ==========================================
+
+    private static HttpURLConnection createConnection(String urlStr, String method) throws Exception {
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod(method);
+        conn.setConnectTimeout(10000); // Default 10s
+        conn.setReadTimeout(10000); // Default 10s
+        if ("POST".equals(method)) {
+            conn.setDoOutput(true);
         }
-        return "";
+        return conn;
     }
 
-    private static String getListAsString(JsonObject obj, String key) {
-        if (obj.has(key) && !obj.get(key).isJsonNull()) {
-            JsonElement el = obj.get(key);
-            if (el.isJsonArray()) {
-                JsonArray arr = el.getAsJsonArray();
-                List<String> items = new ArrayList<>();
-                for (JsonElement e : arr) {
-                    items.add(e.getAsString());
-                }
-                return String.join(", ", items);
-            } else if (el.isJsonPrimitive()) {
-                return el.getAsString();
-            }
+    private static void sendJson(HttpURLConnection conn, JsonObject json) throws Exception {
+        conn.setRequestProperty("Content-Type", "application/json");
+        try (java.io.OutputStream os = conn.getOutputStream()) {
+            byte[] input = json.toString().getBytes("utf-8");
+            os.write(input, 0, input.length);
         }
-        return "";
     }
+
+    private static String readResponse(HttpURLConnection conn) throws Exception {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            return response.toString();
+        }
+    }
+
 }

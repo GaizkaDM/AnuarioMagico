@@ -1,282 +1,70 @@
+/* estilos_slytherin.css - Medieval Slytherin Edition */
+
+/* Fondo general - Deep Emerald & Medieval Font */
 .root {
-    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
-    -fx-background-color: linear-gradient(to bottom, #d4e4d4, #c8dcc8);
+    -fx-background-color: linear-gradient(to bottom, #0a2b10, #051a05);
+    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
 }
 
-/* Encabezado */
-.detail-header {
-    -fx-background-color: rgba(255, 255, 255, 0.7);
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-width: 0 0 2 0;
-}
-
-/* Títulos */
-.detail-title {
-    -fx-text-fill: #1a4d1a;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-}
-
-.detail-subtitle {
-    -fx-text-fill: #2d5a2d;
-    -fx-font-size: 12px;
-}
-
-/* Imagen grande en detalle */
-.detail-image-container {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-background-radius: 16;
-    -fx-border-color: rgba(45, 90, 45, 0.5);
+/* TARJETA CENTRAL DEL DETALLE */
+.detail-card {
+    -fx-background-color: rgba(10, 43, 16, 0.85);
+    /* Dark Green Glass */
+    -fx-background-radius: 8;
+    -fx-border-color: #a8a9ad;
+    /* Silver Border */
     -fx-border-width: 2;
-    -fx-padding: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 18, 0.3, 0, 4);
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 20, 0, 0, 5);
+}
+
+/* Título de Detalle (Renamed from .detail-title) */
+.titulo-detalle {
+    -fx-text-fill: #c0c0c0;
+    /* Silver Text */
+    -fx-font-size: 32px;
+    /* Bigger title for card */
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
+    -fx-padding: 0 0 10 0;
 }
 
 /* Labels generales en vista Slytherin */
 .label {
-    -fx-text-fill: #1a3d1a;
+    -fx-text-fill: #e0e0e0;
 }
 
-/* Labels en negrita (títulos de campos) */
+/* Labels en negrita */
 .label[style*="bold"] {
-    -fx-text-fill: #2d5a2d;
-}
-
-/* TitledPane - Secciones expandibles */
-.titled-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-width: 2;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-}
-
-.titled-pane>.title {
-    -fx-background-color: rgba(212, 228, 212, 0.9);
-    -fx-background-radius: 14 14 0 0;
-}
-
-.titled-pane>.title>.text {
-    -fx-fill: #2d5a2d;
+    -fx-text-fill: #a8a9ad;
+    /* Silver */
     -fx-font-weight: bold;
 }
 
-.titled-pane>*.content {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 0 0 14 14;
-}
-
-/* Botón de volver en detalle Slytherin */
-.detail-back-button {
-    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
-    -fx-text-fill: white;
-    -fx-background-radius: 20;
-    -fx-padding: 6 14 6 14;
-    -fx-font-weight: bold;
-}
-
-.detail-back-button:hover {
-    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
-}
-
-/* ScrollPane detalle */
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane .viewport {
-    -fx-background-color: transparent;
-}
-
-/* Grids de detalle */
-.grid-detail {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 12;
-    -fx-padding: 10;
-    -fx-border-color: rgba(45, 90, 45, 0.35);
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-}
-
-/* TextArea para JSON (si se usa también aquí) */
-.json-area {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 12;
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-}
-
-/* === Tarjetas de personajes y paginación (añadido) === */
-
-#contenedorTarjetas {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane>.viewport {
-    -fx-background-color: transparent;
-}
-
-#btnPaginaAnterior,
-#btnPaginaSiguiente {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
-}
-
-#btnVolver {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
-}
-
-.root {
-    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
-    -fx-background-color: linear-gradient(to bottom, #d4e4d4, #c8dcc8);
-}
-
-/* Encabezado */
-.detail-header {
-    -fx-background-color: rgba(255, 255, 255, 0.7);
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-width: 0 0 2 0;
-}
-
-/* Títulos */
-.detail-title {
-    -fx-text-fill: #1a4d1a;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-}
-
-.detail-subtitle {
-    -fx-text-fill: #2d5a2d;
-    -fx-font-size: 12px;
-}
-
-/* Imagen grande en detalle */
-.detail-image-container {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-background-radius: 16;
-    -fx-border-color: rgba(45, 90, 45, 0.5);
-    -fx-border-width: 2;
-    -fx-padding: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 18, 0.3, 0, 4);
-}
-
-/* Labels generales en vista Slytherin */
-.label {
-    -fx-text-fill: #1a3d1a;
-}
-
-/* Labels en negrita (títulos de campos) */
-.label[style*="bold"] {
-    -fx-text-fill: #2d5a2d;
-}
-
-/* TitledPane - Secciones expandibles */
-.titled-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-width: 2;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-}
-
-.titled-pane>.title {
-    -fx-background-color: rgba(212, 228, 212, 0.9);
-    -fx-background-radius: 14 14 0 0;
-}
-
-.titled-pane>.title>.text {
-    -fx-fill: #2d5a2d;
-    -fx-font-weight: bold;
-}
-
-.titled-pane>*.content {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 0 0 14 14;
-}
-
-/* Botón de volver en detalle Slytherin */
-.detail-back-button {
-    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
-    -fx-text-fill: white;
-    -fx-background-radius: 20;
-    -fx-padding: 6 14 6 14;
-    -fx-font-weight: bold;
-}
-
-.detail-back-button:hover {
-    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
-}
-
-/* ScrollPane detalle */
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane .viewport {
-    -fx-background-color: transparent;
-}
-
-/* Grids de detalle */
-.grid-detail {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 12;
-    -fx-padding: 10;
-    -fx-border-color: rgba(45, 90, 45, 0.35);
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-}
-
-/* TextArea para JSON (si se usa también aquí) */
-.json-area {
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 12;
-    -fx-border-color: rgba(45, 90, 45, 0.4);
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
-}
-
-/* === Tarjetas de personajes y paginación (añadido) === */
-
-#contenedorTarjetas {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane>.viewport {
-    -fx-background-color: transparent;
-}
-
-#btnPaginaAnterior,
-#btnPaginaSiguiente {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
-}
-
-#btnVolver {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
-}
-
-/* ==== Additional visual enhancements for Slytherin view ==== */
-.glass-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-background-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 10, 0.2, 0, 2);
-}
-
+/* Botón de volver y favoritos (Shared style) */
+.volver-btn,
+.favorito-btn,
 .secondary-button {
-    -fx-background-color: linear-gradient(to right, #2d5a2d, #3c7a3c);
-    -fx-text-fill: white;
-    -fx-background-radius: 12;
+    -fx-background-color: linear-gradient(to right, #1a472a, #0e2b18);
+    -fx-text-fill: #c0c0c0;
+    -fx-background-radius: 4;
+    -fx-border-color: #a8a9ad;
+    -fx-border-width: 1;
     -fx-padding: 6 14 6 14;
     -fx-font-weight: bold;
+    -fx-font-family: "Georgia", serif;
 }
 
+.volver-btn:hover,
+.favorito-btn:hover,
 .secondary-button:hover {
-    -fx-background-color: linear-gradient(to right, #3c7a3c, #4c8a4c);
+    -fx-background-color: linear-gradient(to right, #2d5a2d, #1a472a);
+    -fx-border-color: #ffffff;
+    -fx-cursor: hand;
+}
+
+/* ScrollPane */
+.scroll-pane,
+.scroll-pane>.viewport {
+    -fx-background-color: transparent;
 }

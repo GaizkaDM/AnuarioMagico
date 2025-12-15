@@ -1,281 +1,245 @@
-.root {
-    -fx-font-family: "Segoe UI", "Roboto", "Sans-Serif";
-    -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4a8);
+/* main_view.css - Medieval Gryffindor Edition */
+
+/* Fondo general - Deep Burgundy & Medieval Font */
+#root {
+    -fx-background-color: linear-gradient(to bottom, #2b0a0d, #1a0505);
+    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
 }
 
-/* Hero */
-.hero-bar {
-    -fx-background-color: transparent;
-}
-
-.hero-title {
-    -fx-text-fill: #8B2500;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-.hero-subtitle {
-    -fx-text-fill: #5a3825;
-    -fx-font-size: 13px;
-}
-
-/* Barra superior de filtros */
-.filtros-bar {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-background-radius: 16;
-    -fx-padding: 10 14 10 14;
-    -fx-border-color: rgba(139, 37, 0, 0.35);
-    -fx-border-radius: 16;
-    -fx-border-width: 1;
-}
-
-/* Campos de filtro */
-.text-field {
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-border-color: rgba(139, 37, 0, 0.20);
-    -fx-border-width: 1;
-    -fx-padding: 4 8 4 8;
-}
-
-.text-field:focused {
-    -fx-border-color: rgba(139, 37, 0, 0.60);
-    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.35), 10, 0.2, 0, 2);
-}
-
-/* ComboBox */
-.combo-box-base {
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-    -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-border-color: rgba(139, 37, 0, 0.20);
-    -fx-border-width: 1;
-    -fx-padding: 2 6 2 6;
-}
-
-.combo-box-base:focused {
-    -fx-border-color: rgba(139, 37, 0, 0.60);
-    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.35), 10, 0.2, 0, 2);
-}
-
-/* Botón primario (por ejemplo, importar API) */
-.primary-button {
-    -fx-background-color: linear-gradient(to right, #8B2500, #A52A2A);
-    -fx-text-fill: white;
-    -fx-padding: 8 18 8 18;
-    -fx-background-radius: 20;
-    -fx-font-weight: bold;
-}
-
-.primary-button:hover {
-    -fx-background-color: linear-gradient(to right, #A52A2A, #c13f2c);
-}
-
-.primary-button:pressed {
-    -fx-background-color: #703000;
-}
-
-/* Botones secundarios */
-.button {
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-}
-
-.button:hover {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.2, 0, 1);
-}
-
-/* Métricas (tarjetas pequeñas de resumen) */
-.metric-card {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
-    -fx-padding: 12 16 12 16;
-    -fx-background-radius: 14;
-    -fx-border-color: rgba(139, 37, 0, 0.4);
+/* Contenedor superior - Framed */
+#topContainer {
+    -fx-background-color: rgba(40, 10, 10, 0.7);
+    -fx-background-radius: 4;
+    -fx-border-color: #d4af37;
     -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.3), 18, 0.3, 0, 4);
+    -fx-border-style: solid;
+    /* Could simulate double with padding if needed, but solid bold is good */
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 12, 0, 0, 4);
 }
 
-.metric-title {
-    -fx-text-fill: #5a3825;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-}
-
-.metric-value {
-    -fx-text-fill: #8B2500;
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-}
-
-.accent-green {
-    -fx-text-fill: #2d7a2d;
-}
-
-.accent-red {
-    -fx-text-fill: #c41e3a;
-}
-
-/* Tarjeta principal de tabla/listado */
-.table-card {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-background-radius: 16;
-    -fx-padding: 12 14 14 14;
-    -fx-border-color: rgba(139, 37, 0, 0.4);
-    -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(139, 37, 0, 0.3), 22, 0.3, 0, 6);
-}
-
-/* Títulos de sección */
-.titulo-seccion {
-    -fx-text-fill: #8B2500;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-}
-
-.subtitulo-seccion {
-    -fx-text-fill: #5a3825;
-    -fx-font-size: 11px;
-}
-
-/* Tabla */
-.table-view {
-    -fx-background-color: transparent;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: rgba(139, 37, 0, 0.3);
-    -fx-border-width: 1;
-}
-
-.table-view .column-header-background {
-    -fx-background-color: linear-gradient(to bottom, #f5e6d3, #e8d4a8);
-    -fx-background-radius: 14 14 0 0;
-}
-
-.table-view .column-header,
-.table-view .filler {
-    -fx-size: 28;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: #5a3825;
-    -fx-font-weight: bold;
-    -fx-font-size: 12px;
-}
-
-.table-row-cell {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
-}
-
-.table-row-cell:odd {
-    -fx-background-color: rgba(252, 245, 233, 0.9);
-}
-
-.table-row-cell:selected {
-    -fx-background-color: #8B2500;
-}
-
-.table-row-cell:selected .text {
-    -fx-fill: white;
-}
-
-/* Barra de estado abajo */
-.status-bar {
-    -fx-background-color: rgba(139, 37, 0, 0.85);
-    -fx-padding: 4 10 4 10;
-}
-
-.status-bar .label {
-    -fx-text-fill: #fbe9d3;
-    -fx-font-size: 11px;
-}
-
-/* Barra de menú */
+/* Menu */
 .menu-bar {
-    -fx-background-color: rgba(255, 255, 255, 0.75);
-    -fx-border-color: rgba(139, 37, 0, 0.2);
-    -fx-border-width: 0 0 1 0;
+    -fx-background-color: transparent;
 }
 
 .menu-bar .label {
-    -fx-text-fill: #5a3825;
-}
-
-.menu:hover {
-    -fx-background-color: rgba(139, 37, 0, 0.17);
-}
-
-.menu:showing {
-    -fx-background-color: rgba(139, 37, 0, 0.32);
-}
-
-/* Menú desplegable */
-.context-menu {
-    -fx-background-color: rgba(255, 255, 255, 0.98);
-    -fx-background-radius: 8;
-    -fx-border-color: rgba(139, 37, 0, 0.4);
-    -fx-border-radius: 8;
-    -fx-border-width: 2;
-}
-
-.menu-item {
-    -fx-background-color: rgba(245, 230, 211, 0.98);
+    -fx-text-fill: #f0e6d2;
+    /* Parchment white */
+    -fx-font-family: "Georgia", serif;
 }
 
 .menu-item .label {
-    -fx-text-fill: #2a1810;
+    -fx-text-fill: #2b0a0d;
+    /* Dark text in menu items */
 }
 
-.menu-item:focused {
-    -fx-background-color: rgba(139, 37, 0, 0.3);
+.context-menu {
+    -fx-background-color: #f5f0db;
+    /* Parchment bg for menus */
+    -fx-border-color: #8b4513;
+    -fx-border-width: 1;
 }
 
-.menu-item:focused .label {
-    -fx-text-fill: #ffffff;
+/* Barra de filtros */
+#filtersBar .label {
+    -fx-text-fill: #d4af37;
+    /* Gold */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
 }
 
-/* === Tarjetas de personajes y paginación (añadido) === */
+/* Inputs - Slots in the wall */
+.text-field {
+    -fx-background-color: #1a0505;
+    -fx-background-radius: 4;
+    -fx-border-color: #5c2020;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-text-fill: #f0e6d2;
+    -fx-prompt-text-fill: rgba(240, 230, 210, 0.4);
+}
 
-/* Contenedor de tarjetas: sin fondo propio, deja ver el fondo global */
-#contenedorTarjetas {
+.text-field:focused {
+    -fx-border-color: #d4af37;
+}
+
+/* Dropdowns / ComboBox - Fixed Readability */
+.combo-box-base {
+    -fx-background-color: #1a0505;
+    -fx-background-radius: 4;
+    -fx-border-color: #5c2020;
+    -fx-border-radius: 4;
+}
+
+.combo-box-base:focused {
+    -fx-border-color: #d4af37;
+}
+
+/* The prompt text inside the closed box */
+.combo-box .list-cell {
+    -fx-text-fill: #f0e6d2;
+}
+
+/* The dropdown popup list */
+.combo-box-popup .list-view {
+    -fx-background-color: #f5f0db;
+    /* Parchment background */
+    -fx-border-color: #8b4513;
+    -fx-border-width: 1;
+}
+
+.combo-box-popup .list-cell {
     -fx-background-color: transparent;
+    -fx-text-fill: #2b0a0d;
+    /* Dark text for readability */
+    -fx-padding: 4 8;
 }
 
-/* El contenido interno de los ScrollPane no añade fondo sólido */
+.combo-box-popup .list-cell:filled:selected,
+.combo-box-popup .list-cell:filled:hover {
+    -fx-background-color: #d4af37;
+    /* Highlight with Gold */
+    -fx-text-fill: #1a0505;
+}
+
+/* Checkbox */
+.check-box {
+    -fx-text-fill: #f0e6d2;
+}
+
+.check-box .box {
+    -fx-background-color: #1a0505;
+    -fx-border-color: #5c2020;
+    -fx-background-radius: 3;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #d4af37;
+}
+
+/* ScrollPane */
+.scroll-pane,
 .scroll-pane>.viewport {
     -fx-background-color: transparent;
 }
 
-/* Botones de paginación: respetan el estilo general, solo redondeo y padding suave */
-#btnPaginaAnterior,
-#btnPaginaSiguiente {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
+/* Contenedor de tarjetas */
+#contenedorTarjetas {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-border-color: rgba(212, 175, 55, 0.2);
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
 }
 
-/* Botón de volver en la vista de detalle */
-#btnVolver {
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-padding: 4 12 4 12;
-}
-
-/* ==== New visual enhancements ==== */
-.glass-pane {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-background-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 10, 0.2, 0, 2);
-}
-
-.secondary-button {
-    -fx-background-color: linear-gradient(to right, #5a3825, #8B2500);
-    -fx-text-fill: white;
-    -fx-background-radius: 12;
-    -fx-padding: 6 14 6 14;
+/* Botones base */
+.button {
+    -fx-background-radius: 4;
+    /* Less rounded, more blocky/medieval */
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+    -fx-font-family: "Georgia", serif;
     -fx-font-weight: bold;
 }
 
-.secondary-button:hover {
-    -fx-background-color: linear-gradient(to right, #8B2500, #a0522d);
+/* Botón Importar - The Golden Seal */
+#btnImportarAPI {
+    -fx-background-color: linear-gradient(to bottom, #d4af37, #b8860b);
+    -fx-text-fill: #2b0a0d;
+    -fx-border-color: #8b6914;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 0, 2);
+    -fx-font-size: 14px;
+}
+
+#btnImportarAPI:hover {
+    -fx-background-color: linear-gradient(to bottom, #f0d46e, #d4af37);
+    -fx-border-color: #f0d46e;
+}
+
+/* Botón Limpiar */
+#btnLimpiar {
+    -fx-background-color: rgba(43, 10, 13, 0.8);
+    -fx-text-fill: #d4af37;
+    -fx-border-color: #d4af37;
+    -fx-border-width: 1;
+}
+
+#btnLimpiar:hover {
+    -fx-background-color: rgba(212, 175, 55, 0.2);
+}
+
+/* Paginación - Runes style */
+#btnPaginaAnterior,
+#btnPaginaSiguiente {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d4af37;
+    -fx-border-color: #5c2020;
+    -fx-border-width: 1;
+    -fx-font-size: 14px;
+}
+
+#btnPaginaAnterior:hover,
+#btnPaginaSiguiente:hover {
+    -fx-text-fill: #f0d46e;
+    -fx-border-color: #d4af37;
+}
+
+/* Barra de estado */
+#statusBar {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-text-fill: #a09070;
+    -fx-border-color: #5c2020;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* =========================
+   TARJETAS - Parchment Style
+   ========================= */
+
+.card {
+    -fx-background-color: #f5f0db;
+    /* Parchment */
+    -fx-background-radius: 6;
+    -fx-border-color: #8b4513;
+    /* SaddleBrown border */
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 4);
+    -fx-padding: 12;
+    -fx-spacing: 8;
+}
+
+.card-title {
+    -fx-text-fill: #5c0a0a;
+    /* Blood red text */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-weight: 800;
+    -fx-font-size: 16px;
+    -fx-underline: true;
+    /* Classic touch */
+}
+
+.card-meta {
+    -fx-text-fill: #2b1b17;
+    /* Very dark brown */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-style: italic;
+}
+
+.card-button {
+    -fx-background-color: #740001;
+    /* Scarlet */
+    -fx-text-fill: #d4af37;
+    /* Gold */
+    -fx-border-color: #2b0a0d;
+    -fx-border-width: 1;
+    -fx-background-radius: 4;
+}
+
+.card-button:hover {
+    -fx-background-color: #8f1010;
+    -fx-cursor: hand;
 }

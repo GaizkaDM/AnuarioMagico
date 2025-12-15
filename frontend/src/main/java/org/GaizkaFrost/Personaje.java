@@ -1,8 +1,19 @@
 package org.GaizkaFrost;
 
 /**
- * Modelo completo que representa un personaje según tu SQL y tu interfaz.
+ * Modelo de datos que representa un personaje del universo Harry Potter.
+ * Mapea los datos provenientes de la API y de la base de datos local.
+ *
+ * @author GaizkaFrost
+ * @version 1.0
+ * @since 2025-12-14
  */
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Personaje {
 
     // --- CAMPOS PRINCIPALES ---
@@ -331,5 +342,75 @@ public class Personaje {
 
     public void setJobs(String jobs) {
         this.jobs = jobs;
+    }
+
+    // ==========================
+    // FACTORY METHODS & UTILS
+    // ==========================
+
+    public static Personaje fromJson(JsonObject obj) {
+        String id = getStringOrEmpty(obj, "id");
+        String nombre = getStringOrEmpty(obj, "name");
+        String casa = getStringOrEmpty(obj, "house");
+        String died = getStringOrEmpty(obj, "died");
+        String estado = (died != null && !died.isEmpty()) ? "Fallecido" : "Vivo";
+        String patronus = getStringOrEmpty(obj, "patronus");
+        String imagen = getStringOrEmpty(obj, "image");
+
+        Personaje p = new Personaje(id, nombre, casa, estado, patronus, imagen);
+
+        if (obj.has("is_favorite") && !obj.get("is_favorite").isJsonNull()) {
+            p.setFavorite(obj.get("is_favorite").getAsBoolean());
+        }
+
+        p.setBorn(getStringOrEmpty(obj, "born"));
+        p.setDied(died);
+        p.setGender(getStringOrEmpty(obj, "gender"));
+        p.setSpecies(getStringOrEmpty(obj, "species"));
+        p.setBloodStatus(getStringOrEmpty(obj, "blood_status"));
+        p.setRole(getStringOrEmpty(obj, "role"));
+        p.setWiki(getStringOrEmpty(obj, "wiki"));
+
+        p.setAlias(getListAsString(obj, "alias_names"));
+        p.setTitles(getListAsString(obj, "titles"));
+        p.setWand(getListAsString(obj, "wand"));
+        p.setRomances(getListAsString(obj, "romances"));
+        p.setFamily(getListAsString(obj, "family_member"));
+        p.setJobs(getListAsString(obj, "jobs"));
+
+        p.setAnimagus(getStringOrEmpty(obj, "animagus"));
+        p.setBoggart(getStringOrEmpty(obj, "boggart"));
+        p.setEyeColor(getStringOrEmpty(obj, "eye_color"));
+        p.setHairColor(getStringOrEmpty(obj, "hair_color"));
+        p.setSkinColor(getStringOrEmpty(obj, "skin_color"));
+        p.setHeight(getStringOrEmpty(obj, "height"));
+        p.setWeight(getStringOrEmpty(obj, "weight"));
+        p.setNationality(getStringOrEmpty(obj, "nationality"));
+
+        return p;
+    }
+
+    private static String getStringOrEmpty(JsonObject obj, String key) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            return obj.get(key).getAsString();
+        }
+        return "";
+    }
+
+    private static String getListAsString(JsonObject obj, String key) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            JsonElement el = obj.get(key);
+            if (el.isJsonArray()) {
+                JsonArray arr = el.getAsJsonArray();
+                List<String> items = new ArrayList<>();
+                for (JsonElement e : arr) {
+                    items.add(e.getAsString());
+                }
+                return String.join(", ", items);
+            } else if (el.isJsonPrimitive()) {
+                return el.getAsString();
+            }
+        }
+        return "";
     }
 }

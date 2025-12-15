@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 import requests
 import sqlite3
 import hashlib
@@ -10,224 +11,388 @@ import json
 from PIL import Image
 import mysql.connector
 from mysql.connector import Error
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+# Importar funciones de sincronización del módulo hermano
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from sync_mysql import sync_sqlite_to_mysql, sync_mysql_to_sqlite
+
+"""
+Módulo principal de la aplicación Backend (Flask).
+Encargado de gestionar la API REST, la conexión con PotterDB,
+la base de datos SQLite local y las funciones de autenticación/sincronización.
+
+@author: GaizkaFrost
+@version: 1.0
+@date: 2025-12-14
+"""
+
+__author__ = "GaizkaFrost"
+__version__ = "1.0"
+__status__ = "Development"
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for JavaFX client
+CORS(app)  # Habilitar CORS para cliente JavaFX
 
-# PotterDB API base URL
-POTTERDB_API = "https://api.potterdb.com/v1/characters"
+from config import DB_FILE, MYSQL_CONFIG, MASTER_PASSWORD, POTTERDB_API
 
-# Database file
-DB_FILE = 'favorites.db'
+# Configuración SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-# MySQL Configuration
-MYSQL_CONFIG = {
-    'host': '127.0.0.1',
-    'port': 3309,
-    'database': 'hogwarts',
-    'user': 'appuser',
-    'password': 'appPass123'
-}
+# Almacén de sesiones simple en memoria: token -> usuario
+SESSIONS = {} 
+# --- MODELOS SQLALCHEMY ---
+
+class User(db.Model):
+    __tablename__ = 'users'
+    username = db.Column(db.String(255), primary_key=True)
+    password_hash = db.Column(db.String(255))
+    created_at = db.Column(db.String(100))
+
+class Favorite(db.Model):
+    __tablename__ = 'favorites'
+    character_id = db.Column(db.String(255), primary_key=True)
+    is_favorite = db.Column(db.Boolean, default=False)
+
+class Character(db.Model):
+    __tablename__ = 'characters'
+    id = db.Column(db.String(255), primary_key=True)
+    name = db.Column(db.String(255))
+    house = db.Column(db.String(255))
+    image = db.Column(db.Text)
+    died = db.Column(db.String(255))
+    born = db.Column(db.String(255))
+    patronus = db.Column(db.String(255))
+    gender = db.Column(db.String(50))
+    species = db.Column(db.String(100))
+    blood_status = db.Column(db.String(100))
+    role = db.Column(db.Text)
+    wiki = db.Column(db.Text)
+    slug = db.Column(db.String(255))
+    image_blob = db.Column(db.LargeBinary)
+    alias_names = db.Column(db.Text)
+    animagus = db.Column(db.Text)
+    boggart = db.Column(db.Text)
+    eye_color = db.Column(db.String(100))
+    family_member = db.Column(db.Text)
+    hair_color = db.Column(db.String(100))
+    height = db.Column(db.String(50))
+    jobs = db.Column(db.Text)
+    nationality = db.Column(db.String(100))
+    romances = db.Column(db.Text)
+    skin_color = db.Column(db.String(100))
+    titles = db.Column(db.Text)
+    wand = db.Column(db.Text)
+    weight = db.Column(db.String(50))
 
 def init_db():
-    """Initialize SQLite database for favorites and characters"""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    # Tabla de favoritos
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS favorites (
-            character_id TEXT PRIMARY KEY,
-            is_favorite INTEGER DEFAULT 0
-        )
-    ''')
-    
-    # Tabla de personajes (caché persistente)
-    # Tabla de personajes (caché persistente)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS characters (
-            id TEXT PRIMARY KEY,
-            name TEXT,
-            house TEXT,
-            image TEXT,
-            died TEXT,
-            born TEXT,
-            patronus TEXT,
-            gender TEXT,
-            species TEXT,
-            blood_status TEXT,
-            role TEXT,
-            wiki TEXT,
-            slug TEXT,
-            image_blob BLOB,
-            alias_names TEXT,
-            animagus TEXT,
-            boggart TEXT,
-            eye_color TEXT,
-            family_member TEXT,
-            hair_color TEXT,
-            height TEXT,
-            jobs TEXT,
-            nationality TEXT,
-            romances TEXT,
-            skin_color TEXT,
-            titles TEXT,
-            wand TEXT,
-            weight TEXT
-        )
-    ''')
-    
-    # Migration: Check for new columns and add them if missing
-    cursor.execute("PRAGMA table_info(characters)")
-    existing_columns = [info[1] for info in cursor.fetchall()]
-    
-    columns_to_add = {
-        'image_blob': 'BLOB',
-        'alias_names': 'TEXT',
-        'animagus': 'TEXT',
-        'boggart': 'TEXT',
-        'eye_color': 'TEXT',
-        'family_member': 'TEXT',
-        'hair_color': 'TEXT',
-        'height': 'TEXT',
-        'jobs': 'TEXT',
-        'nationality': 'TEXT',
-        'romances': 'TEXT',
-        'skin_color': 'TEXT',
-        'titles': 'TEXT',
-        'wand': 'TEXT',
-        'weight': 'TEXT'
-    }
-    
-    for col_name, col_type in columns_to_add.items():
-        if col_name not in existing_columns:
-            print(f"⚠ Migrating database: Adding {col_name} column...")
-            cursor.execute(f"ALTER TABLE characters ADD COLUMN {col_name} {col_type}")
-    
-    conn.commit()
-    conn.close()
+    """
+    Inicializa la base de datos SQLite para favoritos y personajes.
+    Crea las tablas 'favorites', 'users' y 'characters' si no existen.
+    También realiza migraciones de columnas si es necesario.
+    """
+    with app.app_context():
+        # Crea todas las tablas definidas en los modelos si no existen
+        db.create_all()
+        
+        # Migración manual para columnas nuevas (por si la DB ya existía antes de SQLAlchemy)
+        # SQLAlchemy create_all no actualiza tablas ya existentes, así que mantenemos esto por seguridad
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            
+            cursor.execute("PRAGMA table_info(characters)")
+            existing_columns = [info[1] for info in cursor.fetchall()]
+            
+            columns_to_add = {
+                'image_blob': 'BLOB',
+                'alias_names': 'TEXT',
+                'animagus': 'TEXT',
+                'boggart': 'TEXT',
+                'eye_color': 'TEXT',
+                'family_member': 'TEXT',
+                'hair_color': 'TEXT',
+                'height': 'TEXT',
+                'jobs': 'TEXT',
+                'nationality': 'TEXT',
+                'romances': 'TEXT',
+                'skin_color': 'TEXT',
+                'titles': 'TEXT',
+                'wand': 'TEXT',
+                'weight': 'TEXT'
+            }
+            
+            for col_name, col_type in columns_to_add.items():
+                if col_name not in existing_columns:
+                    print(f"⚠ Migrating database: Adding {col_name} column...")
+                    try:
+                        cursor.execute(f"ALTER TABLE characters ADD COLUMN {col_name} {col_type}")
+                    except sqlite3.OperationalError:
+                        pass # Probablemente ya existe
+            
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"Migration warning: {e}")
 
 
 def get_favorite_status(character_id):
-    """Get favorite status for a character"""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute('SELECT 1 FROM favorites WHERE character_id = ?', (character_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return True if result else False
+    """
+    Obtiene el estado de favorito de un personaje.
+
+    Args:
+        character_id (str): El ID del personaje.
+
+    Returns:
+        bool: True si es favorito, False en caso contrario.
+    """
+    try:
+        fav = db.session.get(Favorite, character_id)
+        return bool(fav and fav.is_favorite)
+    except Exception:
+        return False
 
 
 def set_favorite_status(character_id, is_favorite):
-    """Set favorite status for a character"""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    if is_favorite:
-        cursor.execute('''
-            INSERT OR IGNORE INTO favorites (character_id, is_favorite)
-            VALUES (?, 1)
-        ''', (character_id,))
-    else:
-        cursor.execute('DELETE FROM favorites WHERE character_id = ?', (character_id,))
+    """
+    Establece el estado de favorito para un personaje.
+
+    Args:
+        character_id (str): El ID del personaje.
+        is_favorite (bool): True para marcar como favorito, False para desmarcar.
+    """
+    try:
+        fav = db.session.get(Favorite, character_id)
         
-    conn.commit()
-    conn.close()
+        if is_favorite:
+            if not fav:
+                fav = Favorite(character_id=character_id, is_favorite=True)
+                db.session.add(fav)
+            else:
+                fav.is_favorite = True
+        else:
+            if fav:
+                db.session.delete(fav)
+                
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error setting favorite status: {e}")
+        raise e
 
 
-def save_characters_to_db(characters):
-    """Save a list of characters to the database"""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    
-    for char in characters:
-        # Check if we already have the blob, don't overwrite it with NULL if we do
-        cursor.execute('SELECT image_blob FROM characters WHERE id = ?', (char['id'],))
-        existing_blob = cursor.fetchone()
-        
-        # We only update non-blob fields, or insert if new. 
-        # But for simplicity, we can use the ON CONFLICT clause or a check.
-        # Here we just re-insert. Ideally we should merge.
-        # A simpler way without losing blob:
-        
-        image_blob = None
-        if existing_blob and existing_blob[0]:
-            image_blob = existing_blob[0]
+def save_characters_to_db(characters_data):
+    """
+    Guarda una lista de personajes en la base de datos local SQLite usando SQLAlchemy.
+    Actualiza la información existente sin sobrescribir el BLOB de imagen si ya existe.
 
-        cursor.execute('''
-            INSERT OR REPLACE INTO characters (
-                id, name, house, image, died, born, patronus, 
-                gender, species, blood_status, role, wiki, slug, image_blob,
-                alias_names, animagus, boggart, eye_color, family_member,
-                hair_color, height, jobs, nationality, romances,
-                skin_color, titles, wand, weight
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            char['id'], char['name'], char['house'], char['image'], 
-            char['died'], char['born'], char['patronus'],
-            char['gender'], char['species'], char['blood_status'], 
-            char['role'], char['wiki'], char.get('slug', ''),
-            image_blob,
-            json.dumps(char.get('alias_names', [])),
-            char.get('animagus', ''),
-            char.get('boggart', ''),
-            char.get('eye_color', ''),
-            json.dumps(char.get('family_member', [])),
-            char.get('hair_color', ''),
-            char.get('height', ''),
-            json.dumps(char.get('jobs', [])),
-            char.get('nationality', ''),
-            json.dumps(char.get('romances', [])),
-            char.get('skin_color', ''),
-            json.dumps(char.get('titles', [])),
-            json.dumps(char.get('wand', [])),
-            char.get('weight', '')
-        ))
-        
-    conn.commit()
-    conn.close()
+    Args:
+        characters_data (list): Lista de diccionarios con la información de los personajes.
+    """
+    try:
+        for char_data in characters_data:
+            # Buscar si existe
+            char = db.session.get(Character, char_data['id'])
+            
+            # Preparar datos (serializar listas a JSON strings)
+            # Nota: Asumimos que data ya viene 'limpia' del endpoint, pero debemos convertir listas a JSON
+            def ensure_json(val):
+                return json.dumps(val) if isinstance(val, (list, dict)) else (val or '')
+
+            # Si ya existe, actualizamos todo MENOS el blob (si el nuevo blob es null)
+            # En la lógica actual, char_data NO trae 'image_blob' normalmente (es None).
+            # Solo si lo trajera explícitamente deberíamos actualizarlo.
+            
+            if not char:
+                char = Character(id=char_data['id'])
+                db.session.add(char)
+            
+            # Actualizar campos
+            char.name = char_data['name']
+            char.house = char_data['house']
+            char.image = char_data['image']
+            char.died = char_data['died']
+            char.born = char_data['born']
+            char.patronus = char_data['patronus']
+            char.gender = char_data['gender']
+            char.species = char_data['species']
+            char.blood_status = char_data['blood_status']
+            char.role = char_data['role']
+            char.wiki = char_data['wiki']
+            char.slug = char_data.get('slug', '')
+            
+            # Serializar campos complejos
+            char.alias_names = ensure_json(char_data.get('alias_names', []))
+            char.animagus = char_data.get('animagus', '')
+            char.boggart = char_data.get('boggart', '')
+            char.eye_color = char_data.get('eye_color', '')
+            char.family_member = ensure_json(char_data.get('family_member', []))
+            char.hair_color = char_data.get('hair_color', '')
+            char.height = char_data.get('height', '')
+            char.jobs = ensure_json(char_data.get('jobs', []))
+            char.nationality = char_data.get('nationality', '')
+            char.romances = ensure_json(char_data.get('romances', []))
+            char.skin_color = char_data.get('skin_color', '')
+            char.titles = ensure_json(char_data.get('titles', []))
+            char.wand = ensure_json(char_data.get('wand', []))
+            char.weight = char_data.get('weight', '')
+            
+            # Gestión de BLOB: Si viene en data, úsalo. Si no, respeta el existente.
+            if 'image_blob' in char_data and char_data['image_blob']:
+                 char.image_blob = char_data['image_blob']
+            
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error saving characters with SQLAlchemy: {e}")
+        raise e
 
 
 def load_characters_from_db():
-    """Load all characters from the database"""
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row  # Para acceder por nombre de columna
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM characters')
-    rows = cursor.fetchall()
-    
-    characters = []
-    for row in rows:
-        char_dict = dict(row)
-        # Quitar el blob del listado general para no saturar la respuesta JSON
-        if 'image_blob' in char_dict:
-            del char_dict['image_blob']
-            
-        # Modificar URL de imagen para apuntar a local
-        char_dict['image'] = f"http://localhost:8000/characters/{char_dict['id']}/image"
-            
-        # Parse JSON fields back to lists
-        json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
-        for field in json_fields:
-            if field in char_dict and char_dict[field]:
-                try:
-                    char_dict[field] = json.loads(char_dict[field])
-                except json.JSONDecodeError:
-                    char_dict[field] = []
-            else:
-                 char_dict[field] = []
+    """
+    Carga todos los personajes desde la base de datos local.
+    Realiza un LEFT JOIN con la tabla de favoritos para eficiencia.
+    Convierte los campos JSON almacenados nuevamente a listas.
 
-        # Añadir estado de favorito
-        char_dict['is_favorite'] = get_favorite_status(char_dict['id'])
-        characters.append(char_dict)
+    Returns:
+        list: Lista de diccionarios con los personajes.
+    """
+    try:
+        # Realizamos una consulta optimizada: SELECT characters.*, favorites.is_favorite FROM characters LEFT JOIN favorites
+        # db.session.query devuelve tuplas (Character, Favorite)
+        # Outerjoin asegura que traemos el personaje aunque no tenga entrada en favoritos
+        results = db.session.query(Character, Favorite.is_favorite).\
+            outerjoin(Favorite, Character.id == Favorite.character_id).all()
         
-    conn.close()
-    return characters
+        characters = []
+        for char, is_fav in results:
+            char_dict = {c.name: getattr(char, c.name) for c in char.__table__.columns}
+            
+            # Quitar el blob del listado general
+            if 'image_blob' in char_dict:
+                del char_dict['image_blob']
+            
+            # Modificar URL de imagen
+            char_dict['image'] = f"http://localhost:8000/characters/{char.id}/image"
+            
+            # Parsear campos JSON
+            json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
+            for field in json_fields:
+                val = char_dict.get(field)
+                if val:
+                    try:
+                        char_dict[field] = json.loads(val)
+                    except (json.JSONDecodeError, TypeError):
+                        char_dict[field] = []
+                else:
+                    char_dict[field] = []
+
+            # Añadir estado de favorito (True si is_fav es 1/True, False si es None o 0)
+            char_dict['is_favorite'] = bool(is_fav)
+            
+            characters.append(char_dict)
+            
+        return characters
+    except Exception as e:
+        print(f"Error loading characters: {e}")
+        return []
+
+
+
+# --- AUTHENTICATION ENDPOINTS ---
+
+@app.route('/auth/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        master_password = data.get('master_password')
+        
+        if not username or not password or not master_password:
+            return jsonify({'error': 'Missing fields'}), 400
+            
+        if master_password != MASTER_PASSWORD:
+            return jsonify({'error': 'Invalid Master Password'}), 403
+            
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Comprobar si el usuario existe
+        cursor.execute('SELECT 1 FROM users WHERE username = ?', (username,))
+        if cursor.fetchone():
+            conn.close()
+            return jsonify({'error': 'User already exists'}), 409
+            
+        # Crear usuario
+        pw_hash = generate_password_hash(password)
+        created_at = datetime.now().isoformat()
+        
+        cursor.execute('INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)', 
+                       (username, pw_hash, created_at))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'User registered successfully'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/auth/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        
+        if not username or not password:
+            return jsonify({'error': 'Missing fields'}), 400
+            
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT password_hash FROM users WHERE username = ?', (username,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if not row or not check_password_hash(row[0], password):
+            return jsonify({'error': 'Invalid credentials'}), 401
+            
+        # Generar token simple
+        token = str(uuid.uuid4())
+        SESSIONS[token] = username
+        
+        return jsonify({
+            'success': True, 
+            'token': token,
+            'username': username
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+    token = request.headers.get('Authorization')
+    if token and token in SESSIONS:
+        del SESSIONS[token]
+    return jsonify({'success': True})
 
 
 def generate_id(slug):
-    """Generate a consistent ID from PotterDB slug"""
+    """
+    Genera un ID consistente basado en el slug de PotterDB.
+    
+    Args:
+        slug (str): El slug del personaje.
+        
+    Returns:
+        str: El ID generado o el propio slug.
+    """
     if slug:
         return slug
     # Fallback: generate from hash if no slug
@@ -237,7 +402,14 @@ def generate_id(slug):
 @app.route('/characters', methods=['GET'])
 def get_characters():
     """
-    Fetch characters. Tries local DB first, then API.
+    Endpoint para obtener personajes.
+    
+    Flujo:
+    1. Intenta cargar desde la DB local SQLite.
+    2. Si está vacía, descarga desde la API de PotterDB (paginación).
+    3. Filtra personajes (sin imagen, palabras prohibidas).
+    4. Guarda en DB local.
+    5. Devuelve la lista filtrada.
     """
     try:
         # 1. Intentar cargar de base de datos local
@@ -246,7 +418,7 @@ def get_characters():
         if local_characters:
             print(f"✓ Returning {len(local_characters)} characters from local SQLite DB")
             
-            # Apply filtering if requested
+            # Aplicar filtrado si se solicita
             if request.args.get('filter') == 'favorites':
                 local_characters = [c for c in local_characters if c['is_favorite']]
                 
@@ -257,7 +429,7 @@ def get_characters():
         all_characters = []
         page = 1
         
-        # Fetch all pages from the API
+        # Obtener todas las páginas de la API
         while True:
             print(f"  Fetching page {page}...")
             response = requests.get(f"{POTTERDB_API}?page[number]={page}")
@@ -273,7 +445,7 @@ def get_characters():
             
             all_characters.extend(characters)
             
-            # Check if there are more pages
+            # Comprobar si hay más páginas
             meta = data.get('meta', {})
             pagination = meta.get('pagination', {})
             if page >= pagination.get('last', 1):
@@ -283,7 +455,7 @@ def get_characters():
         
         print(f"  Fetched {len(all_characters)} total characters from API")
         
-        # Filter and transform data
+        # Filtrar y transformar datos
         filtered_characters = []
         exclude_keywords = ['unidentified', 'unknown', 'student', 'girl', 'boy', 'man', 'woman', 'baby', 'child', 'spectator', 'team', 'gang', 'group', 'troll', 'portrait', 'house-elf', 'ghost', 'ghosts', 'champion', 'mentor', 'creature', 'abraxan', 'actor', 'announcer', 'cat', 'killer', 'enemy', 'antipodean', 'shopkeeper', 'ashwinder', 'reserve', 'augurey', 'aunt', 'mascot', 'grandmother', 'beggar', 'bespectacled', 'corridor', 'boa constrictor', 'ministry', 'hagrid\'s', 'enthusiast', 'fiancee', 'fianceé', 'friends', 'chief', 'victim', 'guard', 'guards', 'witch', 'wizard', 'waiter', 'deer', 'cousin', 'cousins', 'sister', 'sisters', 'brother', 'brothers', 'father', 'grandfather', 'parents', 'great-grandmother']
         
@@ -292,19 +464,22 @@ def get_characters():
             name = attributes.get('name', '')
             image_url = attributes.get('image')
             
-            # Filter: must have image
+            name = attributes.get('name', '')
+            image_url = attributes.get('image')
+            
+            # Filtro: debe tener imagen
             if not image_url:
                 continue
             
-            # Filter: exclude keywords in name
+            # Filtro: excluir palabras clave en el nombre
             if any(keyword.lower() in name.lower() for keyword in exclude_keywords):
                 continue
             
-            # Generate ID from slug
+            # Generar ID desde el slug
             slug = attributes.get('slug', '')
             character_id = generate_id(slug)
             
-            # Build complete response object
+            # Construir objeto de respuesta completo
             # Build complete response object
             char_obj = {
                 'id': character_id,
@@ -352,8 +527,16 @@ def get_characters():
 @app.route('/characters/<character_id>/image', methods=['GET'])
 def get_character_image(character_id):
     """
-    Get character image. 
-    Serve from BLOB if exists, otherwise download, cache and serve.
+    Obtiene la imagen de un personaje.
+    Sirve desde el campo BLOB si existe.
+    Si no, descarga la imagen de la URL original, la convierte a JPEG,
+    la guarda en el BLOB y la sirve.
+    
+    Args:
+        character_id (str): ID del personaje.
+        
+    Returns:
+        Response: Imagen en formato JPEG o JSON de error.
     """
     try:
         conn = sqlite3.connect(DB_FILE)
@@ -385,11 +568,11 @@ def get_character_image(character_id):
         if image_response.status_code == 200:
             image_raw_data = image_response.content
             
-            # Convert to JPEG using Pillow
+            # Convertir RGBA a RGB si es necesario (ej. para PNG/WebP con transparencia)
             try:
                 img = Image.open(io.BytesIO(image_raw_data))
                 
-                # Convert RGBA to RGB if necessary (e.g. for PNG/WebP with transparency)
+                # Convertir RGBA a RGB si es necesario (ej. para PNG/WebP con transparencia)
                 if img.mode in ('RGBA', 'LA'):
                     background = Image.new('RGB', img.size, (255, 255, 255))
                     background.paste(img, mask=img.split()[-1])
@@ -424,15 +607,22 @@ def get_character_image(character_id):
 @app.route('/characters/<character_id>/favorite', methods=['POST'])
 def toggle_favorite(character_id):
     """
-    Toggle favorite status for a character.
-    If 'is_favorite' is provided in JSON, set to that value.
-    Otherwise, flip current status.
+    Alterna o establece el estado de favorito de un personaje.
+    
+    Args:
+        character_id (str): ID del personaje.
+        
+    Body JSON (opcional):
+        { "is_favorite": boolean }
+        
+    Returns:
+        JSON: Nuevo estado del personaje.
     """
     try:
-        # Check current status
+        # Comprobar estado actual
         current_status = get_favorite_status(character_id)
         
-        # Determine new status
+        # Determinar nuevo estado
         data = request.get_json(silent=True)
         if data and 'is_favorite' in data:
             new_status = data['is_favorite']
@@ -454,7 +644,10 @@ def toggle_favorite(character_id):
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
+    """
+    Endpoint de comprobación de estado (Health Check).
+    Devuelve el estado de la DB y contadores de caché.
+    """
     try:
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
@@ -481,12 +674,15 @@ def health():
 
 
 def cache_all_images_background():
-    """Background task to download and cache all images"""
+    """
+    Tarea en segundo plano para descargar y cachear todas las imágenes
+    que faltan en la base de datos local.
+    """
     print("⚡ Starting background image sync...")
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     
-    # Get all characters with an image URL but NO blob
+    # Obtener todos los personajes con URL de imagen pero SIN blob
     cursor.execute("SELECT id, image FROM characters WHERE image IS NOT NULL AND image_blob IS NULL")
     rows = cursor.fetchall()
     conn.close() 
@@ -503,13 +699,13 @@ def cache_all_images_background():
             continue
             
         try:
-            # Download
+            # Descargar
             resp = requests.get(original_url, timeout=10)
             if resp.status_code == 200:
                 raw_data = resp.content
                 final_data = raw_data
                 
-                # Convert
+                # Convertir
                 try:
                     img = Image.open(io.BytesIO(raw_data))
                     if img.mode in ('RGBA', 'LA'):
@@ -525,7 +721,7 @@ def cache_all_images_background():
                 except Exception as e:
                     print(f"  ⚠ Conversion failed for {char_id}: {e}")
                 
-                # Save
+                # Guardar
                 t_conn = sqlite3.connect(DB_FILE)
                 t_cur = t_conn.cursor()
                 t_cur.execute("UPDATE characters SET image_blob = ? WHERE id = ?", (final_data, char_id))
@@ -545,7 +741,10 @@ def cache_all_images_background():
 
 @app.route('/admin/sync-images', methods=['POST'])
 def trigger_image_sync():
-    """Trigger background image download for offline support"""
+    """
+    Endpoint administrativo para iniciar la descarga de imágenes en segundo plano.
+    Útil para soporte offline.
+    """
     thread = threading.Thread(target=cache_all_images_background)
     thread.daemon = True
     thread.start()
@@ -553,122 +752,39 @@ def trigger_image_sync():
 
 
 @app.route('/admin/sync-mysql', methods=['POST'])
-def sync_mysql():
-    """Trigger synchronization to MySQL"""
+def sync_mysql_push():
+    """
+    Sincroniza los datos locales de SQLite a una base de datos MySQL externa (PUSH).
+    Sincroniza: Personajes, Favoritos y Usuarios.
+    """
     try:
-        # SQLite connection
-        sqlite_conn = sqlite3.connect(DB_FILE)
-        sqlite_conn.row_factory = sqlite3.Row
-        sqlite_cursor = sqlite_conn.cursor()
-        
-        # MySQL connection
-        try:
-            mysql_conn = mysql.connector.connect(**MYSQL_CONFIG)
-        except Error as e:
-            return jsonify({"error": f"MySQL Connection failed: {str(e)}"}), 502
-            
-        mysql_cursor = mysql_conn.cursor()
-        
-        # 1. Create Tables
-        mysql_cursor.execute("""
-        CREATE TABLE IF NOT EXISTS characters (
-            id VARCHAR(255) PRIMARY KEY,
-            name VARCHAR(255),
-            house VARCHAR(255),
-            image TEXT,
-            died TEXT,
-            born TEXT,
-            patronus TEXT,
-            gender VARCHAR(50),
-            species VARCHAR(100),
-            blood_status VARCHAR(100),
-            role TEXT,
-            wiki TEXT,
-            slug TEXT,
-            image_blob MEDIUMBLOB,
-            alias_names TEXT,
-            animagus TEXT,
-            boggart TEXT,
-            eye_color TEXT,
-            family_member TEXT,
-            hair_color TEXT,
-            height TEXT,
-            jobs TEXT,
-            nationality TEXT,
-            romances TEXT,
-            skin_color TEXT,
-            titles TEXT,
-            wand TEXT,
-            weight TEXT,
-            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-        """)
-        
-        mysql_cursor.execute("""
-        CREATE TABLE IF NOT EXISTS favorites (
-            character_id VARCHAR(255) PRIMARY KEY,
-            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-        """)
-        
-        # 2. Sync Characters
-        # Clear existing data to ensure we match the local filter exactly
-        mysql_cursor.execute("DELETE FROM characters")
-        
-        sqlite_cursor.execute("SELECT * FROM characters")
-        characters = sqlite_cursor.fetchall()
-        
-        count = 0
-        for char in characters:
-            char_dict = dict(char)
-            # Remove keys that might not exist in target if schema differs, but here we aligned them.
-            # Convert dict to keys/values for SQL
-            columns = ', '.join(char_dict.keys())
-            placeholders = ', '.join(['%s'] * len(char_dict))
-            update_clause = ', '.join([f"{k}=new.{k}" for k in char_dict.keys() if k != 'id'])
-            
-            sql = f"INSERT INTO characters ({columns}) VALUES ({placeholders}) AS new ON DUPLICATE KEY UPDATE {update_clause}"
-            mysql_cursor.execute(sql, list(char_dict.values()))
-            count += 1
-            
-        # 3. Sync Favorites
-        # Truncate favorites in MySQL first to mirror deletions
-        mysql_cursor.execute("DELETE FROM favorites")
-        
-        sqlite_cursor.execute("SELECT character_id FROM favorites")
-        favorites = sqlite_cursor.fetchall()
-        
-        fav_count = 0
-        for fav in favorites:
-            # fav is Row object, access by index or key
-            c_id = fav['character_id']
-            
-            mysql_cursor.execute("""
-                INSERT IGNORE INTO favorites (character_id, is_favorite) 
-                VALUES (%s, 1)
-            """, (c_id,))
-            fav_count += 1
-            
-        mysql_conn.commit()
-        mysql_conn.close()
-        sqlite_conn.close()
-        
-        return jsonify({
-            "success": True, 
-            "message": f"Synced {count} characters and {fav_count} favorites to MySQL",
-            "mysql_status": "connected"
-        })
-        
+        # Ejecutar la lógica encapsulada en sync_mysql.py
+        # Nota: ejecutamos directamente la función importada para reutilizar lógica
+        sync_sqlite_to_mysql()
+        return jsonify({"success": True, "message": "Push to MySQL completed sucessfully"})
     except Exception as e:
-        print(f"Sync error: {e}")
+        print(f"Sync Push Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/admin/sync-pull', methods=['POST'])
+def sync_mysql_pull():
+    """
+    Descarga datos de MySQL a la base de datos local SQLite (PULL).
+    Actualiza Usuarios, Favoritos y Personajes.
+    """
+    try:
+        sync_mysql_to_sqlite()
+        return jsonify({"success": True, "message": "Pull from MySQL completed successfully"})
+    except Exception as e:
+        print(f"Sync Pull Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
 
-# Legacy endpoint for backwards compatibility
+# Endpoint legado para retrocompatibilidad
 @app.route('/personajes', methods=['GET'])
 def get_personajes():
-    """Legacy endpoint - redirects to /characters"""
+    """Endpoint legado - redirige a /characters"""
     return get_characters()
 
 
@@ -681,6 +797,7 @@ if __name__ == '__main__':
     print("  - GET  /characters              : Get all filtered characters")
     print("  - GET  /characters/<id>/image   : Get character image (lazy cache)")
     print("  - POST /characters/<id>/favorite : Toggle favorite status")
-    print("  - POST /admin/sync-images       : Trigger full image cache (OFFLINE MODE)")
+    print("  - POST /admin/sync-mysql        : Push local to Cloud")
+    print("  - POST /admin/sync-pull         : Pull Cloud to local")
     print("  - GET  /health                  : Health check")
     app.run(debug=True, port=8000, host='0.0.0.0')
