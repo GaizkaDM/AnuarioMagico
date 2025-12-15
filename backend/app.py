@@ -32,7 +32,12 @@ def create_app():
     CORS(app)
     
     # Config
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE}'
+    # Ensure URI is compatible with Windows paths
+    db_uri = f'sqlite:///{DB_FILE}'
+    if os.name == 'nt':
+        db_uri = f"sqlite:///{DB_FILE.replace('\\', '/')}"
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Init Extensions
