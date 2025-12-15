@@ -18,8 +18,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.GaizkaFrost.DetailController"
-            stylesheets="@../styles/estilos_detalles.css"
+            fx:controller="org.GaizkaFrost.controllers.DetailController"
+            stylesheets="@../styles/estilos.css"
             styleClass="glass-pane">
 
     <top>

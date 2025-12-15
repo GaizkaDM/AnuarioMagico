@@ -8,7 +8,9 @@ Author: Xiker
 import sqlite3
 import json
 from typing import Dict, List, Optional
-from sync_mysql import get_sqlite_connection
+import json
+from typing import Dict, List, Optional
+from backend.services.sync_mysql import get_sqlite_connection
 
 
 class DaoSQLite:

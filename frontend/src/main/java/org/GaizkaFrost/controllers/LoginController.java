@@ -1,4 +1,6 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.controllers;
+
+import org.GaizkaFrost.services.HarryPotterAPI;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

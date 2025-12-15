@@ -11,7 +11,7 @@ from xml.dom import minidom
 import pickle
 import json
 from typing import List, Dict
-from sync_sqlite import DaoSQLite
+from backend.services.sync_sqlite import DaoSQLite
 
 
 class ExportService:

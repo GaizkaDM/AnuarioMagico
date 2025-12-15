@@ -1,4 +1,4 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -19,16 +19,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import org.GaizkaFrost.App;
+import org.GaizkaFrost.models.Personaje;
+import org.GaizkaFrost.services.HarryPotterAPI;
+
 /**
- * Controlador principal: muestra los personajes como tarjetas con paginación y
- * filtros.
- * Gestiona la interacción principal del usuario con el anuario.
- *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * Controlador principal (Renamed from Controlador)
  */
-public class Controlador implements Initializable {
+public class MainController implements Initializable {
 
     @FXML
     private TextField txtBuscar;

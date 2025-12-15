@@ -1,4 +1,6 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.services;
+
+import org.GaizkaFrost.models.Personaje;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

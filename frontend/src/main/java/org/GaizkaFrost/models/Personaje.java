@@ -1,4 +1,4 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.models;
 
 /**
  * Modelo de datos que representa un personaje del universo Harry Potter.

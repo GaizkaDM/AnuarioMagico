@@ -1,4 +1,8 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.controllers;
+
+import org.GaizkaFrost.models.Personaje;
+import org.GaizkaFrost.services.HarryPotterAPI;
+import org.GaizkaFrost.App;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

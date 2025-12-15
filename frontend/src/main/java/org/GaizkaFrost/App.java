@@ -60,7 +60,7 @@ public class App extends Application {
      * @param fxml El nombre del archivo FXML (sin extensión).
      * @throws IOException Si no se puede cargar el archivo.
      */
-    static void setRoot(String fxml) throws IOException {
+    public static void setRoot(String fxml) throws IOException {
         setRoot(fxml, stage.getTitle());
     }
 
@@ -71,7 +71,7 @@ public class App extends Application {
      * @param title El nuevo título para la ventana.
      * @throws IOException Si no se puede cargar el archivo.
      */
-    static void setRoot(String fxml, String title) throws IOException {
+    public static void setRoot(String fxml, String title) throws IOException {
         Parent root = loadFXML(fxml);
         scene.setRoot(root);
 
@@ -81,7 +81,7 @@ public class App extends Application {
         stage.setMaximized(true);
     }
 
-    static <T> T setRootAndGetController(String fxml, String title) throws IOException {
+    public static <T> T setRootAndGetController(String fxml, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
         Parent root = loader.load();
 
