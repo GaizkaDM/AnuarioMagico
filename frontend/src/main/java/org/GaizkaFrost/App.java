@@ -17,9 +17,9 @@ import java.net.URL;
  * Clase principal de la aplicación JavaFX.
  * Inicia el Stage principal y gestiona la carga de vistas FXML.
  *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * @author Gaizka
+ * @author Diego
+ * @author Xiker
  */
 public class App extends Application {
 

@@ -1,9 +1,9 @@
 """
 PersonajeService.py
-Servicio de negocio para gestionar operaciones de personajes
-Orquesta las llamadas a sync_sqlite y ExportService en el orden correcto
+Servicio para la lógica de negocio relacionada con Personajes.
+Gestiona la obtención de datos desde la API externa y la sincronización con la base de datos local.
 
-Author: Xiker
+Autores: Xiker, Diego
 """
 
 from typing import Dict, Optional

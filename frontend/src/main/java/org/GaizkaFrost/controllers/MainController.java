@@ -24,7 +24,12 @@ import org.GaizkaFrost.models.Personaje;
 import org.GaizkaFrost.services.HarryPotterAPI;
 
 /**
- * Controlador principal (Renamed from Controlador)
+ * Controlador principal de la aplicación.
+ * Gestiona la interfaz principal, listado de personajes, filtrado y navegación a detalles.
+ * 
+ * @author Gaizka
+ * @author Diego
+ * @author Xiker
  */
 public class MainController implements Initializable {
 

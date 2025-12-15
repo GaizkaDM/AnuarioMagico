@@ -5,12 +5,10 @@ import sys
 import os
 
 """
-Módulo para la sincronización de la base de datos local SQLite con una base de datos MySQL remota.
-Permite respaldar datos de personajes, favoritos y usuarios.
+Módulo de sincronización con MySQL.
+Permite volcar los datos locales (SQLite) a una base de datos MySQL remota o local para respaldo.
 
-@author: GaizkaFrost
-@version: 1.0
-@date: 2025-12-14
+Autores: Diego, Gaizka
 """
 
 __author__ = "GaizkaFrost"

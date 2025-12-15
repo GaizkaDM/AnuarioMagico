@@ -19,9 +19,9 @@ import java.util.List;
  * Maneja solicitudes HTTP para autenticación, obtención de personajes y gestión
  * de favoritos.
  *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * @author Gaizka
+ * @author Xiker
+ * @author Diego
  */
 public class HarryPotterAPI {
 

@@ -1,6 +1,16 @@
+"""
+Modelo de Personaje detallado.
+Contiene toda la información relativa a un personaje de Harry Potter, incluyendo datos biográficos y blob de imagen.
+
+Autores: Gaizka, Xiker, Diego
+"""
 from backend.extensions import db
 
 class Character(db.Model):
+    """
+    Clase que mapea la tabla 'characters'.
+    Incluye campos extensos para el anuario y datos binarios para imágenes offline.
+    """
     __tablename__ = 'characters'
     id = db.Column(db.String(255), primary_key=True)
     name = db.Column(db.String(255))

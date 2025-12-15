@@ -1,4 +1,10 @@
 
+"""
+Configuración global de la aplicación Flask.
+Define rutas de base de datos, claves secretas y URLs de APIs externas.
+
+Autores: Gaizka, Diego
+"""
 import os
 
 # Directorio base del proyecto (un nivel arriba de config.py)

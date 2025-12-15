@@ -5,9 +5,9 @@ package org.GaizkaFrost;
  * Necesaria para crear un JAR ejecutable con dependencias de JavaFX
  * correctamente.
  *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * @author Gaizka
+ * @author Diego
+ * @author Xiker
  */
 public class Lanzador {
     /**

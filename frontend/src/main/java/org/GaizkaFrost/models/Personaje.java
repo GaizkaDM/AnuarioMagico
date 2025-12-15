@@ -4,7 +4,7 @@ package org.GaizkaFrost.models;
  * Modelo de datos que representa un personaje del universo Harry Potter.
  * Mapea los datos provenientes de la API y de la base de datos local.
  *
- * @author GaizkaFrost
+ * @author Gaizka
  * @version 1.0
  * @since 2025-12-14
  */
@@ -14,6 +14,14 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modelo de datos que representa un personaje de Harry Potter.
+ * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la interfaz.
+ * 
+ * @author Xiker
+ * @author Gaizka
+ * @author Diego
+ */
 public class Personaje {
 
     // --- CAMPOS PRINCIPALES ---

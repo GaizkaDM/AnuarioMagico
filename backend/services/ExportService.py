@@ -1,8 +1,9 @@
 """
 ExportService.py
-Servicio para exportar datos de personajes a diferentes formatos (CSV, XML, Binario)
+Servicio de exportación de datos.
+Genera reportes en formatos como PDF o CSV con la información de los personajes.
 
-Author: Xiker
+Autores: Diego, Xiker
 """
 
 import csv

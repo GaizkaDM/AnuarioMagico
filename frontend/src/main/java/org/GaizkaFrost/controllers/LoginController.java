@@ -11,9 +11,9 @@ import javafx.stage.Stage;
  * Controlador para la vista de inicio de sesión y registro.
  * Gestiona la autenticación de usuarios contra el backend.
  *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * @author Gaizka
+ * @author Diego
+ * @author Xiker
  */
 public class LoginController {
 

@@ -1,3 +1,9 @@
+"""
+Servicio de gestión de imágenes.
+Se encarga de descargar, procesar y almacenar imágenes de personajes en formato binario (BLOB).
+
+Autores: Gaizka, Xiker
+"""
 import requests
 import io
 from PIL import Image
