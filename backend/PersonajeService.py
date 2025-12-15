@@ -2,6 +2,8 @@
 PersonajeService.py
 Servicio de negocio para gestionar operaciones de personajes
 Orquesta las llamadas a sync_sqlite y ExportService en el orden correcto
+
+Author: Xiker
 """
 
 from typing import Dict, Optional
@@ -18,6 +20,8 @@ class PersonajeService:
         
         Args:
             db_file: Ruta al archivo de base de datos SQLite
+            
+        Author: Xiker
         """
         self.dao = DaoSQLite(db_file)
         self.export_service = ExportService(self.dao)
@@ -37,6 +41,8 @@ class PersonajeService:
             
         Returns:
             True si todas las operaciones fueron exitosas
+            
+        Author: Xiker
         """
         print(f"\n{'='*60}")
         print(f"AÑADIENDO PERSONAJE: {personaje.get('name', 'Sin nombre')}")
@@ -85,6 +91,8 @@ class PersonajeService:
             
         Returns:
             True si todas las operaciones fueron exitosas
+            
+        Author: Xiker
         """
         print(f"\n{'='*60}")
         print(f"EDITANDO PERSONAJE: {personaje_id}")
@@ -132,6 +140,8 @@ class PersonajeService:
             
         Returns:
             True si todas las operaciones fueron exitosas
+            
+        Author: Xiker
         """
         print(f"\n{'='*60}")
         print(f"ELIMINANDO PERSONAJE: {personaje_id}")
@@ -173,6 +183,8 @@ class PersonajeService:
             
         Returns:
             Diccionario con los datos del personaje o None si no existe
+            
+        Author: Xiker
         """
         return self.dao.obtener_personaje(personaje_id)
     
@@ -182,6 +194,8 @@ class PersonajeService:
         
         Returns:
             Lista de diccionarios con los datos de todos los personajes
+            
+        Author: Xiker
         """
         return self.dao.obtener_todos_personajes()
 

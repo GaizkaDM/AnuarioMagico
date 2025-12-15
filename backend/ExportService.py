@@ -1,6 +1,8 @@
 """
 ExportService.py
 Servicio para exportar datos de personajes a diferentes formatos (CSV, XML, Binario)
+
+Author: Xiker
 """
 
 import csv
@@ -21,6 +23,8 @@ class ExportService:
         
         Args:
             dao: Instancia de DaoSQLite para acceder a los datos
+            
+        Author: Xiker
         """
         self.dao = dao
         self.csv_file = 'personajes.csv'
@@ -33,6 +37,8 @@ class ExportService:
         
         Returns:
             True si se exportó correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             personajes = self.dao.obtener_todos_personajes()
@@ -87,6 +93,8 @@ class ExportService:
         
         Returns:
             True si se exportó correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             personajes = self.dao.obtener_todos_personajes()
@@ -144,6 +152,8 @@ class ExportService:
         
         Returns:
             True si se exportó correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             # Leer el archivo XML
@@ -192,6 +202,8 @@ class ExportService:
         
         Returns:
             Lista de personajes o lista vacía si hay error
+            
+        Author: Xiker
         """
         try:
             with open(self.bin_file, 'rb') as f:
@@ -213,6 +225,8 @@ class ExportService:
         
         Returns:
             True si todas las exportaciones fueron exitosas
+            
+        Author: Xiker
         """
         print("\n=== Iniciando exportación completa ===")
         

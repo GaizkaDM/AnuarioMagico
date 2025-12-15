@@ -1,6 +1,8 @@
 """
 sync_sqlite.py
 Data Access Object para gestionar operaciones CRUD en la base de datos SQLite
+
+Author: Xiker
 """
 
 import sqlite3
@@ -17,11 +19,17 @@ class DaoSQLite:
         
         Args:
             db_file: Ruta al archivo de base de datos SQLite
+            
+        Author: Xiker
         """
         self.db_file = db_file
     
     def _get_connection(self) -> sqlite3.Connection:
-        """Crea y retorna una conexión a la base de datos"""
+        """
+        Crea y retorna una conexión a la base de datos
+        
+        Author: Xiker
+        """
         conn = sqlite3.connect(self.db_file)
         conn.row_factory = sqlite3.Row
         return conn
@@ -35,6 +43,8 @@ class DaoSQLite:
             
         Returns:
             True si se añadió correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             conn = self._get_connection()
@@ -109,6 +119,8 @@ class DaoSQLite:
             
         Returns:
             True si se editó correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             conn = self._get_connection()
@@ -174,6 +186,8 @@ class DaoSQLite:
             
         Returns:
             True si se eliminó correctamente, False en caso contrario
+            
+        Author: Xiker
         """
         try:
             conn = self._get_connection()
@@ -210,6 +224,8 @@ class DaoSQLite:
             
         Returns:
             Diccionario con los datos del personaje o None si no existe
+            
+        Author: Xiker
         """
         try:
             conn = self._get_connection()
@@ -247,6 +263,8 @@ class DaoSQLite:
         
         Returns:
             Lista de diccionarios con los datos de todos los personajes
+            
+        Author: Xiker
         """
         try:
             conn = self._get_connection()
