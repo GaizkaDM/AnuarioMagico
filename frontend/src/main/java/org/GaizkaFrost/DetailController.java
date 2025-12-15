@@ -27,7 +27,7 @@ public class DetailController {
     @FXML
     private ImageView imgGrande;
     @FXML
-    private Button btnGenerarPDF;
+    private Button btnGenerarPDFDetail;
     @FXML
     private Button btnEditar;
     @FXML
@@ -76,8 +76,8 @@ public class DetailController {
 
         btnFavorite.setOnAction(event -> toggleFavorite());
 
-        if (btnGenerarPDF != null) {
-            btnGenerarPDF.setOnAction(event -> {
+        if (btnGenerarPDFDetail != null) {
+            btnGenerarPDFDetail.setOnAction(event -> {
                 System.out.println("Generar PDF solicitado para: "
                         + (currentPersonaje != null ? currentPersonaje.getNombre() : "Unknown"));
             });
