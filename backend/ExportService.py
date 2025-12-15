@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 import pickle
 import json
+import base64
 from typing import List, Dict
 from sync_sqlite import DaoSQLite
 
@@ -196,6 +197,7 @@ class ExportService:
             print(f"✗ Error al exportar a binario: {str(e)}")
             return False
     
+    
     def importar_desde_binario(self) -> List[Dict]:
         """
         Importa personajes desde el archivo binario
@@ -217,6 +219,82 @@ class ExportService:
             return []
         except Exception as e:
             print(f"✗ Error al importar desde binario: {str(e)}")
+            return []
+
+    def importar_desde_csv(self, archivo_csv: str) -> List[Dict]:
+        """
+        Importa personajes desde un archivo CSV
+        
+        Args:
+            archivo_csv: Ruta al archivo CSV a importar
+            
+        Returns:
+            Lista de diccionarios con los datos de los personajes
+            
+        Author: Xiker
+        """
+        try:
+            personajes = []
+            
+            with open(archivo_csv, 'r', newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                
+                # Campos que son listas JSON en el CSV
+                campos_json = [
+                    'alias_names', 'family_member', 'jobs', 'romances', 
+                    'titles', 'wand'
+                ]
+                
+                for row in reader:
+                    personaje = dict(row)
+                    
+                    # Convertir strings JSON a listas reales
+                    for campo in campos_json:
+                        if campo in personaje and personaje[campo]:
+                            try:
+                                personaje[campo] = json.loads(personaje[campo])
+                            except json.JSONDecodeError:
+                                personaje[campo] = []
+                        else:
+                            personaje[campo] = []
+                            
+                    # Limpieza de campos vacíos o 'None' string
+                    for key, value in personaje.items():
+                        if value == 'None':
+                            personaje[key] = None
+                        elif value == '':
+                            # Mantener vacío si no es de los campos JSON (que ya gestionamos arriba)
+                            if key not in campos_json:
+                                personaje[key] = ''
+                    
+                    # Tratamiento especial para image_blob: Decodificar Base64
+                    if 'image_blob' in personaje:
+                        val = personaje['image_blob']
+                        if val and isinstance(val, str) and val != '[BINARY_DATA]':
+                            try:
+                                # Soporte simple para data URI scheme (data:image/png;base64,...)
+                                if ',' in val:
+                                    val = val.split(',', 1)[1]
+                                
+                                personaje['image_blob'] = base64.b64decode(val)
+                            except Exception:
+                                # Si falla decodificación, marcamos como None (inválido)
+                                print(f"  ⚠ Advertencia: Error al decodificar image_blob para {personaje.get('name', 'Unknown')}")
+                                personaje['image_blob'] = None
+                        else:
+                            # Si es [BINARY_DATA] o vacío, no es un blob válido para importar
+                            personaje['image_blob'] = None
+                                
+                    personajes.append(personaje)
+            
+            print(f"✓ Leídos {len(personajes)} personajes desde {archivo_csv}")
+            return personajes
+            
+        except FileNotFoundError:
+            print(f"✗ Error: No se encuentra el archivo {archivo_csv}")
+            return []
+        except Exception as e:
+            print(f"✗ Error al importar desde CSV: {str(e)}")
             return []
     
     def exportar_todo(self) -> bool:

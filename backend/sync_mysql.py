@@ -4,6 +4,8 @@ from mysql.connector import Error
 import sys
 import os
 
+
+
 """
 Módulo para la sincronización de la base de datos local SQLite con una base de datos MySQL remota.
 Permite respaldar datos de personajes, favoritos y usuarios.
@@ -48,6 +50,8 @@ def get_mysql_connection():
     Returns:
         Connection: Objeto de conexión MySQL o None si falla.
     """
+
+        
     try:
         connection = mysql.connector.connect(**MYSQL_CONFIG)
         if connection.is_connected():

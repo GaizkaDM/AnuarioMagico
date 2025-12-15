@@ -26,8 +26,10 @@ Encargado de gestionar la API REST, la conexión con PotterDB,
 la base de datos SQLite local y las funciones de autenticación/sincronización.
 
 @author: GaizkaFrost
+@modify: Xiker
 @version: 1.0
 @date: 2025-12-14
+
 """
 
 __author__ = "GaizkaFrost"
@@ -787,8 +789,55 @@ def sync_mysql_pull():
         sync_mysql_to_sqlite()
         return jsonify({"success": True, "message": "Pull from MySQL completed successfully"})
     except Exception as e:
-        print(f"Sync Pull Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/admin/import-csv', methods=['POST'])
+def import_csv():
+    """
+    Endpoint masivo para importar personajes desde un archivo CSV.
+    Espera un archivo en el form-data con key 'file'.
+    Recibe un CSV con el modelo de personaje y los añade a la base de datos.
+    Regenera los archivos CSV, XML y binario automáticamente.
+    """
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+            
+        if file and file.filename.endswith('.csv'):
+            # Guardar temporalmente
+            temp_path = 'temp_import.csv'
+            # Asegurarse de guardar en el directorio actual o uno seguro
+            abs_temp_path = os.path.abspath(temp_path)
+            file.save(abs_temp_path)
+            
+            try:
+                # Ejecutar importación
+                stats = personaje_service.importar_personajes_desde_csv(abs_temp_path)
+                
+                # Limpieza
+                if os.path.exists(abs_temp_path):
+                    os.remove(abs_temp_path)
+                    
+                return jsonify({
+                    'success': True,
+                    'message': 'Import completed successfully',
+                    'stats': stats
+                })
+            except Exception as e:
+                if os.path.exists(abs_temp_path):
+                    os.remove(abs_temp_path)
+                raise e
+        else:
+            return jsonify({'error': 'Invalid file type. Must be CSV'}), 400
+            
+    except Exception as e:
+        print(f"Import Error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # --- CRUD ENDPOINTS (Integración con PersonajeService) ---
