@@ -245,3 +245,39 @@
     -fx-background-color: #f0c75e;
     -fx-cursor: hand;
 }
+
+/* =========================
+   LOADING INDICATOR
+   ========================= */
+
+.loading-box {
+    -fx-background-color: rgba(255, 253, 232, 0.9);
+    /* Parchment */
+    -fx-background-radius: 12;
+    -fx-border-color: #ecb939;
+    /* Gold */
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 4);
+    -fx-padding: 30;
+    -fx-max-width: 300;
+    -fx-max-height: 200;
+}
+
+.loading-label {
+    -fx-text-fill: #5c4033;
+    /* Dark Brown */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(one-pass-box, rgba(255, 255, 255, 0.8), 0, 1, 0, 1);
+}
+
+.progress-indicator .indicator {
+    -fx-background-color: #ecb939;
+    /* Gold Spinner */
+}
+
+.progress-indicator .progress {
+    -fx-background-color: #ecb939;
+}

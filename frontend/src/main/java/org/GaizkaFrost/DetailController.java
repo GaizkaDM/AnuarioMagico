@@ -140,16 +140,18 @@ public class DetailController {
     }
 
     public void setDarkMode(boolean isDarkMode) {
-        if (btnVolver.getScene() == null)
-            return;
-        javafx.scene.Parent root = btnVolver.getScene().getRoot();
-        root.getStylesheets().clear();
-        if (isDarkMode) {
-            root.getStylesheets()
-                    .add(getClass().getResource("/styles/estilos_detalles_ravenclaw.css").toExternalForm());
-        } else {
-            root.getStylesheets().add(getClass().getResource("/styles/estilos_detalles.css").toExternalForm());
-        }
+        javafx.application.Platform.runLater(() -> {
+            if (btnVolver.getScene() == null)
+                return;
+            javafx.scene.Parent root = btnVolver.getScene().getRoot();
+            root.getStylesheets().clear();
+            if (isDarkMode) {
+                root.getStylesheets()
+                        .add(getClass().getResource("/styles/estilos_detalles_ravenclaw.css").toExternalForm());
+            } else {
+                root.getStylesheets().add(getClass().getResource("/styles/estilos_detalles.css").toExternalForm());
+            }
+        });
     }
 
     /**

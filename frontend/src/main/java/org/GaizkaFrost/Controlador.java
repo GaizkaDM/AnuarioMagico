@@ -245,16 +245,6 @@ public class Controlador implements Initializable {
             LoginController loginCtrl = loader.getController();
             loginCtrl.setOnSuccessCallback(this::onLoginRealizado);
 
-            // Aplicar tema correcto
-            if (isDarkMode) {
-                root.getStylesheets().clear();
-                root.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
-            } else {
-                // Default is already set in FXML, but ensure if reused
-                root.getStylesheets().clear();
-                root.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
-            }
-
             Stage stage = new Stage();
             stage.setTitle("Login / Registro");
 
@@ -262,8 +252,15 @@ public class Controlador implements Initializable {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.setResizable(false);
 
-            // Tamaño fijo un poco más grande
-            stage.setScene(new Scene(root, 400, 550));
+            // Crear escena y aplicar tema correcto
+            Scene loginScene = new Scene(root, 400, 550);
+            if (isDarkMode) {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
+            } else {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
+            }
+
+            stage.setScene(loginScene);
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
