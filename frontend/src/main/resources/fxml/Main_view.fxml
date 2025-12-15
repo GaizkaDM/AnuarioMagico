@@ -20,6 +20,7 @@
                 </Menu>
                 <Menu text="Ayuda">
                     <items>
+                        <MenuItem fx:id="menuManual" text="Manual de Usuario"/>
                         <MenuItem text="Acerca de"/>
                     </items>
                 </Menu>

@@ -22,6 +22,7 @@ public class App extends Application {
 
     private static Stage stage;
     private static Scene scene;
+    private static App instance;
 
     /**
      * Punto de entrada principal para la aplicación JavaFX.
@@ -31,6 +32,7 @@ public class App extends Application {
      */
     @Override
     public void start(Stage s) throws IOException {
+        instance = this;
         stage = s;
 
         Parent root = loadFXML("Main_view");
@@ -38,8 +40,7 @@ public class App extends Application {
 
         // CSS global una sola vez
         scene.getStylesheets().add(
-                App.class.getResource("/styles/estilos.css").toExternalForm()
-        );
+                App.class.getResource("/styles/estilos.css").toExternalForm());
 
         stage.setTitle("Anuario Hogwarts");
         stage.setScene(scene);
@@ -105,5 +106,16 @@ public class App extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    /**
+     * Abre una URL en el navegador por defecto del sistema.
+     * 
+     * @param url La URL a abrir (puede ser http:// o file://)
+     */
+    public static void openWebpage(String url) {
+        if (instance != null) {
+            instance.getHostServices().showDocument(url);
+        }
     }
 }

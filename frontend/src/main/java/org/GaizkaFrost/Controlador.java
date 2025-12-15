@@ -66,6 +66,8 @@ public class Controlador implements Initializable {
     @FXML
     private MenuItem menuLogin;
     @FXML
+    private MenuItem menuManual;
+    @FXML
     private Label lblUsuario;
     @FXML
     private ScrollPane scrollPane;
@@ -119,6 +121,11 @@ public class Controlador implements Initializable {
         } else {
             // Configurar menú de inicio de sesión
             menuLogin.setOnAction(e -> mostrarLogin());
+
+            // Configurar menú de ayuda
+            if (menuManual != null) {
+                menuManual.setOnAction(e -> mostrarAyuda());
+            }
         }
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
@@ -136,11 +143,6 @@ public class Controlador implements Initializable {
                 Platform.runLater(this::sincronizar);
             }
         }).start();
-
-        // Cargar datos automáticamente desde la API al inicio (esto se llama arriba
-        // tras sync, o aquí si quitamos la llamada directa)
-        // Lo dejamos comentado porque lo llamamos en el Thread
-        // importarDesdeAPI();
 
         // Filtros
         txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
@@ -391,5 +393,117 @@ public class Controlador implements Initializable {
                 });
             }
         }).start();
+    }
+
+    /**
+     * Muestra el manual de usuario en una nueva ventana.
+     * Guía detallada "paso a paso" para usuarios principiantes.
+     */
+    private void mostrarAyuda() {
+        Stage helpStage = new Stage();
+        helpStage.setTitle("Manual de Usuario - Anuario Mágico (Guía Detallada)");
+
+        VBox content = new VBox(20); // Más espacio entre secciones
+        content.setPadding(new javafx.geometry.Insets(25));
+        content.setStyle("-fx-background-color: #fafafa;");
+
+        // Título Principal
+        Label title = new Label("📖 Guía de Uso del Anuario Mágico");
+        title.setStyle(
+                "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #5a3e1b; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);");
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setAlignment(javafx.geometry.Pos.CENTER);
+
+        // Intro
+        Label intro = new Label(
+                "¡Hola! Bienvenido a tu enciclopedia mágica. No te preocupes si no eres un experto en ordenadores, esta guía te explicará todo paso a paso.");
+        intro.setWrapText(true);
+        intro.setStyle("-fx-font-size: 15px; -fx-padding: 0 0 10 0;");
+
+        // Sección 1: La Pantalla Principal
+        Label sec1 = new Label("1. La Pantalla Principal");
+        sec1.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text1 = new Label(
+                "Lo primero que ves son las **Tarjetas de Personajes**.\n" +
+                        "• Cada recuadro es un personaje (Harry, Hermione, etc.).\n" +
+                        "• **Para ver más:** Usa la rueda de tu ratón para bajar y subir, o arrastra la barra gris de la derecha.\n"
+                        +
+                        "• **Páginas:** Abajo del todo hay botones 'Anterior' y 'Siguiente'. Si no encuentras a alguien, ¡prueba en la siguiente página!");
+        text1.setWrapText(true);
+        text1.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        // Sección 2: Cómo Buscar
+        Label sec2 = new Label("2. ¿Cómo busco a alguien?");
+        sec2.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text2 = new Label(
+                "Arriba a la izquierda tienes varias herramientas:\n" +
+                        "• **Casilla 'Buscar':** Haz clic ahí y escribe un nombre (ej. 'Potter'). La lista cambiará sola mientras escribes.\n"
+                        +
+                        "• **Menú 'Casa':** Pincha y elige una casa (ej. 'Gryffindor') para ver solo a sus miembros.\n"
+                        +
+                        "• **Menú 'Estado':** Elige 'Vivo' o 'Fallecido' si quieres filtrar así.\n" +
+                        "• **Botón Limpiar:** Si te lías con tanto filtro, pulsa este botón para borrar todo y ver la lista completa otra vez.");
+        text2.setWrapText(true);
+        text2.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        // Sección 3: Ver Detalles y Fotos
+        Label sec3 = new Label("3. Ver Detalles y Fotos");
+        sec3.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text3 = new Label(
+                "¿Quieres saber más de un personaje?\n" +
+                        "1. Busca su tarjeta en la lista.\n" +
+                        "2. Pulsa el botón **'Ver detalles'** que tiene cada tarjeta.\n" +
+                        "3. Se abrirá una pantalla nueva con su foto grande, varita, patronus y más datos.\n" +
+                        "4. Para volver, pulsa el botón **'Volver'** arriba a la izquierda.");
+        text3.setWrapText(true);
+        text3.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        // Sección 4: Favoritos
+        Label sec4 = new Label("4. Guardar mis Favoritos");
+        sec4.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text4 = new Label(
+                "Para no perder de vista a tus preferidos:\n" +
+                        "• Entra en los detalles de un personaje y pulsa el botón **'Corazón / Añadir a Favoritos'**.\n"
+                        +
+                        "• Luego, en la pantalla principal, marca la cajita **'Ver solo favoritos'** (a la izquierda) y solo saldrán ellos.");
+        text4.setWrapText(true);
+        text4.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        // Sección 5: Sincronización (La Nube)
+        Label sec5 = new Label("5. Botón Sincronizar (La Nube)");
+        sec5.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text5 = new Label(
+                "La aplicación guarda los datos en tu ordenador para que funcione aunque se vaya internet.\n" +
+                        "• Si crees que faltan datos nuevos, pulsa el botón **'Sincronizar'**.\n" +
+                        "• Espérate un poco a que termine la barra de carga.\n" +
+                        "• **Nota:** Las imágenes se descargan la primera vez que las ves, así que si alguna no sale, espera unos segundos con internet conectado.");
+        text5.setWrapText(true);
+        text5.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        // Sección 6: Preguntas (FAQ)
+        Label sec6 = new Label("6. Preguntas Frecuentes");
+        sec6.setStyle(
+                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
+        Label text6 = new Label(
+                "• ¿Por qué algunos no tienen foto? No todos los magos se han hecho fotos para el anuario.\n" +
+                        "• ¿Cómo arreglo un dato mal puesto? Solo los profesores (administradores) pueden cambiar datos.");
+        text6.setWrapText(true);
+        text6.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
+
+        content.getChildren().addAll(title, intro, sec1, text1, sec2, text2, sec3, text3, sec4, text4, sec5, text5,
+                sec6, text6);
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: #fafafa; -fx-border-color: transparent;");
+
+        Scene scene = new Scene(scroll, 700, 800);
+        helpStage.setScene(scene);
+        helpStage.show();
     }
 }
