@@ -60,6 +60,8 @@ public class Controlador implements Initializable {
     private Label lblTotalPaginas;
     @FXML
     private Label statusBar;
+    @FXML
+    private VBox loadingBox;
 
     private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
     private List<Personaje> listaFiltrada = new ArrayList<>();
@@ -136,6 +138,7 @@ public class Controlador implements Initializable {
         comboEstado.getItems().addAll("Vivo", "Fallecido");
 
         // Intentar sincronizar datos de la nube al inicio (Pull)
+        setCargando(true); // Mostrar spinner mientras se intenta el pull
         new Thread(() -> {
             System.out.println("Intentando sincronización inicial (Pull)...");
             boolean synced = HarryPotterAPI.syncPull();
@@ -480,6 +483,7 @@ public class Controlador implements Initializable {
      * Actualiza la interfaz gráfica una vez completada la carga.
      */
     private void sincronizar() {
+        setCargando(true);
         btnSincronizar.setDisable(true);
         statusBar.setText("Cargando personajes...");
 
@@ -502,6 +506,7 @@ public class Controlador implements Initializable {
                     actualizarPagina();
                     statusBar.setText("Personajes cargados.");
                     btnSincronizar.setDisable(false);
+                    setCargando(false);
                 });
 
             } catch (Exception e) {
@@ -509,8 +514,18 @@ public class Controlador implements Initializable {
                 Platform.runLater(() -> {
                     statusBar.setText("Error al cargar datos.");
                     btnSincronizar.setDisable(false);
+                    setCargando(false);
                 });
             }
         }).start();
+    }
+
+    private void setCargando(boolean cargando) {
+        if (loadingBox != null) {
+            loadingBox.setVisible(cargando);
+            if (cargando) {
+                loadingBox.toFront();
+            }
+        }
     }
 }
