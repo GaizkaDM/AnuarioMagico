@@ -76,7 +76,11 @@
                 </padding>
 
                 <Button fx:id="btnPaginaAnterior" text="Anterior"/>
-                <Label fx:id="lblPagina" text="Página 0 de 0"/>
+                <HBox alignment="CENTER" spacing="5">
+                    <Label text="Página" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtPagina" prefWidth="50" alignment="CENTER" text="1"/>
+                    <Label fx:id="lblTotalPaginas" text="de 1" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
+                </HBox>
                 <Button fx:id="btnPaginaSiguiente" text="Siguiente"/>
             </HBox>
 

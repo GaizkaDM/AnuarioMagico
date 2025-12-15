@@ -1,19 +1,15 @@
-/* main_view.css - Medieval Gryffindor Edition */
+/* main_view.css - Hufflepuff Edition */
 
-/* Fondo general - Deep Burgundy & Medieval Font */
+/* Fondo general - Deep Earth & Medieval Font */
 #root {
-    -fx-background-color: linear-gradient(to bottom, #2b0a0d, #1a0505);
+    -fx-background-color: linear-gradient(to bottom, #372e29, #1a1612);
     -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
 }
 
-/* Contenedor superior - Framed */
 /* Contenedor lateral - Seamless Sidebar */
 #filtersBar {
     -fx-background-color: transparent;
     -fx-padding: 20 15 20 15;
-    /* Optional: Add a subtle right separator line if desired, but user asked for "same screen" look */
-    /* -fx-border-color: rgba(212, 175, 55, 0.1); */
-    /* -fx-border-width: 0 1 0 0; */
 }
 
 /* Menu */
@@ -28,31 +24,34 @@
 }
 
 .menu-item .label {
-    -fx-text-fill: #2b0a0d;
-    /* Dark text in menu items */
+    -fx-text-fill: #1a1612;
+    /* Dark text */
 }
 
 .context-menu {
     -fx-background-color: #f5f0db;
-    /* Parchment bg for menus */
-    -fx-border-color: #8b4513;
+    /* Parchment bg */
+    -fx-border-color: #5c4033;
+    /* Dark Brown */
     -fx-border-width: 1;
 }
 
 /* Barra de filtros */
 #filtersBar .label {
-    -fx-text-fill: #d4af37;
-    /* Gold */
+    -fx-text-fill: #ecb939;
+    /* Hufflepuff Yellow */
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
 }
 
-/* Inputs - Slots in the wall */
+/* Inputs */
 .text-field {
-    -fx-background-color: #1a0505;
+    -fx-background-color: #1f1a17;
+    /* Very dark earth */
     -fx-background-radius: 4;
-    -fx-border-color: #5c2020;
+    -fx-border-color: #5c4033;
+    /* Dark brown border */
     -fx-border-width: 1;
     -fx-border-radius: 4;
     -fx-text-fill: #f0e6d2;
@@ -60,61 +59,59 @@
 }
 
 .text-field:focused {
-    -fx-border-color: #d4af37;
+    -fx-border-color: #ecb939;
+    /* Yellow focus */
 }
 
-/* Dropdowns / ComboBox - Fixed Readability */
+/* Dropdowns / ComboBox */
 .combo-box-base {
-    -fx-background-color: #1a0505;
+    -fx-background-color: #1f1a17;
     -fx-background-radius: 4;
-    -fx-border-color: #5c2020;
+    -fx-border-color: #5c4033;
     -fx-border-radius: 4;
 }
 
 .combo-box-base:focused {
-    -fx-border-color: #d4af37;
+    -fx-border-color: #ecb939;
 }
 
-/* The prompt text inside the closed box */
 .combo-box .list-cell {
     -fx-text-fill: #f0e6d2;
 }
 
-/* The dropdown popup list */
 .combo-box-popup .list-view {
     -fx-background-color: #f5f0db;
-    /* Parchment background */
-    -fx-border-color: #8b4513;
+    /* Parchment */
+    -fx-border-color: #5c4033;
     -fx-border-width: 1;
 }
 
 .combo-box-popup .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #2b0a0d;
-    /* Dark text for readability */
+    -fx-text-fill: #1a1612;
     -fx-padding: 4 8;
 }
 
 .combo-box-popup .list-cell:filled:selected,
 .combo-box-popup .list-cell:filled:hover {
-    -fx-background-color: #d4af37;
-    /* Highlight with Gold */
-    -fx-text-fill: #1a0505;
+    -fx-background-color: #ecb939;
+    /* Yellow highlight */
+    -fx-text-fill: #1a1612;
 }
 
 /* Checkbox */
 .check-box {
-    -fx-text-fill: #f0e6d2;
+    -fx-text-fill: #ecb939;
 }
 
 .check-box .box {
-    -fx-background-color: #1a0505;
-    -fx-border-color: #5c2020;
+    -fx-background-color: #1f1a17;
+    -fx-border-color: #5c4033;
     -fx-background-radius: 3;
 }
 
 .check-box:selected .mark {
-    -fx-background-color: #d4af37;
+    -fx-background-color: #ecb939;
 }
 
 /* ScrollPane */
@@ -124,20 +121,14 @@
 }
 
 /* Contenedor de tarjetas */
-/* Contenedor de tarjetas - Transparent */
 #contenedorTarjetas {
     -fx-background-color: transparent;
     -fx-padding: 10;
-    /* -fx-border-color: rgba(212, 175, 55, 0.2); */
-    /* -fx-border-width: 1; */
-    /* -fx-background-radius: 8; */
-    /* -fx-border-radius: 8; */
 }
 
 /* Botones base */
 .button {
     -fx-background-radius: 4;
-    /* Less rounded, more blocky/medieval */
     -fx-border-radius: 4;
     -fx-cursor: hand;
     -fx-font-family: "Georgia", serif;
@@ -146,67 +137,76 @@
 
 /* Botón Importar - The Golden Seal */
 #btnImportarAPI {
-    -fx-background-color: linear-gradient(to bottom, #d4af37, #b8860b);
-    -fx-text-fill: #2b0a0d;
-    -fx-border-color: #8b6914;
+    -fx-background-color: linear-gradient(to bottom, #ecb939, #c49a2d);
+    -fx-text-fill: #1a1612;
+    -fx-border-color: #5c4033;
     -fx-border-width: 2;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 0, 2);
     -fx-font-size: 14px;
 }
 
 #btnImportarAPI:hover {
-    -fx-background-color: linear-gradient(to bottom, #f0d46e, #d4af37);
-    -fx-border-color: #f0d46e;
+    -fx-background-color: linear-gradient(to bottom, #f0c75e, #ecb939);
+    -fx-border-color: #f0c75e;
 }
 
-/* Botón Limpiar y Generar PDF */
+/* Botón Limpiar y Generar PDF
+   Matching Hufflepuff Style: Dark Earth with Yellow Text/Borders?? 
+   OR match primary buttons (Yellow with Dark Text)?
+   Let's match the Login "Entrar" button style (Yellow primary), or keep them secondary?
+   The previous style was "Secondary".
+   Let's make them Dark Earth with Yellow accents to contrast with the primary actions if we consider Import primary.
+   Actually, let's make them fit the theme:
+   Bg: Dark Earth, Text: Yellow, Border: Yellow.
+*/
 #btnLimpiar,
 #btnGenerarPDF {
-    -fx-background-color: rgba(43, 10, 13, 0.8);
-    -fx-text-fill: #d4af37;
-    -fx-border-color: #d4af37;
+    -fx-background-color: rgba(31, 26, 23, 0.8);
+    -fx-text-fill: #ecb939;
+    -fx-border-color: #ecb939;
     -fx-border-width: 1;
 }
 
 #btnLimpiar:hover,
 #btnGenerarPDF:hover {
-    -fx-background-color: rgba(212, 175, 55, 0.2);
+    -fx-background-color: rgba(236, 185, 57, 0.2);
 }
 
-/* Paginación - Runes style */
+/* Paginación */
 #btnPaginaAnterior,
 #btnPaginaSiguiente {
     -fx-background-color: transparent;
-    -fx-text-fill: #d4af37;
-    -fx-border-color: #5c2020;
+    -fx-text-fill: #ecb939;
+    -fx-border-color: #5c4033;
     -fx-border-width: 1;
     -fx-font-size: 14px;
 }
 
 #btnPaginaAnterior:hover,
 #btnPaginaSiguiente:hover {
-    -fx-text-fill: #f0d46e;
-    -fx-border-color: #d4af37;
+    -fx-text-fill: #f0c75e;
+    -fx-border-color: #ecb939;
 }
 
 /* Barra de estado */
 #statusBar {
     -fx-background-color: rgba(0, 0, 0, 0.5);
-    -fx-text-fill: #a09070;
-    -fx-border-color: #5c2020;
+    -fx-text-fill: #d3c6a6;
+    /* Softer earth text */
+    -fx-border-color: #5c4033;
     -fx-border-width: 1 0 0 0;
 }
 
 /* =========================
-   TARJETAS - Parchment Style
+   TARJETAS
    ========================= */
 
 .card {
     -fx-background-color: #f5f0db;
     /* Parchment */
     -fx-background-radius: 6;
-    -fx-border-color: #8b4513;
-    /* SaddleBrown border */
+    -fx-border-color: #5c4033;
+    /* Dark Brown border */
     -fx-border-width: 2;
     -fx-border-radius: 6;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 4);
@@ -215,33 +215,52 @@
 }
 
 .card-title {
-    -fx-text-fill: #5c0a0a;
-    /* Blood red text */
+    -fx-text-fill: #1a1612;
+    /* Dark Brown/Black */
     -fx-font-family: "Georgia", serif;
     -fx-font-weight: 800;
     -fx-font-size: 16px;
     -fx-underline: true;
-    /* Classic touch */
 }
 
 .card-meta {
-    -fx-text-fill: #2b1b17;
-    /* Very dark brown */
+    -fx-text-fill: #3e2723;
+    /* Dark Brown */
     -fx-font-family: "Georgia", serif;
     -fx-font-style: italic;
 }
 
 .card-button {
-    -fx-background-color: #740001;
-    /* Scarlet */
-    -fx-text-fill: #d4af37;
-    /* Gold */
-    -fx-border-color: #2b0a0d;
+    -fx-background-color: #ecb939;
+    /* Hufflepuff Yellow */
+    -fx-text-fill: #1a1612;
+    /* Dark text */
+    -fx-border-color: #1a1612;
     -fx-border-width: 1;
     -fx-background-radius: 4;
 }
 
 .card-button:hover {
-    -fx-background-color: #8f1010;
+    -fx-background-color: #f0c75e;
     -fx-cursor: hand;
+}
+
+/* Secondary/Detail buttons (if reused here) */
+.secondary-button {
+    -fx-background-color: #c0c0c0;
+    /* Standard silver/grey? Or Hufflepuff secondary? */
+    /* Let's keep them neutral or match the theme. 
+       Gryffindor had Green/Silver there (Slytherin style for details?).
+       The detail view used "secondary-button". 
+       Let's define a Hufflepuff secondary: Black/Dark Grey with Yellow text?
+    */
+    -fx-background-color: #1f1a17;
+    -fx-text-fill: #ecb939;
+    -fx-border-color: #ecb939;
+    -fx-border-width: 1;
+    -fx-font-weight: bold;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #3e2723;
 }

@@ -107,15 +107,4 @@ public class App extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-    /**
-     * Abre una URL en el navegador por defecto del sistema.
-     * 
-     * @param url La URL a abrir (puede ser http:// o file://)
-     */
-    public static void openWebpage(String url) {
-        if (instance != null) {
-            instance.getHostServices().showDocument(url);
-        }
-    }
 }

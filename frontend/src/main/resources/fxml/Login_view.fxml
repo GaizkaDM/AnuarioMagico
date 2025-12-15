@@ -12,29 +12,29 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.GaizkaFrost.LoginController"
       alignment="CENTER" spacing="15"
-      style="-fx-background-color: white; -fx-padding: 30;">
+      stylesheets="@../styles/login.css">
 
-    <Label text="Inicio de Sesión" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="Inicio de Sesión" styleClass="title-label"/>
 
-    <VBox spacing="5">
+    <VBox spacing="5" maxWidth="300">
         <Label text="Usuario:"/>
         <TextField fx:id="txtUsuario" promptText="Nombre de usuario"/>
     </VBox>
 
-    <VBox spacing="5">
+    <VBox spacing="5" maxWidth="300">
         <Label text="Contraseña:"/>
         <PasswordField fx:id="txtPassword" promptText="Contraseña"/>
     </VBox>
 
     <CheckBox fx:id="chkRegistro" text="Quiero registrarme (Nuevo usuario)"/>
 
-    <VBox fx:id="boxMasterPassword" spacing="5" visible="false" managed="false">
+    <VBox fx:id="boxMasterPassword" spacing="5" visible="false" managed="false" maxWidth="300">
         <Label text="Contraseña Maestra (Requerida para registro):"/>
         <PasswordField fx:id="txtMasterPassword" promptText="Solo para registros"/>
     </VBox>
 
     <Button fx:id="btnAccion" text="Entrar" styleClass="primary-button" prefWidth="200"/>
     
-    <Label fx:id="lblStatus" text="" style="-fx-text-fill: red;"/>
+    <Label fx:id="lblStatus" text="" style="-fx-text-fill: red; -fx-font-weight: bold;"/>
 
 </VBox>
