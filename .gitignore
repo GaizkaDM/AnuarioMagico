@@ -1,33 +1,82 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.py[cod]
 *.so
 *.egg-info/
 .pytest_cache/
+*.pyc
+env/
+ENV/
+build/
+dist/
+*.egg
 
-# Database
+# Database (NO subir bases de datos)
 *.db
 *.sqlite
 *.sqlite3
+anuario.db
+favorites.db
 
-# Java
+# Archivos de exportación generados (NO subir)
+personajes.csv
+personajes.xml
+personajes.bin
+*.bin
+*.csv
+*.xml
+
+# Java / Maven
 target/
 *.class
 *.jar
 *.war
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
 
 # IDE
 .idea/
 .vscode/
 *.iml
 .DS_Store
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
 
 # Frontend specific
 frontend/target/
 frontend/nbactions.xml
 frontend/output.txt
+frontend/.vscode/
 
-# Logs
+# Logs y debug
 *.log
+debug_output*.txt
+debug_sync.txt
+error_log.txt
 
+# Archivos de configuración sensibles (SI TIENEN CREDENCIALES)
+# Descomentar si config.py tiene contraseñas reales
+# backend/config.py
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Docker (si no usas docker, puedes mantenerlo)
+# .env
+
+# Instancias y datos locales
+instance/

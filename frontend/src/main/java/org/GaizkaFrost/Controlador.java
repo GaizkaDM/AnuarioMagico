@@ -99,8 +99,25 @@ public class Controlador implements Initializable {
             });
         }
 
-        // Configurar menú de inicio de sesión
-        menuLogin.setOnAction(e -> mostrarLogin());
+        // Verificar si hay una sesión activa previa (cuando se vuelve de otra vista)
+        if (HarryPotterAPI.isLoggedIn()) {
+            // Restaurar estado de sesión en la UI
+            isLoggedIn = true;
+            currentUser = HarryPotterAPI.getUsername();
+            menuLogin.setText("Cerrar Sesión");
+            menuLogin.setOnAction(e -> cerrarSesion());
+
+            if (currentUser != null) {
+                lblUsuario.setText("Usuario: " + currentUser);
+                statusBar.setText("Sesión iniciada como " + currentUser + ".");
+            } else {
+                lblUsuario.setText("Usuario: [Sesión activa]");
+                statusBar.setText("Sesión activa.");
+            }
+        } else {
+            // Configurar menú de inicio de sesión
+            menuLogin.setOnAction(e -> mostrarLogin());
+        }
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
         comboEstado.getItems().addAll("Vivo", "Fallecido");
@@ -195,6 +212,7 @@ public class Controlador implements Initializable {
     private void cerrarSesion() {
         isLoggedIn = false;
         currentUser = null;
+        HarryPotterAPI.clearToken(); // Limpiar token de sesión
         menuLogin.setText("Iniciar Sesión");
         menuLogin.setOnAction(e -> mostrarLogin());
         lblUsuario.setText("");

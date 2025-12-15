@@ -76,6 +76,15 @@ public class DetailController {
 
         btnFavorite.setOnAction(event -> toggleFavorite());
 
+        // Botones de CRUD: solo visibles si hay sesión activa
+        if (btnEditar != null) {
+            btnEditar.setOnAction(event -> editarPersonaje());
+        }
+
+        if (btnEliminar != null) {
+            btnEliminar.setOnAction(event -> eliminarPersonaje());
+        }
+
         if (btnGenerarPDF != null) {
             btnGenerarPDF.setOnAction(event -> {
                 System.out.println("Generar PDF solicitado para: "
@@ -153,6 +162,17 @@ public class DetailController {
         this.currentPersonaje = p;
         updateFavoriteUI();
 
+        // Controlar visibilidad de botones CRUD según autenticación
+        boolean loggedIn = HarryPotterAPI.isLoggedIn();
+        if (btnEditar != null) {
+            btnEditar.setVisible(loggedIn);
+            btnEditar.setManaged(loggedIn);
+        }
+        if (btnEliminar != null) {
+            btnEliminar.setVisible(loggedIn);
+            btnEliminar.setManaged(loggedIn);
+        }
+
         lblNombre.setText(p.getNombre());
 
         if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
@@ -184,5 +204,238 @@ public class DetailController {
      */
     private String nullToDash(String s) {
         return (s == null || s.isEmpty()) ? "-" : s;
+    }
+
+    /**
+     * Elimina el personaje actual tras confirmar con el usuario.
+     * Requiere sesión activa.
+     */
+    private void eliminarPersonaje() {
+        if (!HarryPotterAPI.isLoggedIn()) {
+            mostrarAlerta("No autorizado", "Debes iniciar sesión para eliminar personajes.");
+            return;
+        }
+
+        if (currentPersonaje == null) {
+            mostrarAlerta("Error", "No hay personaje seleccionado.");
+            return;
+        }
+
+        // Confirmación
+        javafx.scene.control.Alert confirmacion = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText("¿Eliminar personaje?");
+        confirmacion.setContentText("¿Estás seguro de que quieres eliminar a " + currentPersonaje.getNombre() + "?");
+
+        if (confirmacion.showAndWait()
+                .orElse(javafx.scene.control.ButtonType.CANCEL) == javafx.scene.control.ButtonType.OK) {
+            new Thread(() -> {
+                try {
+                    boolean success = HarryPotterAPI.deleteCharacter(currentPersonaje.getApiId());
+                    javafx.application.Platform.runLater(() -> {
+                        if (success) {
+                            mostrarAlerta("Éxito", "Personaje eliminado correctamente.");
+                            // Volver a la vista principal
+                            try {
+                                App.setRoot("Main_view", "Anuario Hogwarts");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            mostrarAlerta("Error", "No se pudo eliminar el personaje.");
+                        }
+                    });
+                } catch (Exception e) {
+                    javafx.application.Platform.runLater(() -> {
+                        mostrarAlerta("Error", "Error al eliminar: " + e.getMessage());
+                    });
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    /**
+     * Abre un formulario para editar el personaje actual.
+     * Requiere sesión activa.
+     */
+    private void editarPersonaje() {
+        if (!HarryPotterAPI.isLoggedIn()) {
+            mostrarAlerta("No autorizado", "Debes iniciar sesión para editar personajes.");
+            return;
+        }
+
+        if (currentPersonaje == null) {
+            mostrarAlerta("Error", "No hay personaje seleccionado.");
+            return;
+        }
+
+        // Crear un diálogo con ScrollPane para todos los campos
+        javafx.scene.control.Dialog<Boolean> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle("Editar Personaje");
+        dialog.setHeaderText("Editar datos de " + currentPersonaje.getNombre());
+
+        javafx.scene.control.ButtonType btnGuardar = new javafx.scene.control.ButtonType("Guardar",
+                javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, javafx.scene.control.ButtonType.CANCEL);
+
+        // Crear formulario completo con ScrollPane
+        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new javafx.geometry.Insets(20, 20, 20, 20));
+
+        // Crear campos de texto para todos los atributos editables
+        javafx.scene.control.TextField txtNombre = new javafx.scene.control.TextField(currentPersonaje.getNombre());
+        javafx.scene.control.TextField txtBorn = new javafx.scene.control.TextField(currentPersonaje.getBorn());
+        javafx.scene.control.TextField txtDied = new javafx.scene.control.TextField(currentPersonaje.getDied());
+        javafx.scene.control.TextField txtGender = new javafx.scene.control.TextField(currentPersonaje.getGender());
+        javafx.scene.control.TextField txtSpecies = new javafx.scene.control.TextField(currentPersonaje.getSpecies());
+        javafx.scene.control.TextField txtAnimagus = new javafx.scene.control.TextField(currentPersonaje.getAnimagus());
+        javafx.scene.control.TextField txtNationality = new javafx.scene.control.TextField(
+                currentPersonaje.getNationality());
+        javafx.scene.control.TextField txtHouse = new javafx.scene.control.TextField(currentPersonaje.getCasa());
+        javafx.scene.control.TextField txtPatronus = new javafx.scene.control.TextField(currentPersonaje.getPatronus());
+        // Usar TextArea para campos que pueden ser largos (arrays convertidos a string)
+        javafx.scene.control.TextArea txtAlias = new javafx.scene.control.TextArea(currentPersonaje.getAlias());
+        txtAlias.setPrefRowCount(2);
+        txtAlias.setWrapText(true);
+        txtAlias.setPrefWidth(300);
+
+        javafx.scene.control.TextArea txtTitles = new javafx.scene.control.TextArea(currentPersonaje.getTitles());
+        txtTitles.setPrefRowCount(2);
+        txtTitles.setWrapText(true);
+        txtTitles.setPrefWidth(300);
+
+        javafx.scene.control.TextArea txtWand = new javafx.scene.control.TextArea(currentPersonaje.getWand());
+        txtWand.setPrefRowCount(2);
+        txtWand.setWrapText(true);
+        txtWand.setPrefWidth(300);
+
+        // Establecer ancho preferido para los campos de texto simples
+        txtNombre.setPrefWidth(300);
+        txtBorn.setPrefWidth(300);
+        txtDied.setPrefWidth(300);
+        txtGender.setPrefWidth(300);
+        txtSpecies.setPrefWidth(300);
+        txtAnimagus.setPrefWidth(300);
+        txtNationality.setPrefWidth(300);
+        txtHouse.setPrefWidth(300);
+        txtPatronus.setPrefWidth(300);
+
+        // Añadir campos al grid
+        int row = 0;
+        grid.add(new javafx.scene.control.Label("Nombre:"), 0, row);
+        grid.add(txtNombre, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Born:"), 0, row);
+        grid.add(txtBorn, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Died:"), 0, row);
+        grid.add(txtDied, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Gender:"), 0, row);
+        grid.add(txtGender, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Species:"), 0, row);
+        grid.add(txtSpecies, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Animagus:"), 0, row);
+        grid.add(txtAnimagus, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Nationality:"), 0, row);
+        grid.add(txtNationality, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("House:"), 0, row);
+        grid.add(txtHouse, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Patronus:"), 0, row);
+        grid.add(txtPatronus, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Alias:"), 0, row);
+        grid.add(txtAlias, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Titles:"), 0, row);
+        grid.add(txtTitles, 1, row++);
+
+        grid.add(new javafx.scene.control.Label("Wand:"), 0, row);
+        grid.add(txtWand, 1, row++);
+
+        scrollPane.setContent(grid);
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().setPrefWidth(500);
+
+        dialog.setResultConverter(dialogButton -> {
+            return dialogButton == btnGuardar;
+        });
+
+        dialog.showAndWait().ifPresent(save -> {
+            if (save) {
+                // Construir JSON con todos los datos actualizados
+                com.google.gson.JsonObject updates = new com.google.gson.JsonObject();
+                updates.addProperty("name", txtNombre.getText());
+                updates.addProperty("born", txtBorn.getText());
+                updates.addProperty("died", txtDied.getText());
+                updates.addProperty("gender", txtGender.getText());
+                updates.addProperty("species", txtSpecies.getText());
+                updates.addProperty("animagus", txtAnimagus.getText());
+                updates.addProperty("nationality", txtNationality.getText());
+                updates.addProperty("house", txtHouse.getText());
+                updates.addProperty("patronus", txtPatronus.getText());
+                updates.addProperty("alias_names", txtAlias.getText());
+                updates.addProperty("titles", txtTitles.getText());
+                updates.addProperty("wand", txtWand.getText());
+
+                new Thread(() -> {
+                    try {
+                        boolean success = HarryPotterAPI.editCharacter(currentPersonaje.getApiId(), updates);
+                        javafx.application.Platform.runLater(() -> {
+                            if (success) {
+                                mostrarAlerta("Éxito", "Personaje actualizado correctamente.");
+                                // Actualizar datos locales
+                                currentPersonaje.setNombre(txtNombre.getText());
+                                currentPersonaje.setBorn(txtBorn.getText());
+                                currentPersonaje.setDied(txtDied.getText());
+                                currentPersonaje.setGender(txtGender.getText());
+                                currentPersonaje.setSpecies(txtSpecies.getText());
+                                currentPersonaje.setAnimagus(txtAnimagus.getText());
+                                currentPersonaje.setNationality(txtNationality.getText());
+                                currentPersonaje.setCasa(txtHouse.getText());
+                                currentPersonaje.setPatronus(txtPatronus.getText());
+                                currentPersonaje.setAlias(txtAlias.getText());
+                                currentPersonaje.setTitles(txtTitles.getText());
+                                currentPersonaje.setWand(txtWand.getText());
+                                // Refrescar vista
+                                setPersonaje(currentPersonaje);
+                            } else {
+                                mostrarAlerta("Error", "No se pudo actualizar el personaje.");
+                            }
+                        });
+                    } catch (Exception e) {
+                        javafx.application.Platform.runLater(() -> {
+                            mostrarAlerta("Error", "Error al actualizar: " + e.getMessage());
+                        });
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+        });
+    }
+
+    /**
+     * Muestra una alerta informativa al usuario.
+     */
+    private void mostrarAlerta(String titulo, String mensaje) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
