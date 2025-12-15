@@ -18,6 +18,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from sync_mysql import sync_sqlite_to_mysql, sync_mysql_to_sqlite
+from PersonajeService import PersonajeService
 
 """
 Módulo principal de la aplicación Backend (Flask).
@@ -42,6 +43,9 @@ from config import DB_FILE, MYSQL_CONFIG, MASTER_PASSWORD, POTTERDB_API
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Inicializar servicio de personajes (CRUD + Exportación)
+personaje_service = PersonajeService(DB_FILE)
 
 # Almacén de sesiones simple en memoria: token -> usuario
 SESSIONS = {} 
@@ -516,6 +520,13 @@ def get_characters():
         save_characters_to_db(filtered_characters)
         print(f"✓ Saved {len(filtered_characters)} characters to SQLite DB")
         
+        # 3b. Generar archivos de exportación (CSV, XML, Binario)
+        try:
+            print("⟳ Generating export files from fresh data...")
+            personaje_service.export_service.exportar_todo()
+        except Exception as ex_error:
+            print(f"⚠ Export warning: {ex_error}")
+        
         # 4. Recargar desde DB para tener las URLs locales correctas
         return get_characters()
     
@@ -778,6 +789,78 @@ def sync_mysql_pull():
     except Exception as e:
         print(f"Sync Pull Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+# --- CRUD ENDPOINTS (Integración con PersonajeService) ---
+
+@app.route('/characters', methods=['POST'])
+def add_character():
+    """
+    Añade un nuevo personaje manualmente.
+    Dispara automáticamente la regeneración de archivos CSV/XML/Bin.
+    Maneja campos JSON y serialización.
+    """
+    try:
+        data = request.get_json()
+        
+        # Validación básica
+        if not data.get('name'):
+            return jsonify({'error': 'Name is required'}), 400
+            
+        # Generar ID si no viene
+        if not data.get('id'):
+            data['id'] = generate_id(data.get('slug') or data['name'])
+            
+        # Usar el servicio para añadir (esto actualiza SQLite y crea exports)
+        success = personaje_service.añadir_personaje(data)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Character added and files exported', 'id': data['id']}), 201
+        else:
+            return jsonify({'error': 'Failed to add character (check logs)'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/characters/<character_id>', methods=['PUT', 'PATCH'])
+def edit_character(character_id):
+    """
+    Edita un personaje existente.
+    Dispara automáticamente la regeneración de archivos CSV/XML/Bin.
+    """
+    try:
+        data = request.get_json()
+        
+        # Usar el servicio para editar
+        success = personaje_service.editar_personaje(character_id, data)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Character updated and files exported'}), 200
+        else:
+            return jsonify({'error': 'Failed to update character or ID not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/characters/<character_id>', methods=['DELETE'])
+def delete_character(character_id):
+    """
+    Elimina un personaje.
+    Dispara automáticamente la regeneración de archivos CSV/XML/Bin.
+    """
+    try:
+        # Usar el servicio para eliminar
+        success = personaje_service.eliminar_personaje(character_id)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Character deleted and files exported'}), 200
+        else:
+            # Podría ser que no existe, pero PersonajeService devuelve False en error genérico.
+            # Asumimos 404/500 según contexto, aquí 404 es razonable para "no hecho".
+            return jsonify({'error': 'Failed to delete character or ID not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 

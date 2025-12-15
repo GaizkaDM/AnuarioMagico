@@ -8,6 +8,7 @@ Author: Xiker
 import sqlite3
 import json
 from typing import Dict, List, Optional
+from sync_mysql import get_sqlite_connection
 
 
 class DaoSQLite:
@@ -26,13 +27,17 @@ class DaoSQLite:
     
     def _get_connection(self) -> sqlite3.Connection:
         """
-        Crea y retorna una conexión a la base de datos
+        Crea y retorna una conexión a la base de datos using sync_mysql utility
         
         Author: Xiker
         """
-        conn = sqlite3.connect(self.db_file)
-        conn.row_factory = sqlite3.Row
-        return conn
+        # Nota: get_sqlite_connection utiliza la configuración global (SQLITE_DB)
+        # ignorando self.db_file si es diferente.
+        conn = get_sqlite_connection()
+        if conn:
+            conn.row_factory = sqlite3.Row
+            return conn
+        raise sqlite3.Error(f"No se pudo conectar a la base de datos")
     
     def añadir_personaje(self, personaje: Dict) -> bool:
         """
