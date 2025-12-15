@@ -199,8 +199,14 @@ public class Controlador implements Initializable {
 
             Stage stage = new Stage();
             stage.setTitle("Login / Registro");
-            stage.setScene(new Scene(root));
-            stage.show();
+
+            // Modal y no redimensionable
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+
+            // Tamaño fijo un poco más grande
+            stage.setScene(new Scene(root, 400, 550));
+            stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }
