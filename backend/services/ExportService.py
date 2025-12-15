@@ -12,7 +12,7 @@ import pickle
 import json
 import base64
 from typing import List, Dict
-from sync_sqlite import DaoSQLite
+from backend.services.sync_sqlite import DaoSQLite
 
 
 class ExportService:

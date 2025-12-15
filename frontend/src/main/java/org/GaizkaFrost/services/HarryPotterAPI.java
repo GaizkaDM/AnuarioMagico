@@ -1,4 +1,6 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.services;
+
+import org.GaizkaFrost.models.Personaje;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -25,6 +27,68 @@ public class HarryPotterAPI {
 
     private static final String API_URL = "http://localhost:8000/characters";
     private static final String AUTH_URL = "http://localhost:8000/auth";
+
+    // Token de sesión para autenticación
+    private static String currentToken = null;
+    private static String currentUsername = null;
+
+    // ==========================================
+    // GESTIÓN DE SESIÓN Y TOKEN
+    // ==========================================
+
+    /**
+     * Establece el token de sesión actual.
+     */
+    public static void setToken(String token) {
+        setToken(token, null);
+    }
+
+    /**
+     * Establece el token y nombre de usuario de la sesión actual.
+     */
+    public static void setToken(String token, String username) {
+        currentToken = token;
+        currentUsername = username;
+        System.out.println("Token guardado: "
+                + (token != null ? token.substring(0, Math.min(8, token.length())) + "..." : "null"));
+        if (username != null) {
+            System.out.println("Usuario: " + username);
+        }
+    }
+
+    /**
+     * Obtiene el token de sesión actual.
+     */
+    public static String getToken() {
+        return currentToken;
+    }
+
+    /**
+     * Obtiene el nombre de usuario de la sesión actual.
+     */
+    public static String getUsername() {
+        return currentUsername;
+    }
+
+    /**
+     * Limpia el token de sesión.
+     */
+    public static void clearToken() {
+        currentToken = null;
+        currentUsername = null;
+        System.out.println("Token eliminado");
+    }
+
+    /**
+     * Verifica si hay una sesión activa.
+     */
+    public static boolean isLoggedIn() {
+        return currentToken != null && !currentToken.isEmpty();
+    }
+
+    // ==========================================
+    // AUTENTICACIÓN
+    // ==========================================
 
     /**
      * Realiza el inicio de sesión del usuario.
@@ -125,6 +189,75 @@ public class HarryPotterAPI {
     }
 
     // ==========================================
+    // CRUD DE PERSONAJES
+    // ==========================================
+
+    /**
+     * Añade un nuevo personaje.
+     * Requiere sesión iniciada (verificación en frontend).
+     * 
+     * @param personaje El personaje a añadir (como JsonObject).
+     * @return true si se añadió correctamente, false en caso contrario.
+     */
+    public static boolean addCharacter(JsonObject personaje) throws Exception {
+        if (!isLoggedIn()) {
+            System.err.println("Error: No hay sesión iniciada");
+            return false;
+        }
+
+        HttpURLConnection conn = createConnection(API_URL, "POST");
+        sendJson(conn, personaje);
+
+        int responseCode = conn.getResponseCode();
+        conn.disconnect();
+        return responseCode == 201 || responseCode == 200;
+    }
+
+    /**
+     * Edita un personaje existente.
+     * Requiere sesión iniciada (verificación en frontend).
+     * 
+     * @param characterId       El ID del personaje a editar.
+     * @param datosActualizados Los datos a actualizar (como JsonObject).
+     * @return true si se editó correctamente, false en caso contrario.
+     */
+    public static boolean editCharacter(String characterId, JsonObject datosActualizados) throws Exception {
+        if (!isLoggedIn()) {
+            System.err.println("Error: No hay sesión iniciada");
+            return false;
+        }
+
+        String url = API_URL + "/" + characterId;
+        HttpURLConnection conn = createConnection(url, "PUT");
+        sendJson(conn, datosActualizados);
+
+        int responseCode = conn.getResponseCode();
+        conn.disconnect();
+        return responseCode == 200;
+    }
+
+    /**
+     * Elimina un personaje.
+     * Requiere sesión iniciada (verificación en frontend).
+     * 
+     * @param characterId El ID del personaje a eliminar.
+     * @return true si se eliminó correctamente, false en caso contrario.
+     */
+    public static boolean deleteCharacter(String characterId) throws Exception {
+        if (!isLoggedIn()) {
+            System.err.println("Error: No hay sesión iniciada");
+            return false;
+        }
+
+        String url = API_URL + "/" + characterId;
+        HttpURLConnection conn = createConnection(url, "DELETE");
+
+        int responseCode = conn.getResponseCode();
+        conn.disconnect();
+        return responseCode == 200;
+    }
+
+    // ==========================================
     // MÉTODOS AUXILIARES PRIVADOS (HELPERS)
     // ==========================================
 
@@ -134,7 +267,13 @@ public class HarryPotterAPI {
         conn.setRequestMethod(method);
         conn.setConnectTimeout(10000); // Default 10s
         conn.setReadTimeout(10000); // Default 10s
-        if ("POST".equals(method)) {
+
+        // Incluir token de autenticación si existe
+        if (currentToken != null && !currentToken.isEmpty()) {
+            conn.setRequestProperty("Authorization", currentToken);
+        }
+
+        if ("POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method) || "DELETE".equals(method)) {
             conn.setDoOutput(true);
         }
         return conn;

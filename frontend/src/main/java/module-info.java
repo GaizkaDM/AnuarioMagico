@@ -3,6 +3,13 @@ module org.diegofg {
     requires javafx.fxml;
     requires javafx.media;
     requires com.google.gson;
-    opens org.GaizkaFrost to javafx.fxml;
+    requires java.logging;
+
     exports org.GaizkaFrost;
+    exports org.GaizkaFrost.controllers;
+    exports org.GaizkaFrost.models;
+    exports org.GaizkaFrost.services;
+
+    opens org.GaizkaFrost.controllers to javafx.fxml;
+    opens org.GaizkaFrost to javafx.fxml;
 }

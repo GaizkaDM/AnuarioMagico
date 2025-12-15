@@ -7,8 +7,9 @@ Author: Xiker
 """
 
 from typing import Dict, Optional
-from sync_sqlite import DaoSQLite
-from ExportService import ExportService
+from typing import Dict, Optional
+from backend.services.sync_sqlite import DaoSQLite
+from backend.services.ExportService import ExportService
 
 
 class PersonajeService:

@@ -1,4 +1,6 @@
-package org.GaizkaFrost;
+package org.GaizkaFrost.controllers;
+
+import org.GaizkaFrost.services.HarryPotterAPI;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -96,6 +98,8 @@ public class LoginController {
                 } else {
                     String token = HarryPotterAPI.login(user, pass);
                     if (token != null) {
+                        // Guardar token y username en HarryPotterAPI
+                        HarryPotterAPI.setToken(token, user);
                         updateIO(() -> {
                             if (onSuccessCallback != null)
                                 onSuccessCallback.accept(user);

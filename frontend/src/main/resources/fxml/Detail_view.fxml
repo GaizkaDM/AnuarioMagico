@@ -12,13 +12,14 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.GaizkaFrost.DetailController"
-            stylesheets="@../styles/estilos_slytherin.css"
+            fx:controller="org.GaizkaFrost.controllers.DetailController"
+            stylesheets="@../styles/estilos.css"
             styleClass="glass-pane">
 
     <top>
@@ -63,48 +64,61 @@
                                 <Insets top="10" right="10" bottom="10" left="10"/>
                             </padding>
                             <columnConstraints>
-                                <ColumnConstraints percentWidth="30"/>
-                                <ColumnConstraints percentWidth="70"/>
+                                <ColumnConstraints percentWidth="30" hgrow="SOMETIMES"/>
+                                <ColumnConstraints percentWidth="70" hgrow="ALWAYS"/>
                             </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                                <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
+                            </rowConstraints>
 
-                            <Label text="Born:"/>
-                            <Label fx:id="lblBorn" GridPane.columnIndex="1"/>
+                            <Label text="Nacimiento:"/>
+                            <Label fx:id="lblBorn" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Died:" GridPane.rowIndex="1"/>
-                            <Label fx:id="lblDied" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                            <Label text="Fallecimiento:" GridPane.rowIndex="1"/>
+                            <Label fx:id="lblDied" GridPane.rowIndex="1" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Gender:" GridPane.rowIndex="2"/>
-                            <Label fx:id="lblGender" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                            <Label text="Género:" GridPane.rowIndex="2"/>
+                            <Label fx:id="lblGender" GridPane.rowIndex="2" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Species:" GridPane.rowIndex="3"/>
-                            <Label fx:id="lblSpecies" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                            <Label text="Especie:" GridPane.rowIndex="3"/>
+                            <Label fx:id="lblSpecies" GridPane.rowIndex="3" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Animagus:" GridPane.rowIndex="4"/>
-                            <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            <Label text="Animago:" GridPane.rowIndex="4"/>
+                            <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Nationality:" GridPane.rowIndex="5"/>
-                            <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                            <Label text="Nacionalidad:" GridPane.rowIndex="5"/>
+                            <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="House:" GridPane.rowIndex="6"/>
-                            <Label fx:id="lblHouse" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                            <Label text="Casa:" GridPane.rowIndex="6"/>
+                            <Label fx:id="lblHouse" GridPane.rowIndex="6" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
                             <Label text="Patronus:" GridPane.rowIndex="7"/>
-                            <Label fx:id="lblPatronus" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                            <Label fx:id="lblPatronus" GridPane.rowIndex="7" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
                             <Label text="Alias:" GridPane.rowIndex="8"/>
-                            <Label fx:id="lblAlias" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                            <Label fx:id="lblAlias" GridPane.rowIndex="8" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Titles:" GridPane.rowIndex="9"/>
-                            <Label fx:id="lblTitles" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                            <Label text="Títulos:" GridPane.rowIndex="9"/>
+                            <Label fx:id="lblTitles" GridPane.rowIndex="9" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Wand:" GridPane.rowIndex="10"/>
-                            <Label fx:id="lblWand" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                            <Label text="Varita:" GridPane.rowIndex="10"/>
+                            <Label fx:id="lblWand" GridPane.rowIndex="10" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
                         </GridPane>
 
                         <HBox alignment="BOTTOM_RIGHT" spacing="10">
                             <Button fx:id="btnEditar" text="Editar" styleClass="secondary-button"/>
                             <Button fx:id="btnEliminar" text="Eliminar" styleClass="secondary-button"/>
-                            <Button fx:id="btnGenerarPDF" text="Generar PDF" styleClass="secondary-button"/>
+                            <Button fx:id="btnGenerarPDFDetail" text="Generar PDF" styleClass="secondary-button"/>
                         </HBox>
 
                     </VBox>

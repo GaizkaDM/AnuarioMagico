@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hogwarts_db
+    restart: unless-stopped
+    ports:
+      - "3309:3306"  # Evita conflicto con puerto 3306 local
+    environment:
+      MYSQL_ROOT_PASSWORD: MiPass1234
+      MYSQL_DATABASE: hogwarts
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: appPass123
+    volumes:
+      - hogwarts_mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
+volumes:
+  hogwarts_mysql_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

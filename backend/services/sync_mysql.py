@@ -19,11 +19,12 @@ __author__ = "GaizkaFrost"
 __version__ = "1.0"
 
 from datetime import datetime
+# Ensure backend dir is in path to import config
 try:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from config import DB_FILE, MYSQL_CONFIG
 except ImportError:
     # Fallback si se ejecuta como script standalone sin contexto de paquete
-    import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from config import DB_FILE, MYSQL_CONFIG
 

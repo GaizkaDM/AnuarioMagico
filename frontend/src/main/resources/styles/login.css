@@ -1,0 +1,56 @@
+/* login.css - Light Hufflepuff Edition */
+
+/* Fondo general - Clean White/Cream */
+#root {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #fffbf0);
+    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+    -fx-padding: 20;
+}
+
+/* Titulos */
+.titulo-login {
+    -fx-text-fill: #ecb939;
+    /* Yellow Title */
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+/* Inputs */
+.text-field,
+.password-field {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-text-fill: #333;
+    -fx-prompt-text-fill: #999;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #ecb939;
+    -fx-background-color: #fffdf5;
+}
+
+/* Botones */
+.button {
+    -fx-background-color: #ecb939;
+    /* Hufflepuff Yellow */
+    -fx-text-fill: #1a1612;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #f0c75e;
+}
+
+/* Link/Text Secondary */
+.label-link {
+    -fx-text-fill: #b38600;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
