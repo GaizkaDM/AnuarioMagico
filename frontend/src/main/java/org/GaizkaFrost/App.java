@@ -7,6 +7,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.io.File;
 
 /**
  * Clase principal de la aplicación JavaFX.
@@ -32,6 +36,7 @@ public class App extends Application {
      */
     @Override
     public void start(Stage s) throws IOException {
+        setupLogging(); // Initialize logging
         instance = this;
         stage = s;
 
@@ -106,5 +111,23 @@ public class App extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private void setupLogging() {
+        try {
+            // Ensure logs directory exists
+            File logDir = new File("logs");
+            if (!logDir.exists()) {
+                logDir.mkdirs();
+            }
+
+            FileHandler fh = new FileHandler("logs/frontend.log", 1024 * 1024, 3, true);
+            fh.setFormatter(new SimpleFormatter());
+            Logger logger = Logger.getLogger("");
+            logger.addHandler(fh);
+            logger.info("Frontend Logging Initialized");
+        } catch (IOException e) {
+            System.err.println("Failed to setup logging: " + e.getMessage());
+        }
     }
 }

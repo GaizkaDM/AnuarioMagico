@@ -44,6 +44,40 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+# --- LOGGING CONFIGURATION ---
+import logging
+from logging.handlers import RotatingFileHandler
+
+def setup_logging():
+    log_dir = os.path.join(BASE_DIR, 'logs')
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+        
+    log_file = os.path.join(log_dir, 'backend.log')
+    
+    # Configure root logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    
+    # File handler (Rotating: 1MB, 3 backups)
+    file_handler = RotatingFileHandler(log_file, maxBytes=1_000_000, backupCount=3)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    ))
+    logger.addHandler(file_handler)
+    
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(message)s'
+    ))
+    logger.addHandler(console_handler)
+    
+    logging.info("Backend Logging Initialized")
+
+setup_logging()
+# -----------------------------
+
 # Inicializar servicio de personajes (CRUD + Exportación)
 personaje_service = PersonajeService(DB_FILE)
 

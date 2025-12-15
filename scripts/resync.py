@@ -2,11 +2,17 @@ import sqlite3
 import requests
 import time
 import sys
+import os
+
+# Robust path handling
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, 'data', 'anuario.db')
 
 # 1. Clear current character data to force re-fetch with new filters
 print("1️⃣  Clearing local database...")
 try:
-    conn = sqlite3.connect('anuario.db')
+    print(f"   Using DB: {DB_PATH}")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM characters") # Keep table, remove rows
     conn.commit()
