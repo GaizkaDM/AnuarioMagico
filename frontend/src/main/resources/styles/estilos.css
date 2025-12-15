@@ -1,12 +1,12 @@
-/* main_view.css - Hufflepuff Edition */
+/* main_view.css - Light Hufflepuff Edition */
 
-/* Fondo general - Deep Earth & Medieval Font */
+/* Fondo general - Clean White/Cream & Medieval Font */
 #root {
-    -fx-background-color: linear-gradient(to bottom, #372e29, #1a1612);
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #fffbf0);
     -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
 }
 
-/* Contenedor lateral - Seamless Sidebar */
+/* Contenedor lateral */
 #filtersBar {
     -fx-background-color: transparent;
     -fx-padding: 20 15 20 15;
@@ -18,56 +18,57 @@
 }
 
 .menu-bar .label {
-    -fx-text-fill: #f0e6d2;
-    /* Parchment white */
+    -fx-text-fill: #5c4033;
+    /* Dark Brown Text */
     -fx-font-family: "Georgia", serif;
 }
 
 .menu-item .label {
     -fx-text-fill: #1a1612;
-    /* Dark text */
+    /* Black Text */
 }
 
 .context-menu {
-    -fx-background-color: #f5f0db;
-    /* Parchment bg */
-    -fx-border-color: #5c4033;
-    /* Dark Brown */
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ecb939;
+    /* Yellow Border */
     -fx-border-width: 1;
 }
 
 /* Barra de filtros */
 #filtersBar .label {
-    -fx-text-fill: #ecb939;
-    /* Hufflepuff Yellow */
+    -fx-text-fill: #b38600;
+    /* Darker Yellow/Gold for readability on white */
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
+    -fx-effect: none;
+    /* Removed shadow for cleaner look */
 }
 
 /* Inputs */
 .text-field {
-    -fx-background-color: #1f1a17;
-    /* Very dark earth */
+    -fx-background-color: #ffffff;
     -fx-background-radius: 4;
-    -fx-border-color: #5c4033;
-    /* Dark brown border */
+    -fx-border-color: #ccc;
+    /* Subtle Grey border */
     -fx-border-width: 1;
     -fx-border-radius: 4;
-    -fx-text-fill: #f0e6d2;
-    -fx-prompt-text-fill: rgba(240, 230, 210, 0.4);
+    -fx-text-fill: #333;
+    -fx-prompt-text-fill: #999;
 }
 
 .text-field:focused {
     -fx-border-color: #ecb939;
     /* Yellow focus */
+    -fx-background-color: #fffdf5;
+    /* Very subtle yellow tint */
 }
 
 /* Dropdowns / ComboBox */
 .combo-box-base {
-    -fx-background-color: #1f1a17;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 4;
-    -fx-border-color: #5c4033;
+    -fx-border-color: #ccc;
     -fx-border-radius: 4;
 }
 
@@ -76,37 +77,37 @@
 }
 
 .combo-box .list-cell {
-    -fx-text-fill: #f0e6d2;
+    -fx-text-fill: #333;
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: #f5f0db;
-    /* Parchment */
-    -fx-border-color: #5c4033;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ecb939;
     -fx-border-width: 1;
 }
 
 .combo-box-popup .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #1a1612;
+    -fx-text-fill: #333;
     -fx-padding: 4 8;
 }
 
 .combo-box-popup .list-cell:filled:selected,
 .combo-box-popup .list-cell:filled:hover {
-    -fx-background-color: #ecb939;
-    /* Yellow highlight */
-    -fx-text-fill: #1a1612;
+    -fx-background-color: #fff3c4;
+    /* Light Yellow highlight */
+    -fx-text-fill: #333;
 }
 
 /* Checkbox */
 .check-box {
-    -fx-text-fill: #ecb939;
+    -fx-text-fill: #5c4033;
+    /* Dark Brown */
 }
 
 .check-box .box {
-    -fx-background-color: #1f1a17;
-    -fx-border-color: #5c4033;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
     -fx-background-radius: 3;
 }
 
@@ -135,65 +136,62 @@
     -fx-font-weight: bold;
 }
 
-/* Botón Importar - The Golden Seal */
+/* Botón Importar - Primary Action */
 #btnImportarAPI {
-    -fx-background-color: linear-gradient(to bottom, #ecb939, #c49a2d);
+    -fx-background-color: #ecb939;
+    /* Hufflepuff Yellow */
     -fx-text-fill: #1a1612;
-    -fx-border-color: #5c4033;
-    -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 0, 2);
+    /* Dark Brown/Black */
+    -fx-border-color: #d4a017;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
     -fx-font-size: 14px;
 }
 
 #btnImportarAPI:hover {
-    -fx-background-color: linear-gradient(to bottom, #f0c75e, #ecb939);
+    -fx-background-color: #f0c75e;
     -fx-border-color: #f0c75e;
 }
 
-/* Botón Limpiar y Generar PDF
-   Matching Hufflepuff Style: Dark Earth with Yellow Text/Borders?? 
-   OR match primary buttons (Yellow with Dark Text)?
-   Let's match the Login "Entrar" button style (Yellow primary), or keep them secondary?
-   The previous style was "Secondary".
-   Let's make them Dark Earth with Yellow accents to contrast with the primary actions if we consider Import primary.
-   Actually, let's make them fit the theme:
-   Bg: Dark Earth, Text: Yellow, Border: Yellow.
-*/
+/* Botón Limpiar y Generar PDF */
 #btnLimpiar,
 #btnGenerarPDF {
-    -fx-background-color: rgba(31, 26, 23, 0.8);
-    -fx-text-fill: #ecb939;
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #b38600;
+    /* Dark Yellow text */
     -fx-border-color: #ecb939;
     -fx-border-width: 1;
 }
 
 #btnLimpiar:hover,
 #btnGenerarPDF:hover {
-    -fx-background-color: rgba(236, 185, 57, 0.2);
+    -fx-background-color: #fff8e1;
+    /* Very light yellow hover */
 }
 
 /* Paginación */
 #btnPaginaAnterior,
 #btnPaginaSiguiente {
     -fx-background-color: transparent;
-    -fx-text-fill: #ecb939;
-    -fx-border-color: #5c4033;
+    -fx-text-fill: #b38600;
+    -fx-border-color: #e0e0e0;
+    /* Light Grey */
     -fx-border-width: 1;
     -fx-font-size: 14px;
 }
 
 #btnPaginaAnterior:hover,
 #btnPaginaSiguiente:hover {
-    -fx-text-fill: #f0c75e;
+    -fx-text-fill: #d4a017;
     -fx-border-color: #ecb939;
+    -fx-background-color: #fffdf5;
 }
 
 /* Barra de estado */
 #statusBar {
-    -fx-background-color: rgba(0, 0, 0, 0.5);
-    -fx-text-fill: #d3c6a6;
-    /* Softer earth text */
-    -fx-border-color: #5c4033;
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+    -fx-text-fill: #5c4033;
+    -fx-border-color: #ecb939;
     -fx-border-width: 1 0 0 0;
 }
 
@@ -202,65 +200,48 @@
    ========================= */
 
 .card {
-    -fx-background-color: #f5f0db;
-    /* Parchment */
-    -fx-background-radius: 6;
-    -fx-border-color: #5c4033;
-    /* Dark Brown border */
-    -fx-border-width: 2;
-    -fx-border-radius: 6;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 4);
+    -fx-background-color: #ffffff;
+    /* Pure White Card */
+    -fx-background-radius: 8;
+    -fx-border-color: #ecb939;
+    /* Yellow Border */
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+    /* Soft shadow */
     -fx-padding: 12;
     -fx-spacing: 8;
 }
 
+.card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(236, 185, 57, 0.4), 8, 0, 0, 3);
+    /* Yellow glow on hover */
+}
+
 .card-title {
-    -fx-text-fill: #1a1612;
-    /* Dark Brown/Black */
+    -fx-text-fill: #3e2723;
+    /* Dark Brown */
     -fx-font-family: "Georgia", serif;
     -fx-font-weight: 800;
     -fx-font-size: 16px;
-    -fx-underline: true;
+    -fx-underline: false;
 }
 
 .card-meta {
-    -fx-text-fill: #3e2723;
-    /* Dark Brown */
+    -fx-text-fill: #6d4c41;
+    /* Softer Brown */
     -fx-font-family: "Georgia", serif;
     -fx-font-style: italic;
 }
 
 .card-button {
     -fx-background-color: #ecb939;
-    /* Hufflepuff Yellow */
     -fx-text-fill: #1a1612;
-    /* Dark text */
-    -fx-border-color: #1a1612;
-    -fx-border-width: 1;
+    -fx-border-color: transparent;
     -fx-background-radius: 4;
 }
 
 .card-button:hover {
     -fx-background-color: #f0c75e;
     -fx-cursor: hand;
-}
-
-/* Secondary/Detail buttons (if reused here) */
-.secondary-button {
-    -fx-background-color: #c0c0c0;
-    /* Standard silver/grey? Or Hufflepuff secondary? */
-    /* Let's keep them neutral or match the theme. 
-       Gryffindor had Green/Silver there (Slytherin style for details?).
-       The detail view used "secondary-button". 
-       Let's define a Hufflepuff secondary: Black/Dark Grey with Yellow text?
-    */
-    -fx-background-color: #1f1a17;
-    -fx-text-fill: #ecb939;
-    -fx-border-color: #ecb939;
-    -fx-border-width: 1;
-    -fx-font-weight: bold;
-}
-
-.secondary-button:hover {
-    -fx-background-color: #3e2723;
 }

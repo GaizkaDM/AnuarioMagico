@@ -55,6 +55,8 @@ public class Controlador implements Initializable {
     @FXML
     private TextField txtPagina;
     @FXML
+    private TextField txtPaginaSidebar;
+    @FXML
     private Label lblTotalPaginas;
     @FXML
     private Label statusBar;
@@ -166,6 +168,9 @@ public class Controlador implements Initializable {
             comboEstado.setValue(savedStatus);
         checkFavoritos.setSelected(savedFavorite);
 
+        // Listener para el menú de tema
+        menuTemaOscuro.setOnAction(e -> toggleTheme());
+
         btnLimpiar.setOnAction(e -> {
             txtBuscar.clear();
             comboCasa.getSelectionModel().clearSelection();
@@ -186,10 +191,18 @@ public class Controlador implements Initializable {
         });
 
         // Listener para el campo de número de página
-        txtPagina.setOnAction(e -> manejarCambioPagina());
+        txtPagina.setOnAction(e -> manejarCambioPagina(txtPagina));
         txtPagina.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) { // Si pierde el foco
-                manejarCambioPagina();
+                manejarCambioPagina(txtPagina);
+            }
+        });
+
+        // Jumper de página (Sidebar)
+        txtPaginaSidebar.setOnAction(e -> manejarCambioPagina(txtPaginaSidebar));
+        txtPaginaSidebar.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                manejarCambioPagina(txtPaginaSidebar);
             }
         });
 
@@ -199,9 +212,9 @@ public class Controlador implements Initializable {
     /**
      * Maneja el cambio manual de página desde el TextField.
      */
-    private void manejarCambioPagina() {
+    private void manejarCambioPagina(TextField source) {
         try {
-            int targetPage = Integer.parseInt(txtPagina.getText());
+            int targetPage = Integer.parseInt(source.getText());
             int total = listaFiltrada.size();
             int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
             if (totalPaginas == 0)
@@ -214,15 +227,13 @@ public class Controlador implements Initializable {
 
             paginaActual = targetPage - 1;
             actualizarPagina();
-        } catch (NumberFormatException ex) {
-            // Si el usuario escribe texto inválido, restaurar valor actual
-            txtPagina.setText(String.valueOf(paginaActual + 1));
+        } catch (NumberFormatException e) {
+            // Restore previous valid page
+            source.setText(String.valueOf(paginaActual + 1));
         }
     }
 
-    /**
-     * Muestra la ventana modal de inicio de sesión o registro.
-     */
+    @FXML
     private void mostrarLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"));
@@ -230,6 +241,16 @@ public class Controlador implements Initializable {
 
             LoginController loginCtrl = loader.getController();
             loginCtrl.setOnSuccessCallback(this::onLoginRealizado);
+
+            // Aplicar tema correcto
+            if (isDarkMode) {
+                root.getStylesheets().clear();
+                root.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
+            } else {
+                // Default is already set in FXML, but ensure if reused
+                root.getStylesheets().clear();
+                root.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
+            }
 
             Stage stage = new Stage();
             stage.setTitle("Login / Registro");
@@ -245,6 +266,32 @@ public class Controlador implements Initializable {
             e.printStackTrace();
         }
     }
+
+    // START DARK MODE LOGIC
+    @FXML
+    private javafx.scene.control.CheckMenuItem menuTemaOscuro;
+    private boolean isDarkMode = false;
+
+    private void toggleTheme() {
+        // El estado ya ha cambiado al pulsarlo, solo actualizamos variables y CSS
+        isDarkMode = menuTemaOscuro.isSelected();
+        Scene scene = menuTemaOscuro.getParentPopup().getOwnerWindow().getScene();
+        // Fallback si getParentPopup es null (a veces pasa en inicialización)
+        if (scene == null && contenedorTarjetas.getScene() != null) {
+            scene = contenedorTarjetas.getScene();
+        }
+
+        if (scene != null) {
+            scene.getStylesheets().clear();
+
+            if (isDarkMode) {
+                scene.getStylesheets().add(getClass().getResource("/styles/estilos_ravenclaw.css").toExternalForm());
+            } else {
+                scene.getStylesheets().add(getClass().getResource("/styles/estilos.css").toExternalForm());
+            }
+        }
+    }
+    // END DARK MODE LOGIC
 
     /**
      * Callback ejecutado cuando el inicio de sesión es exitoso.
@@ -422,6 +469,7 @@ public class Controlador implements Initializable {
         try {
             DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
             controller.setPersonaje(p);
+            controller.setDarkMode(isDarkMode);
         } catch (IOException e) {
             e.printStackTrace();
         }

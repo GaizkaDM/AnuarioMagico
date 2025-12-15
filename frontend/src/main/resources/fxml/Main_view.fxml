@@ -18,6 +18,11 @@
                         <MenuItem text="Salir"/>
                     </items>
                 </Menu>
+                <Menu text="Ver">
+                    <items>
+                        <CheckMenuItem fx:id="menuTemaOscuro" text="Modo Oscuro"/>
+                    </items>
+                </Menu>
                 <Menu text="Ayuda">
                     <items>
                         <MenuItem text="Acerca de"/>
@@ -33,16 +38,26 @@
                 <Insets top="20" right="15" bottom="20" left="15"/>
             </padding>
 
+
+
             <Label text="Buscar:"/>
             <TextField fx:id="txtBuscar" promptText="Nombre, casa o patronus..."/>
-
+            
             <Label text="Casa:"/>
             <ComboBox fx:id="comboCasa" maxWidth="Infinity"/>
 
             <Label text="Estado:"/>
             <ComboBox fx:id="comboEstado" maxWidth="Infinity"/>
 
-            <CheckBox fx:id="checkFavoritos" text="Mostrar favoritos"/>
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Ir a página:"/>
+                <TextField fx:id="txtPaginaSidebar" promptText="#" prefWidth="60"/>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="10">
+                 <Label text="Mostrar favoritos:"/>
+                 <CheckBox fx:id="checkFavoritos"/>
+            </HBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
@@ -58,31 +73,33 @@
     <center>
         <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true">
             <content>
-                <FlowPane fx:id="contenedorTarjetas" hgap="12" vgap="12" alignment="TOP_CENTER">
+                <VBox alignment="TOP_CENTER" spacing="20">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets top="10" right="10" bottom="20" left="10"/>
                     </padding>
-                </FlowPane>
+                    
+                    <FlowPane fx:id="contenedorTarjetas" hgap="12" vgap="12" alignment="TOP_CENTER"/>
+                    
+                    <HBox fx:id="paginationBar" spacing="10" alignment="CENTER">
+                        <padding>
+                            <Insets top="5" right="12" bottom="5" left="12"/>
+                        </padding>
+
+                        <Button fx:id="btnPaginaAnterior" text="Anterior"/>
+                        <HBox alignment="CENTER" spacing="5">
+                            <Label text="Página" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
+                            <TextField fx:id="txtPagina" prefWidth="50" alignment="CENTER" text="1"/>
+                            <Label fx:id="lblTotalPaginas" text="de 1" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <Button fx:id="btnPaginaSiguiente" text="Siguiente"/>
+                    </HBox>
+                </VBox>
             </content>
         </ScrollPane>
     </center>
 
     <bottom>
         <VBox>
-            <HBox fx:id="paginationBar" spacing="10" alignment="CENTER">
-                <padding>
-                    <Insets top="5" right="12" bottom="5" left="12"/>
-                </padding>
-
-                <Button fx:id="btnPaginaAnterior" text="Anterior"/>
-                <HBox alignment="CENTER" spacing="5">
-                    <Label text="Página" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtPagina" prefWidth="50" alignment="CENTER" text="1"/>
-                    <Label fx:id="lblTotalPaginas" text="de 1" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
-                </HBox>
-                <Button fx:id="btnPaginaSiguiente" text="Siguiente"/>
-            </HBox>
-
             <Label fx:id="statusBar" text="Listo">
                 <padding>
                     <Insets top="4" right="12" bottom="4" left="12"/>
@@ -90,5 +107,6 @@
             </Label>
         </VBox>
     </bottom>
+
 
 </BorderPane>

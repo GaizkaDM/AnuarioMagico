@@ -1,72 +1,56 @@
-/* login.css - Hufflepuff Edition */
+/* login.css - Light Hufflepuff Edition */
 
-.root {
-    /* Earthy tones: Deep Brown/Black gradient */
-    -fx-background-color: linear-gradient(to bottom, #372e29, #1a1612);
+/* Fondo general - Clean White/Cream */
+#root {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #fffbf0);
     -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
-    -fx-padding: 30;
+    -fx-padding: 20;
 }
 
-.label {
+/* Titulos */
+.titulo-login {
     -fx-text-fill: #ecb939;
-    /* Hufflepuff Yellow */
+    /* Yellow Title */
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
 }
 
+/* Inputs */
 .text-field,
 .password-field {
-    -fx-background-color: #1f1a17;
-    /* Very dark earth */
+    -fx-background-color: #ffffff;
     -fx-background-radius: 4;
-    -fx-border-color: #e0b135;
-    /* Gold/Yellow Border */
+    -fx-border-color: #ccc;
     -fx-border-width: 1;
     -fx-border-radius: 4;
-    -fx-text-fill: #f0e6d2;
-    -fx-prompt-text-fill: rgba(240, 230, 210, 0.4);
+    -fx-text-fill: #333;
+    -fx-prompt-text-fill: #999;
 }
 
 .text-field:focused,
 .password-field:focused {
-    -fx-border-color: #ffd700;
-    /* Brighter gold on focus */
-    -fx-effect: dropshadow(three-pass-box, rgba(236, 185, 57, 0.4), 5, 0, 0, 0);
+    -fx-border-color: #ecb939;
+    -fx-background-color: #fffdf5;
 }
 
-.primary-button {
+/* Botones */
+.button {
     -fx-background-color: #ecb939;
     /* Hufflepuff Yellow */
     -fx-text-fill: #1a1612;
-    /* Dark text for contrast */
-    -fx-border-color: #1a1612;
-    -fx-border-width: 1;
+    -fx-font-weight: bold;
     -fx-background-radius: 4;
     -fx-cursor: hand;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
 }
 
-.primary-button:hover {
+.button:hover {
     -fx-background-color: #f0c75e;
-    /* Lighter yellow */
 }
 
-.check-box {
-    -fx-text-fill: #ecb939;
-}
-
-.check-box .box {
-    -fx-background-color: #1f1a17;
-    -fx-border-color: #ecb939;
-}
-
-.check-box:selected .mark {
-    -fx-background-color: #ecb939;
-}
-
-/* Title specific style */
-.title-label {
-    -fx-font-size: 24px;
-    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
-    -fx-padding: 0 0 20 0;
+/* Link/Text Secondary */
+.label-link {
+    -fx-text-fill: #b38600;
+    -fx-underline: true;
+    -fx-cursor: hand;
 }
