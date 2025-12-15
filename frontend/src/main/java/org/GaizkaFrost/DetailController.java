@@ -85,8 +85,8 @@ public class DetailController {
             btnEliminar.setOnAction(event -> eliminarPersonaje());
         }
 
-        if (btnGenerarPDF != null) {
-            btnGenerarPDF.setOnAction(event -> {
+        if (btnGenerarPDFDetail != null) {
+            btnGenerarPDFDetail.setOnAction(event -> {
                 System.out.println("Generar PDF solicitado para: "
                         + (currentPersonaje != null ? currentPersonaje.getNombre() : "Unknown"));
             });
