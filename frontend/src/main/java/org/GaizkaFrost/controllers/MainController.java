@@ -172,6 +172,7 @@ public class MainController implements Initializable {
         checkFavoritos.setSelected(savedFavorite);
 
         // Listener para el menú de tema
+        menuTemaOscuro.setSelected(App.isDarkMode());
         menuTemaOscuro.setOnAction(e -> toggleTheme());
 
         btnLimpiar.setOnAction(e -> {
@@ -246,14 +247,7 @@ public class MainController implements Initializable {
             loginCtrl.setOnSuccessCallback(this::onLoginRealizado);
 
             // Aplicar tema correcto
-            if (isDarkMode) {
-                root.getStylesheets().clear();
-                root.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
-            } else {
-                // Default is already set in FXML, but ensure if reused
-                root.getStylesheets().clear();
-                root.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
-            }
+            App.applyTheme(root, "Login_view");
 
             Stage stage = new Stage();
             stage.setTitle("Login / Registro");
@@ -270,28 +264,23 @@ public class MainController implements Initializable {
         }
     }
 
+    @FXML
+    private javafx.scene.layout.BorderPane root; // Injected root
+
     // START DARK MODE LOGIC
     @FXML
     private javafx.scene.control.CheckMenuItem menuTemaOscuro;
-    private boolean isDarkMode = false;
 
     private void toggleTheme() {
-        // El estado ya ha cambiado al pulsarlo, solo actualizamos variables y CSS
-        isDarkMode = menuTemaOscuro.isSelected();
-        Scene scene = menuTemaOscuro.getParentPopup().getOwnerWindow().getScene();
-        // Fallback si getParentPopup es null (a veces pasa en inicialización)
-        if (scene == null && contenedorTarjetas.getScene() != null) {
-            scene = contenedorTarjetas.getScene();
-        }
+        boolean newMode = menuTemaOscuro.isSelected();
+        App.setDarkMode(newMode);
 
-        if (scene != null) {
-            scene.getStylesheets().clear();
-
-            if (isDarkMode) {
-                scene.getStylesheets().add(getClass().getResource("/styles/estilos_ravenclaw.css").toExternalForm());
-            } else {
-                scene.getStylesheets().add(getClass().getResource("/styles/estilos.css").toExternalForm());
-            }
+        // Apply to current view immediately
+        if (root != null) {
+            App.applyTheme(root, "Main_view");
+        } else if (contenedorTarjetas.getScene() != null) {
+            // Fallback if root not injected for some reason
+            App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
         }
     }
     // END DARK MODE LOGIC
@@ -472,7 +461,6 @@ public class MainController implements Initializable {
         try {
             DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
             controller.setPersonaje(p);
-            controller.setDarkMode(isDarkMode);
         } catch (IOException e) {
             e.printStackTrace();
         }

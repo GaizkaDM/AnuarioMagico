@@ -11,6 +11,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.io.File;
+import java.net.URL;
 
 /**
  * Clase principal de la aplicación JavaFX.
@@ -27,6 +28,15 @@ public class App extends Application {
     private static Stage stage;
     private static Scene scene;
     private static App instance;
+    private static boolean isDarkMode = false;
+
+    public static boolean isDarkMode() {
+        return isDarkMode;
+    }
+
+    public static void setDarkMode(boolean mode) {
+        isDarkMode = mode;
+    }
 
     /**
      * Punto de entrada principal para la aplicación JavaFX.
@@ -84,6 +94,7 @@ public class App extends Application {
     public static <T> T setRootAndGetController(String fxml, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
         Parent root = loader.load();
+        applyTheme(root, fxml);
 
         scene.setRoot(root);
         stage.setTitle(title);
@@ -99,9 +110,38 @@ public class App extends Application {
      * @return El nodo raíz (Parent) cargado.
      * @throws IOException Si ocurre un error de E/S.
      */
+    /**
+     * Applies the correct theme (Normal/Dark) based on global state.
+     */
+    public static void applyTheme(Parent root, String fxml) {
+        root.getStylesheets().clear();
+        String cssPath = "";
+
+        switch (fxml) {
+            case "Main_view":
+                cssPath = isDarkMode ? "/styles/estilos_ravenclaw.css" : "/styles/estilos.css";
+                break;
+            case "Detail_view":
+                cssPath = isDarkMode ? "/styles/estilos_detalles_ravenclaw.css" : "/styles/estilos_detalles.css";
+                break;
+            case "Login_view":
+                cssPath = isDarkMode ? "/styles/login_ravenclaw.css" : "/styles/login.css";
+                break;
+        }
+
+        if (!cssPath.isEmpty()) {
+            URL resource = App.class.getResource(cssPath);
+            if (resource != null) {
+                root.getStylesheets().add(resource.toExternalForm());
+            }
+        }
+    }
+
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
-        return fxmlLoader.load();
+        Parent root = fxmlLoader.load();
+        applyTheme(root, fxml);
+        return root;
     }
 
     /**
