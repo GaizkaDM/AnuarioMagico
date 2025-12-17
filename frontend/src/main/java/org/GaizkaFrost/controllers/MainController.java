@@ -249,7 +249,19 @@ public class MainController implements Initializable {
         }
         if (btnGenerarPDF != null) {
             btnGenerarPDF.setOnAction(e -> {
-                ReportService.generateListReport(listaFiltrada, (Stage) btnGenerarPDF.getScene().getWindow());
+                System.out.println("DEBUG: Button PDF clicked in MainController");
+                try {
+                    ReportService.generateListReport(listaFiltrada, (Stage) btnGenerarPDF.getScene().getWindow());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error al generar PDF");
+                    alert.setContentText(
+                            "No se pudo generar el reporte.\nPosible causa: Librerías faltantes o error en plantilla.\n\nDetalle: "
+                                    + t.getMessage());
+                    alert.showAndWait();
+                }
             });
         }
     }
@@ -583,38 +595,84 @@ public class MainController implements Initializable {
      * Importa personajes desde la API de Harry Potter en un hilo en segundo plano.
      * Actualiza la interfaz gráfica una vez completada la carga.
      */
+    /**
+     * Importa personajes desde la API y sincroniza imágenes.
+     */
     private void sincronizar() {
+        // 1. Carga inicial rápida (datos existentes)
         setCargando(true);
         btnSincronizar.setDisable(true);
-        statusBar.setText("Cargando personajes...");
+        statusBar.setText("Cargando datos locales...");
 
         new Thread(() -> {
             try {
-                List<Personaje> personajesAPI = HarryPotterAPI.fetchCharacters();
+                // Fetch fast
+                List<Personaje> localData = HarryPotterAPI.fetchCharacters();
 
                 Platform.runLater(() -> {
-                    masterData.setAll(personajesAPI);
-                    // Aplicar filtros actuales a los nuevos datos (esto repuebla listaFiltrada)
+                    masterData.setAll(localData);
                     aplicarFiltros();
-
-                    // Restaurar página si corresponde (aplicarFiltros la habrá reseteado a 0)
-                    if (savedPage != -1) {
-                        paginaActual = savedPage;
-                        savedPage = -1;
-                    }
-                    // Si no hay pagina guardada, aplicarFiltros ya la dejó en 0, correcto.
-
                     actualizarPagina();
-                    actualizarPagina();
-                    statusBar.setText(App.getBundle().getString("main.status.ready"));
-                    btnSincronizar.setDisable(false);
-                    setCargando(false);
+                    setCargando(false); // Desbloquear UI inmediatamente
+                    statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
                 });
 
+                // 2. Sincronización en segundo plano (Lento)
+                boolean pullSuccess = HarryPotterAPI.syncPull();
+
+                if (pullSuccess) {
+                    boolean downloading = true;
+                    int noStatusCount = 0;
+
+                    while (downloading) {
+                        try {
+                            com.google.gson.JsonObject status = HarryPotterAPI.getImageSyncStatus();
+
+                            if (status != null) {
+                                boolean running = status.get("running").getAsBoolean();
+                                int current = status.get("current").getAsInt();
+                                int total = status.get("total").getAsInt();
+                                int errors = status.get("errors").getAsInt();
+
+                                Platform.runLater(() -> {
+                                    statusBar.setText(
+                                            String.format("Descargando nuevas imágenes: %d/%d...", current, total));
+                                });
+
+                                if (!running)
+                                    downloading = false;
+                            } else {
+                                noStatusCount++;
+                                if (noStatusCount > 5)
+                                    downloading = false;
+                            }
+
+                            if (downloading)
+                                Thread.sleep(1000); // Polling más lento
+                        } catch (Exception e) {
+                            downloading = false;
+                        }
+                    }
+
+                    // 3. Recarga final tras sincronización
+                    List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
+                    Platform.runLater(() -> {
+                        masterData.setAll(freshData);
+                        aplicarFiltros();
+                        actualizarPagina();
+                        statusBar.setText(App.getBundle().getString("main.status.ready"));
+                        btnSincronizar.setDisable(false);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        statusBar.setText("Modo Offline (Sincronización fallida)");
+                        btnSincronizar.setDisable(false);
+                    });
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
-                    statusBar.setText("Error al cargar datos.");
+                    statusBar.setText("Error al sincronizar.");
                     btnSincronizar.setDisable(false);
                     setCargando(false);
                 });

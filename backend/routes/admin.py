@@ -22,6 +22,10 @@ def trigger_image_sync():
     thread.start()
     return jsonify({"message": "Background image sync started", "status": "started"})
 
+@admin_bp.route('/admin/sync-images/status', methods=['GET'])
+def get_image_sync_status():
+    return jsonify(ImageService.sync_status)
+
 @admin_bp.route('/admin/sync-mysql', methods=['POST'])
 def sync_mysql_push():
     try:
@@ -34,7 +38,13 @@ def sync_mysql_push():
 def sync_mysql_pull():
     try:
         sync_mysql_to_sqlite()
-        return jsonify({"success": True, "message": "Pull from MySQL completed successfully"})
+        
+        # Auto-trigger background image sync to ensure offline availability
+        thread = threading.Thread(target=ImageService.cache_all_images_background)
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({"success": True, "message": "Pull from MySQL completed. Image caching started in background."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

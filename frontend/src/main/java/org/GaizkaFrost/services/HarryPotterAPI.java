@@ -169,6 +169,22 @@ public class HarryPotterAPI {
     }
 
     /**
+     * Obtiene el estado de la sincronización de imágenes en segundo plano.
+     */
+    public static JsonObject getImageSyncStatus() {
+        try {
+            HttpURLConnection conn = createConnection("http://localhost:8000/admin/sync-images/status", "GET");
+            if (conn.getResponseCode() == 200) {
+                String response = readResponse(conn);
+                return new Gson().fromJson(response, JsonObject.class);
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking sync status: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
      * Obtiene la lista de personajes.
      */
     public static List<Personaje> fetchCharacters() throws Exception {

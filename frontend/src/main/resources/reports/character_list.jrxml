@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="character_list" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="character_list" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
     <parameter name="REPORT_TITLE" class="java.lang.String"/>
     <field name="nombre" class="java.lang.String"/>
@@ -12,7 +12,7 @@
     <title>
         <band height="60" splitType="Stretch">
             <textField>
-                <reportElement x="0" y="10" width="555" height="40" uuid="e1f2g3h4-5i6j-7k8l-9m0n-1o2p3q4r5s6t"/>
+                <reportElement x="0" y="10" width="555" height="40"/>
                 <textElement textAlignment="Center">
                     <font size="24" isBold="true"/>
                 </textElement>
@@ -23,7 +23,7 @@
     <columnHeader>
         <band height="30" splitType="Stretch">
             <staticText>
-                <reportElement x="0" y="0" width="200" height="30" uuid="u1v2w3x4-5y6z-7a8b-9c0d-1e2f3a4b5c6d"/>
+                <reportElement x="0" y="0" width="200" height="30"/>
                 <box>
                     <bottomPen lineWidth="1.0"/>
                 </box>
@@ -33,7 +33,7 @@
                 <text><![CDATA[Nombre]]></text>
             </staticText>
             <staticText>
-                <reportElement x="200" y="0" width="120" height="30" uuid="i1j2k3l4-5m6n-7o8p-9q0r-1s2t3u4v5w6x"/>
+                <reportElement x="200" y="0" width="120" height="30"/>
                 <box>
                     <bottomPen lineWidth="1.0"/>
                 </box>
@@ -43,7 +43,7 @@
                 <text><![CDATA[Casa]]></text>
             </staticText>
             <staticText>
-                <reportElement x="320" y="0" width="100" height="30" uuid="y1z2a3b4-5c6d-7e8f-9g0h-1i2j3k4l5m6n"/>
+                <reportElement x="320" y="0" width="100" height="30"/>
                 <box>
                     <bottomPen lineWidth="1.0"/>
                 </box>
@@ -53,7 +53,7 @@
                 <text><![CDATA[Estado]]></text>
             </staticText>
             <staticText>
-                <reportElement x="420" y="0" width="135" height="30" uuid="o1p2q3r4-5s6t-7u8v-9w0x-1y2z3a4b5c6d"/>
+                <reportElement x="420" y="0" width="135" height="30"/>
                 <box>
                     <bottomPen lineWidth="1.0"/>
                 </box>
@@ -65,23 +65,27 @@
         </band>
     </columnHeader>
     <detail>
-        <band height="20" splitType="Stretch">
+        <band height="65" splitType="Stretch">
             <textField>
-                <reportElement x="0" y="0" width="200" height="20" uuid="e1f2g3h4-5i6j-7k8l-9m0n-1o2p3q4r5s6t"/>
+                <reportElement x="50" y="30" width="150" height="20"/>
                 <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="200" y="0" width="120" height="20" uuid="u1v2w3x4-5y6z-7a8b-9c0d-1e2f3a4b5c6d"/>
+                <reportElement x="200" y="30" width="120" height="20"/>
                 <textFieldExpression><![CDATA[$F{casa} == null ? "-" : $F{casa}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="320" y="0" width="100" height="20" uuid="i1j2k3l4-5m6n-7o8p-9q0r-1s2t3u4v5w6x"/>
+                <reportElement x="320" y="30" width="100" height="20"/>
                 <textFieldExpression><![CDATA[$F{estado} == null ? "-" : $F{estado}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="420" y="0" width="135" height="20" uuid="y1z2a3b4-5c6d-7e8f-9g0h-1i2j3k4l5m6n"/>
+                <reportElement x="420" y="30" width="135" height="20"/>
                 <textFieldExpression><![CDATA[$F{patronus} == null ? "-" : $F{patronus}]]></textFieldExpression>
             </textField>
+            <image onErrorType="Blank">
+                 <reportElement x="-10" y="15" width="50" height="50"/>
+                 <imageExpression><![CDATA[""]]></imageExpression>
+            </image>
         </band>
     </detail>
 </jasperReport>

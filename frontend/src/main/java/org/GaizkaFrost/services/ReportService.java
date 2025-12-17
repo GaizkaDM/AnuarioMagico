@@ -39,53 +39,76 @@ public class ReportService {
     }
 
     private static void generateReport(List<Personaje> data, String templateName, String title, Stage owner) {
-        try {
-            // 1. Load Template
-            InputStream reportStream = ReportService.class.getResourceAsStream(REPORT_DIR + templateName);
-            if (reportStream == null) {
-                showAlert(Alert.AlertType.ERROR, "Error", "No se encuentra la plantilla del reporte: " + templateName);
-                return;
-            }
+        // 1. File Chooser (Main Thread)
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        fileChooser.setInitialFileName(title.replace(" ", "_") + ".pdf");
 
-            // 2. Compile Report
-            JasperDesign jasperDesign = JRXmlLoader.load(reportStream);
-            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+        File file = fileChooser.showSaveDialog(owner);
 
-            // 3. Create Data Source
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
+        if (file == null)
+            return;
 
-            // 4. Parameters
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("REPORT_TITLE", title);
-            // Add localized strings if needed
-            parameters.put("LABEL_NAME", App.getBundle().getString("detail.name"));
-            parameters.put("LABEL_HOUSE", App.getBundle().getString("detail.house"));
-            parameters.put("LABEL_STATUS", App.getBundle().getString("edit.label.status"));
-            // ... more params as needed for the template
+        // 2. Background Processing
+        new Thread(() -> {
+            try {
+                // Notify start (Optional, but good for logs)
+                System.out.println("Starting PDF generation for " + file.getName() + "...");
 
-            // 5. Fill Report
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+                // 1. Load Template
+                InputStream reportStream = ReportService.class.getResourceAsStream(REPORT_DIR + templateName);
+                if (reportStream == null) {
+                    javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error",
+                            "No se encuentra la plantilla del reporte: " + templateName));
+                    return;
+                }
 
-            // 6. Save PDF
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Guardar PDF");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
-            fileChooser.setInitialFileName(title.replace(" ", "_") + ".pdf");
+                // 2. Compile Report
+                JasperDesign jasperDesign = JRXmlLoader.load(reportStream);
+                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
 
-            File file = fileChooser.showSaveDialog(owner);
+                // 3. Create Data Source
+                JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(data);
 
-            if (file != null) {
+                // 4. Parameters
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("REPORT_TITLE", title);
+                parameters.put("LABEL_NAME", App.getBundle().getString("detail.name"));
+                parameters.put("LABEL_HOUSE", App.getBundle().getString("detail.house"));
+                parameters.put("LABEL_STATUS", App.getBundle().getString("edit.label.status"));
+                parameters.put("LABEL_PATRONUS", App.getBundle().getString("detail.patronus"));
+                // Add extended fields
+                parameters.put("LABEL_BORN", App.getBundle().getString("detail.born"));
+                parameters.put("LABEL_DIED", App.getBundle().getString("detail.died"));
+                parameters.put("LABEL_GENDER", App.getBundle().getString("detail.gender"));
+                parameters.put("LABEL_SPECIES", App.getBundle().getString("detail.species"));
+                parameters.put("LABEL_ANIMAGUS", App.getBundle().getString("detail.animagus"));
+                parameters.put("LABEL_NATIONALITY", App.getBundle().getString("detail.nationality"));
+                parameters.put("LABEL_ALIAS", App.getBundle().getString("detail.alias"));
+                parameters.put("LABEL_TITLES", App.getBundle().getString("detail.titles"));
+                parameters.put("LABEL_WAND", App.getBundle().getString("detail.wand"));
+
+                // 5. Fill Report (Heavy Lifting - fetching images etc)
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+                // 6. Save PDF
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getAbsolutePath());
-                showAlert(Alert.AlertType.INFORMATION, "Éxito", "PDF generado correctamente: " + file.getName());
-            }
 
-        } catch (JRException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error JasperReports", "Error al generar el reporte: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Error inesperado: " + e.getMessage());
-        }
+                // Success Callback
+                javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.INFORMATION, "Éxito",
+                        "PDF generado correctamente:\n" + file.getAbsolutePath()));
+
+            } catch (JRException e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error JasperReports",
+                        "Error al generar el reporte: " + e.getMessage()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(
+                        () -> showAlert(Alert.AlertType.ERROR, "Error", "Error inesperado: " + e.getMessage()));
+            }
+        }).start();
     }
 
     private static void showAlert(Alert.AlertType type, String title, String content) {

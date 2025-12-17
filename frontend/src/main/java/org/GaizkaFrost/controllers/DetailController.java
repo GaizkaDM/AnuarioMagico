@@ -102,9 +102,15 @@ public class DetailController {
 
         if (btnGenerarPDFDetail != null) {
             btnGenerarPDFDetail.setOnAction(event -> {
-                if (currentPersonaje != null) {
-                    ReportService.generateCharacterReport(currentPersonaje,
-                            (javafx.stage.Stage) btnGenerarPDFDetail.getScene().getWindow());
+                System.out.println("DEBUG: Button PDF clicked in DetailController");
+                try {
+                    if (currentPersonaje != null) {
+                        ReportService.generateCharacterReport(currentPersonaje,
+                                (javafx.stage.Stage) btnGenerarPDFDetail.getScene().getWindow());
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    mostrarAlerta("Error", "No se pudo generar el reporte.\n" + t.getMessage());
                 }
             });
         }

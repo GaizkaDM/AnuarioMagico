@@ -1,10 +1,11 @@
-module org.diegofg {
+@SuppressWarnings("module") module org.GaizkaFrost {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.media;
     requires com.google.gson;
     requires java.logging;
     requires jasperreports;
+    requires java.sql;
 
     exports org.GaizkaFrost;
     exports org.GaizkaFrost.controllers;

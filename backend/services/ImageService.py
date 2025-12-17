@@ -18,6 +18,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import DB_FILE
 
 class ImageService:
+    # Store sync status in memory
+    sync_status = {
+        "running": False,
+        "current": 0,
+        "total": 0,
+        "errors": 0
+    }
+
     @staticmethod
     def get_image_from_db(character_id):
         conn = sqlite3.connect(DB_FILE)
@@ -91,6 +99,10 @@ class ImageService:
     @staticmethod
     def cache_all_images_background():
         print("⚡ Starting background image sync...")
+        ImageService.sync_status["running"] = True
+        ImageService.sync_status["current"] = 0
+        ImageService.sync_status["errors"] = 0
+        
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         
@@ -98,12 +110,17 @@ class ImageService:
         rows = cursor.fetchall()
         
         total = len(rows)
+        ImageService.sync_status["total"] = total
         print(f"⚡ Found {total} images to cache.")
         
         count = 0
         errors = 0
         
         for row in rows:
+            # Update status
+            ImageService.sync_status["current"] = count
+            ImageService.sync_status["errors"] = errors
+            
             char_id, original_url = row
             if not original_url: continue
                 
@@ -125,4 +142,8 @@ class ImageService:
                 print(f"  ✗ Failed to download {char_id}: {e}")
                 
         conn.close()
+        
+        ImageService.sync_status["current"] = count
+        ImageService.sync_status["errors"] = errors
+        ImageService.sync_status["running"] = False
         print(f"⚡ Background sync complete. Cached: {count}, Errors: {errors}")
