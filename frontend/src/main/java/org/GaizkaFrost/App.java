@@ -193,7 +193,7 @@ public class App extends Application {
                 logDir.mkdirs();
             }
 
-            FileHandler fh = new FileHandler("logs/frontend.log", 1024 * 1024, 3, true);
+            FileHandler fh = new FileHandler("logs/frontend.%g.log", 1024 * 1024, 3, true);
             fh.setFormatter(new SimpleFormatter());
             Logger logger = Logger.getLogger("");
             logger.addHandler(fh);
