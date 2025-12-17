@@ -41,11 +41,37 @@ class ImageService:
             return None
             
         try:
-            resp = requests.get(url, timeout=10)
-            if resp.status_code != 200:
-                return None
+            raw_data = None
+            
+            # Handle local file URLs (file:/...)
+            if url.startswith('file:'):
+                from urllib.parse import urlparse, unquote
+                import os
                 
-            raw_data = resp.content
+                # Parse URI
+                parsed = urlparse(url)
+                file_path = unquote(parsed.path)
+                
+                # Windows path fix: /C:/Path -> C:/Path
+                if os.name == 'nt' and file_path.startswith('/') and len(file_path) > 2 and file_path[2] == ':':
+                    file_path = file_path[1:]
+                    
+                if os.path.exists(file_path):
+                    with open(file_path, 'rb') as f:
+                        raw_data = f.read()
+                else:
+                    print(f"File not found: {file_path}")
+                    return None
+            else:
+                # Handle HTTP/HTTPS
+                resp = requests.get(url, timeout=10)
+                if resp.status_code != 200:
+                    return None
+                raw_data = resp.content
+                
+            if not raw_data:
+                return None
+
             img = Image.open(io.BytesIO(raw_data))
             
             if img.mode in ('RGBA', 'LA'):

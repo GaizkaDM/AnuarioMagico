@@ -4,6 +4,7 @@ module org.diegofg {
     requires javafx.media;
     requires com.google.gson;
     requires java.logging;
+    requires jasperreports;
 
     exports org.GaizkaFrost;
     exports org.GaizkaFrost.controllers;

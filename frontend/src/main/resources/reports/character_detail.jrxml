@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="character_detail" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c2e3d4f5-1a2b-3c4d-5e6f-7a8b9c0d1e2f">
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+    <parameter name="REPORT_TITLE" class="java.lang.String"/>
+    <parameter name="LABEL_NAME" class="java.lang.String"/>
+    <parameter name="LABEL_HOUSE" class="java.lang.String"/>
+    <parameter name="LABEL_STATUS" class="java.lang.String"/>
+    <field name="nombre" class="java.lang.String"/>
+    <field name="casa" class="java.lang.String"/>
+    <field name="estado" class="java.lang.String"/>
+    <field name="patronus" class="java.lang.String"/>
+    <field name="imagenUrl" class="java.lang.String"/>
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    <title>
+        <band height="79" splitType="Stretch">
+            <textField>
+                <reportElement x="0" y="20" width="555" height="40" uuid="a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d"/>
+                <textElement textAlignment="Center">
+                    <font size="24" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <detail>
+        <band height="400" splitType="Stretch">
+            <image onErrorType="Blank">
+                <reportElement x="20" y="20" width="200" height="300" uuid="e1f2g3h4-5i6j-7k8l-9m0n-1o2p3q4r5s6t"/>
+                <imageExpression><![CDATA[$F{imagenUrl}]]></imageExpression>
+            </image>
+            <textField>
+                <reportElement x="240" y="20" width="300" height="30" uuid="u1v2w3x4-5y6z-7a8b-9c0d-1e2f3a4b5c6d"/>
+                <textElement>
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="240" y="60" width="100" height="20" uuid="i1j2k3l4-5m6n-7o8p-9q0r-1s2t3u4v5w6x"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{LABEL_HOUSE} + ":"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="60" width="200" height="20" uuid="y1z2a3b4-5c6d-7e8f-9g0h-1i2j3k4l5m6n"/>
+                <textFieldExpression><![CDATA[$F{casa}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="240" y="90" width="100" height="20" uuid="o1p2q3r4-5s6t-7u8v-9w0x-1y2z3a4b5c6d"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{LABEL_STATUS} + ":"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="90" width="200" height="20" uuid="e1f2g3h4-5i6j-7k8l-9m0n-1o2p3q4r5s6t"/>
+                <textFieldExpression><![CDATA[$F{estado}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="240" y="120" width="100" height="20" uuid="u1v2w3x4-5y6z-7a8b-9c0d-1e2f3a4b5c6d"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Patronus:"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="120" width="200" height="20" uuid="i1j2k3l4-5m6n-7o8p-9q0r-1s2t3u4v5w6x"/>
+                <textFieldExpression><![CDATA[$F{patronus}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

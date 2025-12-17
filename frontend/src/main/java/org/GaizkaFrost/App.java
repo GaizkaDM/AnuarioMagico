@@ -93,6 +93,7 @@ public class App extends Application {
 
     public static <T> T setRootAndGetController(String fxml, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
+        loader.setResources(getBundle());
         Parent root = loader.load();
         applyTheme(root, fxml);
 
@@ -127,6 +128,9 @@ public class App extends Application {
             case "Login_view":
                 cssPath = isDarkMode ? "/styles/login_ravenclaw.css" : "/styles/login.css";
                 break;
+            case "Edit_view":
+                cssPath = isDarkMode ? "/styles/form_ravenclaw.css" : "/styles/form.css";
+                break;
         }
 
         if (!cssPath.isEmpty()) {
@@ -137,8 +141,35 @@ public class App extends Application {
         }
     }
 
+    private static java.util.Locale currentLocale = java.util.Locale.ENGLISH;
+    private static java.util.ResourceBundle bundle;
+
+    public static void setLocale(java.util.Locale locale) {
+        currentLocale = locale;
+        bundle = java.util.ResourceBundle.getBundle("i18n.messages", currentLocale);
+    }
+
+    public static java.util.ResourceBundle getBundle() {
+        if (bundle == null) {
+            bundle = java.util.ResourceBundle.getBundle("i18n.messages", currentLocale);
+        }
+        return bundle;
+    }
+
+    public static java.util.Locale getLocale() {
+        return currentLocale;
+    }
+
+    /**
+     * Carga un archivo FXML desde los recursos.
+     *
+     * @param fxml El nombre del archivo FXML.
+     * @return El nodo raíz (Parent) cargado.
+     * @throws IOException Si ocurre un error de E/S.
+     */
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
+        fxmlLoader.setResources(getBundle());
         Parent root = fxmlLoader.load();
         applyTheme(root, fxml);
         return root;
@@ -150,6 +181,7 @@ public class App extends Application {
      * @param args Argumentos de línea de comandos.
      */
     public static void main(String[] args) {
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH); // Force English default
         launch(args);
     }
 

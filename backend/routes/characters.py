@@ -206,3 +206,32 @@ def toggle_favorite(character_id):
         return jsonify({'success': True, 'character_id': character_id, 'is_favorite': new_status})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@characters_bp.route('/characters/<character_id>', methods=['PUT', 'DELETE'])
+def manage_character(character_id):
+    if request.method == 'PUT':
+        # EDIT
+        try:
+            data = request.get_json()
+            if not data: return jsonify({"error": "No data"}), 400
+            
+            success = personaje_service.editar_personaje(character_id, data)
+            if success:
+                return jsonify({"success": True})
+            return jsonify({"error": "Failed to update"}), 500
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+
+    elif request.method == 'DELETE':
+        # DELETE
+        try:
+            success = personaje_service.eliminar_personaje(character_id)
+            if success:
+                return jsonify({"success": True})
+            return jsonify({"error": "Failed to delete"}), 500
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500

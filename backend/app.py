@@ -23,6 +23,7 @@ from backend.extensions import db
 from backend.routes.auth import auth_bp
 from backend.routes.characters import characters_bp
 from backend.routes.admin import admin_bp
+from backend.routes.character_update import character_update_bp
 from backend.models.User import User
 from backend.models.Favorite import Favorite
 from backend.models.Character import Character
@@ -50,6 +51,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(characters_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(character_update_bp, url_prefix='/api/characters')
     
     # Health Check Endpoint
     @app.route('/health', methods=['GET'])

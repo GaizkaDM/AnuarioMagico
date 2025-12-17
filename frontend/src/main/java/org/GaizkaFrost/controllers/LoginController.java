@@ -15,6 +15,9 @@ import javafx.stage.Stage;
  * @author Diego
  * @author Xiker
  */
+import org.GaizkaFrost.App;
+import java.text.MessageFormat;
+
 public class LoginController {
 
     @FXML
@@ -52,11 +55,15 @@ public class LoginController {
         chkRegistro.selectedProperty().addListener((obs, oldVal, newVal) -> {
             boxMasterPassword.setVisible(newVal);
             boxMasterPassword.setManaged(newVal);
-            btnAccion.setText(newVal ? "Registrarse" : "Entrar");
+            btnAccion.setText(App.getBundle().getString("login.button"));
             lblStatus.setText("");
         });
 
-        btnAccion.setOnAction(e -> handleAction());
+        btnAccion.setOnAction(e -> {
+            System.out.println("DEBUG: Button ACCEDER clicked");
+            handleAction();
+        });
+        System.out.println("DEBUG: LoginController initialized");
     }
 
     /**
@@ -70,11 +77,11 @@ public class LoginController {
         boolean isRegister = chkRegistro.isSelected();
 
         if (user.isEmpty() || pass.isEmpty()) {
-            lblStatus.setText("Por favor, rellena los campos.");
+            lblStatus.setText(App.getBundle().getString("login.status.fill"));
             return;
         }
 
-        lblStatus.setText("Procesando...");
+        lblStatus.setText(App.getBundle().getString("login.status.processing"));
         btnAccion.setDisable(true);
 
         new Thread(() -> {
@@ -82,18 +89,19 @@ public class LoginController {
                 if (isRegister) {
                     String master = txtMasterPassword.getText();
                     if (master.isEmpty()) {
-                        updateStatus("Falta contraseña maestra.");
+                        updateStatus("Missing master password."); // Need key
                         return;
                     }
                     boolean ok = HarryPotterAPI.register(user, pass, master);
                     if (ok) {
                         updateIO(() -> {
                             chkRegistro.setSelected(false);
-                            lblStatus.setText("Registro exitoso. Inicia sesión.");
+                            chkRegistro.setSelected(false);
+                            lblStatus.setText("Registration successful. Please login."); // Need key
                             txtPassword.clear();
                         });
                     } else {
-                        updateStatus("Error en registro. Verifica la contraseña maestra.");
+                        updateStatus("Registration error. Check master password."); // Need key
                     }
                 } else {
                     String token = HarryPotterAPI.login(user, pass);
@@ -106,11 +114,12 @@ public class LoginController {
                             ((Stage) btnAccion.getScene().getWindow()).close();
                         });
                     } else {
-                        updateStatus("Usuario o contraseña incorrectos.");
+                        updateStatus(App.getBundle().getString("login.status.error"));
                     }
                 }
             } catch (Exception ex) {
-                updateStatus("Error de conexión: " + ex.getMessage());
+                updateStatus(MessageFormat.format(App.getBundle().getString("login.status.connection_error"),
+                        ex.getMessage()));
                 ex.printStackTrace();
             }
         }).start();
