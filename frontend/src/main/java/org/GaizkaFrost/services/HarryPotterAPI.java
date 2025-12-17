@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class HarryPotterAPI {
 
-    private static final String API_URL = "http://localhost:8000/characters";
-    private static final String AUTH_URL = "http://localhost:8000/auth";
+    private static final String API_URL = "http://127.0.0.1:8000/characters";
+    private static final String AUTH_URL = "http://127.0.0.1:8000/auth";
 
     // Token de sesión para autenticación
     private static String currentToken = null;

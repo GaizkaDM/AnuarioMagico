@@ -48,7 +48,7 @@
             <PasswordField fx:id="txtMasterPassword" promptText="Solo para nuevos registros" styleClass="input-field"/>
         </VBox>
 
-        <Button fx:id="btnAccion" text="%login.button" styleClass="primary-button" maxWidth="Infinity"/>
+        <Button fx:id="btnAccion" text="%login.button" styleClass="primary-button" maxWidth="Infinity" onAction="#onLoginButtonClick"/>
         
         <Label fx:id="lblStatus" text="" wrapText="true" styleClass="status-label"/>
     </VBox>

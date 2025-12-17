@@ -58,11 +58,6 @@ public class LoginController {
             btnAccion.setText(App.getBundle().getString("login.button"));
             lblStatus.setText("");
         });
-
-        btnAccion.setOnAction(e -> {
-            System.out.println("DEBUG: Button ACCEDER clicked");
-            handleAction();
-        });
         System.out.println("DEBUG: LoginController initialized");
     }
 
@@ -71,58 +66,74 @@ public class LoginController {
      * Valida entradas y realiza la llamada a la API correspondiente en un hilo
      * separado.
      */
-    private void handleAction() {
-        String user = txtUsuario.getText();
-        String pass = txtPassword.getText();
-        boolean isRegister = chkRegistro.isSelected();
+    @FXML
+    public void onLoginButtonClick(javafx.event.ActionEvent event) {
+        System.out.println("onLoginButtonClick called (public)");
+        try {
+            String user = txtUsuario.getText();
+            String pass = txtPassword.getText();
+            boolean isRegister = chkRegistro.isSelected();
+            System.out.println("User: " + user + ", Register: " + isRegister);
 
-        if (user.isEmpty() || pass.isEmpty()) {
-            lblStatus.setText(App.getBundle().getString("login.status.fill"));
-            return;
-        }
-
-        lblStatus.setText(App.getBundle().getString("login.status.processing"));
-        btnAccion.setDisable(true);
-
-        new Thread(() -> {
-            try {
-                if (isRegister) {
-                    String master = txtMasterPassword.getText();
-                    if (master.isEmpty()) {
-                        updateStatus("Missing master password."); // Need key
-                        return;
-                    }
-                    boolean ok = HarryPotterAPI.register(user, pass, master);
-                    if (ok) {
-                        updateIO(() -> {
-                            chkRegistro.setSelected(false);
-                            chkRegistro.setSelected(false);
-                            lblStatus.setText("Registration successful. Please login."); // Need key
-                            txtPassword.clear();
-                        });
-                    } else {
-                        updateStatus("Registration error. Check master password."); // Need key
-                    }
-                } else {
-                    String token = HarryPotterAPI.login(user, pass);
-                    if (token != null) {
-                        // Guardar token y username en HarryPotterAPI
-                        HarryPotterAPI.setToken(token, user);
-                        updateIO(() -> {
-                            if (onSuccessCallback != null)
-                                onSuccessCallback.accept(user);
-                            ((Stage) btnAccion.getScene().getWindow()).close();
-                        });
-                    } else {
-                        updateStatus(App.getBundle().getString("login.status.error"));
-                    }
-                }
-            } catch (Exception ex) {
-                updateStatus(MessageFormat.format(App.getBundle().getString("login.status.connection_error"),
-                        ex.getMessage()));
-                ex.printStackTrace();
+            if (user.isEmpty() || pass.isEmpty()) {
+                System.out.println("Empty fields");
+                lblStatus.setText(App.getBundle().getString("login.status.fill"));
+                return;
             }
-        }).start();
+
+            lblStatus.setText(App.getBundle().getString("login.status.processing"));
+            btnAccion.setDisable(true);
+            System.out.println("Button disabled, starting background thread");
+
+            new Thread(() -> {
+                System.out.println("Thread started");
+                try {
+                    if (isRegister) {
+                        String master = txtMasterPassword.getText();
+                        if (master.isEmpty()) {
+                            updateStatus("Missing master password.");
+                            return;
+                        }
+                        boolean ok = HarryPotterAPI.register(user, pass, master);
+                        System.out.println("Register result: " + ok);
+                        if (ok) {
+                            updateIO(() -> {
+                                chkRegistro.setSelected(false);
+                                lblStatus.setText("Registro exitoso. Por favor identifícate.");
+                                txtPassword.clear();
+                            });
+                        } else {
+                            updateStatus("Error en registro. Verifica la clave maestra.");
+                        }
+                    } else {
+                        System.out.println("Attempting login...");
+                        String token = HarryPotterAPI.login(user, pass);
+                        System.out.println("Login info received: " + (token != null ? "Token OK" : "Null"));
+
+                        if (token != null) {
+                            HarryPotterAPI.setToken(token, user);
+                            updateIO(() -> {
+                                System.out.println("Login success - closing window");
+                                if (onSuccessCallback != null)
+                                    onSuccessCallback.accept(user);
+                                ((Stage) btnAccion.getScene().getWindow()).close();
+                            });
+                        } else {
+                            System.out.println("Login failed - Invalid credentials");
+                            updateStatus(App.getBundle().getString("login.status.error"));
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Exception in login thread: " + ex.getMessage());
+                    ex.printStackTrace();
+                    updateStatus(MessageFormat.format(App.getBundle().getString("login.status.connection_error"),
+                            ex.getMessage() != null ? ex.getMessage() : "Unknown Error"));
+                }
+            }).start();
+        } catch (Exception e) {
+            System.err.println("Exception in onLoginButtonClick main thread: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -132,6 +143,7 @@ public class LoginController {
      */
     private void updateStatus(String msg) {
         javafx.application.Platform.runLater(() -> {
+            System.out.println("Updating status: " + msg);
             lblStatus.setText(msg);
             btnAccion.setDisable(false);
         });
@@ -144,6 +156,7 @@ public class LoginController {
      */
     private void updateIO(Runnable r) {
         javafx.application.Platform.runLater(() -> {
+            System.out.println("Executing IO update");
             r.run();
             btnAccion.setDisable(false);
         });

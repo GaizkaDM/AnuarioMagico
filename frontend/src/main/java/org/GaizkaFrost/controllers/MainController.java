@@ -303,7 +303,7 @@ public class MainController implements Initializable {
     @FXML
     private void mostrarLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"), App.getBundle());
             Parent root = loader.load();
 
             LoginController loginCtrl = loader.getController();
