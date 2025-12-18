@@ -34,6 +34,12 @@
 }
 
 /* --- Typography & Headings --- */
+/* --- Typography & Headings --- */
+.header-container {
+    -fx-background-color: transparent;
+    /* Optional: Add a subtle border or gradient to the header background if desired */
+}
+
 .form-title {
     -fx-font-size: 28px;
     -fx-font-family: "Cinzel", "Georgia", serif;
@@ -43,8 +49,7 @@
     /* Deep magical brown */
     -fx-effect: dropshadow(three-pass-box, rgba(236, 185, 57, 0.4), 0, 0, 0, 2);
     /* Subtle glow */
-    -fx-padding: 10 0 20 0;
-    -fx-alignment: center-left;
+    -fx-alignment: center;
 }
 
 .section-header {
@@ -200,4 +205,21 @@
     -fx-text-fill: #e74c3c;
     -fx-font-weight: bold;
     -fx-font-family: "Segoe UI Semibold";
+}
+
+/* --- Advanced Toggle --- */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #5d4037;
+    -fx-font-family: "Cinzel", "Georgia", serif;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-font-size: 15px;
+    -fx-padding: 10 0;
+}
+
+.toggle-button:hover {
+    -fx-text-fill: #ecb939;
 }

@@ -91,10 +91,19 @@ public class EditController {
     @FXML
     private TextArea txtRomances;
 
+    // Advanced Section Toggle
+    @FXML
+    private javafx.scene.layout.VBox boxAdvanced;
+    @FXML
+    private Button btnToggleAdvanced;
+
     @FXML
     private Button btnCancelar;
     @FXML
     private Button btnGuardar;
+
+    @FXML
+    private ScrollPane editScrollPane;
 
     private Personaje currentPersonaje;
     private String currentImageUrl;
@@ -117,8 +126,12 @@ public class EditController {
                     "Gryffindor", "Slytherin", "Hufflepuff", "Ravenclaw", "Unknown", "None"));
         }
 
-        comboEstado.setItems(FXCollections.observableArrayList(
-                "Vivo", "Fallecido", "Desconocido"));
+        // Initialize Status ComboBox with Localized Strings
+        String alive = App.getBundle().getString("combo.status.alive");
+        String deceased = App.getBundle().getString("combo.status.deceased");
+        String unknown = App.getBundle().getString("combo.status.unknown");
+
+        comboEstado.setItems(FXCollections.observableArrayList(alive, deceased, unknown));
 
         comboGenero.setItems(FXCollections.observableArrayList(
                 "Male", "Female", "Other"));
@@ -131,6 +144,43 @@ public class EditController {
         btnCancelar.setOnAction(e -> closeWindow());
         btnGuardar.setOnAction(e -> guardarPersonaje());
         btnSeleccionarFoto.setOnAction(e -> seleccionarFoto());
+
+        // Setup Advanced Toggle
+        if (btnToggleAdvanced != null && boxAdvanced != null) {
+            btnToggleAdvanced.setOnAction(e -> toggleAdvanced());
+            updateToggleUI();
+        }
+
+        // Increase Scroll Speed
+        if (editScrollPane != null) {
+            editScrollPane.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+                if (event.getDeltaY() != 0) {
+                    double delta = event.getDeltaY() * 3.0; // 3x speed
+                    double height = editScrollPane.getContent().getBoundsInLocal().getHeight();
+                    double vValue = editScrollPane.getVvalue();
+                    if (height > 0) {
+                        editScrollPane.setVvalue(vValue + -delta / height);
+                        event.consume();
+                    }
+                }
+            });
+        }
+    }
+
+    private void toggleAdvanced() {
+        boolean isVisible = boxAdvanced.isVisible();
+        boxAdvanced.setVisible(!isVisible);
+        boxAdvanced.setManaged(!isVisible);
+        updateToggleUI();
+    }
+
+    private void updateToggleUI() {
+        boolean isVisible = boxAdvanced.isVisible();
+        if (isVisible) {
+            btnToggleAdvanced.setText(App.getBundle().getString("edit.toggle.advanced.hide"));
+        } else {
+            btnToggleAdvanced.setText(App.getBundle().getString("edit.toggle.advanced.show"));
+        }
     }
 
     public void setPersonaje(Personaje p) {
@@ -147,14 +197,20 @@ public class EditController {
     private void cargarDatos(Personaje p) {
         txtNombre.setText(p.getNombre());
         comboCasa.setValue(p.getCasa());
-        // Map status logic if needed, simplfied here
-        String estado = p.getEstado();
-        if (estado == null || estado.isEmpty())
-            estado = "Desconocido";
-        // If the backend sends "Alive"/"Deceased" map to "Vivo"/"Fallecido" if
-        // necessary
-        // For now trusting the string matches or is close enough.
-        comboEstado.setValue(estado);
+
+        // Map backend status to localized status
+        String estadoBackend = p.getEstado(); // Usually "Vivo" or "Fallecido" or "Unknown" / empty
+        String alive = App.getBundle().getString("combo.status.alive");
+        String deceased = App.getBundle().getString("combo.status.deceased");
+        String unknown = App.getBundle().getString("combo.status.unknown");
+
+        if ("Fallecido".equalsIgnoreCase(estadoBackend) || "Deceased".equalsIgnoreCase(estadoBackend)) {
+            comboEstado.setValue(deceased);
+        } else if ("Vivo".equalsIgnoreCase(estadoBackend) || "Alive".equalsIgnoreCase(estadoBackend)) {
+            comboEstado.setValue(alive);
+        } else {
+            comboEstado.setValue(unknown);
+        }
 
         txtEspecie.setText(p.getSpecies());
         comboGenero.setValue(p.getGender());
@@ -193,7 +249,9 @@ public class EditController {
     private void limpiarFormulario() {
         txtNombre.clear();
         comboCasa.getSelectionModel().clearSelection();
-        comboEstado.getSelectionModel().select("Vivo");
+        // Default to Alive
+        comboEstado.setValue(App.getBundle().getString("combo.status.alive"));
+
         imgPreview.setImage(null);
         currentImageUrl = null;
         selectedImageFile = null;
@@ -209,16 +267,6 @@ public class EditController {
         if (file != null) {
             selectedImageFile = file;
             imgPreview.setImage(new Image(file.toURI().toString()));
-            // In a real app we'd upload this file. For now we might just store the path or
-            // mock it
-            // since the add_character implementation expects a URL or blob logic handled
-            // elsewhere.
-            // But let's assume valid URL or existing logic.
-            // Since this is a simple client, we can't easily "upload" without an upload
-            // endpoint.
-            // check HarryPotterAPI for upload capabilities?
-            // HarryPotterAPI only sends JSON.
-            // We might just use a placeholder or the file path if local.
         }
     }
 
@@ -231,9 +279,13 @@ public class EditController {
         json.addProperty("name", txtNombre.getText());
         json.addProperty("house", comboCasa.getValue());
 
-        // Logic for died/alive based on combo or text
-        String estado = comboEstado.getValue();
-        if ("Fallecido".equals(estado) || (txtMuerte.getText() != null && !txtMuerte.getText().isEmpty())) {
+        // Map localized status back to logic
+        String estadoSelected = comboEstado.getValue();
+        String deceased = App.getBundle().getString("combo.status.deceased");
+
+        boolean isDead = deceased.equals(estadoSelected);
+
+        if (isDead || (txtMuerte.getText() != null && !txtMuerte.getText().isEmpty())) {
             json.addProperty("died", txtMuerte.getText().isEmpty() ? "Unknown" : txtMuerte.getText());
         } else {
             json.addProperty("died", "");
@@ -309,6 +361,11 @@ public class EditController {
             }
 
             if (success) {
+                // If editing, update the local object so DetailView can refresh immediately
+                if (currentPersonaje != null) {
+                    updateLocalModel();
+                }
+
                 // If an image was selected, upload it now
                 if (selectedImageFile != null) {
                     try {
@@ -316,10 +373,19 @@ public class EditController {
                         boolean uploadSuccess = HarryPotterAPI.uploadImage(characterId, selectedImageFile);
                         if (!uploadSuccess) {
                             logger.warn("Image upload failed for character {}", characterId);
+                        } else {
+                            // Update image URL in local model if upload success (assuming predictable path
+                            // or need fetch)
+                            // For now, assume reload will handle image eventually, or set temp file URI
+                            currentPersonaje.setImagenUrl(selectedImageFile.toURI().toString());
                         }
                     } catch (Exception e) {
                         logger.error("Error uploading image: {}", e.getMessage());
                     }
+                } else if (currentImageUrl == null
+                        && (currentPersonaje == null || currentPersonaje.getImagenUrl() == null)) {
+                    // If we set a placeholder in JSON, maybe update model too?
+                    // Not critical.
                 }
 
                 if (onSaveSuccess != null) {
@@ -333,6 +399,50 @@ public class EditController {
             logger.error("Error saving character: {}", e.getMessage(), e);
             lblError.setText(App.getBundle().getString("error.title") + ": " + e.getMessage());
         }
+    }
+
+    private void updateLocalModel() {
+        if (currentPersonaje == null)
+            return;
+
+        currentPersonaje.setNombre(txtNombre.getText());
+        currentPersonaje.setCasa(comboCasa.getValue());
+
+        // Status map
+        String estadoSelected = comboEstado.getValue();
+        String deceased = App.getBundle().getString("combo.status.deceased");
+        String alive = App.getBundle().getString("combo.status.alive");
+
+        if (deceased.equals(estadoSelected)) {
+            currentPersonaje.setEstado("Fallecido");
+        } else if (alive.equals(estadoSelected)) {
+            currentPersonaje.setEstado("Vivo");
+        } else {
+            currentPersonaje.setEstado("Desconocido");
+        }
+
+        currentPersonaje.setSpecies(txtEspecie.getText());
+        currentPersonaje.setGender(comboGenero.getValue());
+        currentPersonaje.setPatronus(txtPatronus.getText());
+
+        currentPersonaje.setEyeColor(txtOjos.getText());
+        currentPersonaje.setHairColor(txtPelo.getText());
+        currentPersonaje.setSkinColor(txtPiel.getText());
+        currentPersonaje.setHeight(txtAltura.getText());
+        currentPersonaje.setWeight(txtPeso.getText());
+
+        currentPersonaje.setBorn(txtNacimiento.getText());
+        currentPersonaje.setDied(txtMuerte.getText());
+        currentPersonaje.setWand(txtVarita.getText());
+        currentPersonaje.setBoggart(txtBoggart.getText());
+        currentPersonaje.setAnimagus(txtAnimago.getText());
+        currentPersonaje.setNationality(txtNacionalidad.getText());
+
+        currentPersonaje.setAlias(txtAlias.getText());
+        currentPersonaje.setTitles(txtTitulos.getText());
+        currentPersonaje.setFamily(txtFamilia.getText());
+        currentPersonaje.setJobs(txtTrabajos.getText());
+        currentPersonaje.setRomances(txtRomances.getText());
     }
 
     private void addJsonList(JsonObject json, String key, String text) {

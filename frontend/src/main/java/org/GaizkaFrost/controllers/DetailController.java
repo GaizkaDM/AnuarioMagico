@@ -327,11 +327,9 @@ public class DetailController {
             EditController controller = loader.getController();
             controller.setPersonaje(currentPersonaje);
             controller.setOnSaveSuccess(() -> {
-                // Since EditController doesn't update the object in memory,
-                // we might want to reload it or just show a message.
-                // For now, let's assume the user will see changes when they return to MainView
-                // or if we could re-fetch.
                 logger.info("Character updated successfully. Refreshing UI...");
+                // Refresh the UI with the updated data in memory
+                setPersonaje(currentPersonaje);
             });
 
             // Apply theme

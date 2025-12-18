@@ -21,21 +21,22 @@
             styleClass="form-root">
 
     <top>
-        <Label fx:id="lblTitulo" text="%edit.title.add" styleClass="form-title">
-            <padding>
-                <Insets top="20" right="20" bottom="10" left="20"/>
+        <HBox alignment="CENTER" styleClass="header-container">
+             <padding>
+                <Insets top="20" bottom="10"/>
             </padding>
-        </Label>
+            <Label fx:id="lblTitulo" text="%edit.title.add" styleClass="form-title"/>
+        </HBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" styleClass="form-scroll">
+        <ScrollPane fx:id="editScrollPane" fitToWidth="true" styleClass="form-scroll">
             <VBox spacing="20" styleClass="form-container">
                 <padding>
                     <Insets top="20" right="30" bottom="30" left="30"/>
                 </padding>
 
-                <!-- SECTION 1: BASIC INFO & IMAGE -->
+                <!-- SECTION 1: HEADER & CORE INFO -->
                 <HBox spacing="30" alignment="TOP_CENTER">
                     <!-- Image Upload Section -->
                     <VBox spacing="10" alignment="CENTER" styleClass="image-section">
@@ -44,15 +45,16 @@
                         <Label text="%edit.required" styleClass="required-label"/>
                     </VBox>
 
-                    <!-- Core Fields -->
-                    <GridPane hgap="15" vgap="15" HBox.hgrow="ALWAYS">
+                    <!-- Main Fields (Matching DetailView) -->
+                    <GridPane hgap="15" vgap="10" HBox.hgrow="ALWAYS">
                         <columnConstraints>
                             <ColumnConstraints hgrow="NEVER" minWidth="100"/>
                             <ColumnConstraints hgrow="ALWAYS"/>
                         </columnConstraints>
 
+                        <!-- Basic Identity -->
                         <Label text="%edit.label.name" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="field-label"/>
-                        <TextField fx:id="txtNombre" GridPane.rowIndex="0" GridPane.columnIndex="1" promptText=""/>
+                        <TextField fx:id="txtNombre" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                         <Label text="%edit.label.house" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="field-label"/>
                         <ComboBox fx:id="comboCasa" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity"/>
@@ -66,89 +68,95 @@
                         <Label text="%edit.label.gender" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="field-label"/>
                         <ComboBox fx:id="comboGenero" GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="Infinity"/>
                         
-                        <Label text="%edit.label.patronus" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
-                        <TextField fx:id="txtPatronus" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                        <Label text="%edit.label.nationality" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtNacionalidad" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                        <!-- Dates & Magic -->
+                        <Label text="%edit.label.born" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtNacimiento" GridPane.rowIndex="6" GridPane.columnIndex="1" promptText="DD-MM-YYYY"/>
+
+                        <Label text="%edit.label.died" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtMuerte" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+                        <Label text="%edit.label.patronus" GridPane.rowIndex="8" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtPatronus" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                        
+                        <Label text="%edit.label.animagus" GridPane.rowIndex="9" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtAnimago" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+
+                        <Label text="%edit.label.wand" GridPane.rowIndex="10" GridPane.columnIndex="0" styleClass="field-label"/>
+                        <TextField fx:id="txtVarita" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
                     </GridPane>
                 </HBox>
 
-                <!-- SECTION 2: PHYSICAL TRAITS -->
-                <Label text="%edit.section.physical" styleClass="section-header"/>
+                <!-- SECTION 2: EXTENDED DETAIL (Visible) -->
+                <!-- Alias & Titles are often important enough to be visible -->
                 <GridPane hgap="15" vgap="10">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
-                    </columnConstraints>
-
-                    <Label text="%edit.label.eyes" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtOjos" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                    <Label text="%edit.label.hair" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtPelo" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                    <Label text="%edit.label.skin" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="txtPiel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                    <Label text="%edit.label.height" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                    <TextField fx:id="txtAltura" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                    
-                    <Label text="%edit.label.weight" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtPeso" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                </GridPane>
-
-                <!-- SECTION 3: WIZARDING DETAILS -->
-                <Label text="%edit.section.magic" styleClass="section-header"/>
-                <GridPane hgap="15" vgap="10">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
-                    </columnConstraints>
-
-                    <Label text="%edit.label.born" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtNacimiento" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="DD-MM-YYYY"/>
-
-                    <Label text="%edit.label.died" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtMuerte" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-
-                    <Label text="%edit.label.wand" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="txtVarita" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
-
-                    <Label text="%edit.label.boggart" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtBoggart" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3"/>
-                    
-                    <Label text="%edit.label.animagus" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                    <TextField fx:id="txtAnimago" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"/>
-                </GridPane>
-
-                <!-- SECTION 4: ADDITIONAL INFO -->
-                <Label text="%edit.section.additional" styleClass="section-header"/>
-                <GridPane hgap="15" vgap="10">
-                    <columnConstraints>
+                     <columnConstraints>
                         <ColumnConstraints hgrow="NEVER" minWidth="100"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
                     </columnConstraints>
                     
-                    <Label text="%edit.label.nationality" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtNacionalidad" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <Label text="%edit.label.alias" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="txtAlias" GridPane.rowIndex="0" GridPane.columnIndex="1" prefRowCount="2"/>
 
-                    <Label text="%edit.label.alias" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextArea fx:id="txtAlias" GridPane.rowIndex="1" GridPane.columnIndex="1" prefRowCount="2" promptText=""/>
-
-                    <Label text="%edit.label.titles" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextArea fx:id="txtTitulos" GridPane.rowIndex="2" GridPane.columnIndex="1" prefRowCount="2" promptText=""/>
-
-                    <Label text="%edit.label.family" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextArea fx:id="txtFamilia" GridPane.rowIndex="3" GridPane.columnIndex="1" prefRowCount="2"/>
-
-                    <Label text="%edit.label.jobs" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <TextArea fx:id="txtTrabajos" GridPane.rowIndex="4" GridPane.columnIndex="1" prefRowCount="2"/>
-                    
-                    <Label text="%edit.label.romances" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                    <TextArea fx:id="txtRomances" GridPane.rowIndex="5" GridPane.columnIndex="1" prefRowCount="2"/>
+                    <Label text="%edit.label.titles" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="txtTitulos" GridPane.rowIndex="1" GridPane.columnIndex="1" prefRowCount="2"/>
                 </GridPane>
+
+                <!-- TOGGLE BUTTON -->
+                <Button fx:id="btnToggleAdvanced" text="%edit.toggle.advanced.show" styleClass="toggle-button" maxWidth="Infinity"/>
+
+                <!-- SECTION 3: ADVANCED (Hidden by default) -->
+                <VBox fx:id="boxAdvanced" spacing="20" visible="false" managed="false">
+                    
+                    <!-- Physical Traits -->
+                    <Label text="%edit.section.physical" styleClass="section-header"/>
+                    <GridPane hgap="15" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="%edit.label.eyes" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtOjos" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                        <Label text="%edit.label.hair" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtPelo" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                        <Label text="%edit.label.skin" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtPiel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                        <Label text="%edit.label.height" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtAltura" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                        
+                        <Label text="%edit.label.weight" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtPeso" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    </GridPane>
+
+                    <!-- Extra Magic & Bio -->
+                    <Label text="%edit.section.additional" styleClass="section-header"/>
+                    <GridPane hgap="15" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="%edit.label.boggart" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtBoggart" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="%edit.label.family" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextArea fx:id="txtFamilia" GridPane.rowIndex="1" GridPane.columnIndex="1" prefRowCount="2"/>
+
+                        <Label text="%edit.label.jobs" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextArea fx:id="txtTrabajos" GridPane.rowIndex="2" GridPane.columnIndex="1" prefRowCount="2"/>
+                        
+                        <Label text="%edit.label.romances" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextArea fx:id="txtRomances" GridPane.rowIndex="3" GridPane.columnIndex="1" prefRowCount="2"/>
+                    </GridPane>
+                </VBox>
             </VBox>
         </ScrollPane>
     </center>
