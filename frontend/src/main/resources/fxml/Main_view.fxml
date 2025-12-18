@@ -47,32 +47,50 @@
             </padding>
 
             <Label text="%main.search.label"/>
-            <TextField fx:id="txtBuscar" promptText="%main.search.prompt"/>
+            <TextField fx:id="txtBuscar" promptText="%main.search.prompt">
+                <tooltip><Tooltip text="%main.tooltip.search"/></tooltip>
+            </TextField>
             
             <Label text="%main.house.label"/>
-            <ComboBox fx:id="comboCasa" maxWidth="Infinity"/>
+            <ComboBox fx:id="comboCasa" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.house"/></tooltip>
+            </ComboBox>
 
             <Label text="%main.status.label"/>
-            <ComboBox fx:id="comboEstado" maxWidth="Infinity"/>
+            <ComboBox fx:id="comboEstado" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.status"/></tooltip>
+            </ComboBox>
 
             <HBox spacing="10" alignment="CENTER">
                 <Label text="%main.page.label"/>
-                <TextField fx:id="txtPaginaSidebar" promptText="#" prefWidth="60"/>
+                <TextField fx:id="txtPaginaSidebar" promptText="#" prefWidth="60">
+                    <tooltip><Tooltip text="%main.tooltip.page_jumper"/></tooltip>
+                </TextField>
             </HBox>
 
             <HBox alignment="CENTER" spacing="10">
                  <Label text="%main.favorites.label"/>
-                 <CheckBox fx:id="checkFavoritos"/>
+                  <CheckBox fx:id="checkFavoritos">
+                      <tooltip><Tooltip text="%main.tooltip.favorites"/></tooltip>
+                  </CheckBox>
             </HBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
             <Label fx:id="lblUsuario" text="" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" wrapText="true"/>
 
-            <Button fx:id="btnLimpiar" text="%main.button.clear" maxWidth="Infinity"/>
-            <Button fx:id="btnGenerarPDF" text="%main.button.pdf" maxWidth="Infinity"/>
-            <Button fx:id="btnSincronizar" text="%main.button.sync" maxWidth="Infinity"/>
-            <Button fx:id="btnAnadir" text="%main.button.add" maxWidth="Infinity"/>
+            <Button fx:id="btnLimpiar" text="%main.button.clear" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.clear"/></tooltip>
+            </Button>
+            <Button fx:id="btnGenerarPDF" text="%main.button.pdf" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.pdf"/></tooltip>
+            </Button>
+            <Button fx:id="btnSincronizar" text="%main.button.sync" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.sync"/></tooltip>
+            </Button>
+            <Button fx:id="btnAnadir" text="%main.button.add" maxWidth="Infinity">
+                <tooltip><Tooltip text="%main.tooltip.add"/></tooltip>
+            </Button>
         </VBox>
     </left>
 
@@ -92,13 +110,19 @@
                                 <Insets top="5" right="12" bottom="5" left="12"/>
                             </padding>
 
-                            <Button fx:id="btnPaginaAnterior" text="%main.pagination.prev"/>
+                            <Button fx:id="btnPaginaAnterior" text="%main.pagination.prev">
+                                <tooltip><Tooltip text="%main.tooltip.prev_page"/></tooltip>
+                            </Button>
                             <HBox alignment="CENTER" spacing="5">
                                 <Label text="%main.pagination.page" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
-                                <TextField fx:id="txtPagina" prefWidth="50" alignment="CENTER" text="1"/>
+                                <TextField fx:id="txtPagina" prefWidth="50" alignment="CENTER" text="1">
+                                    <tooltip><Tooltip text="%main.tooltip.page_jumper"/></tooltip>
+                                </TextField>
                                 <Label fx:id="lblTotalPaginas" text="%main.pagination.of" style="-fx-text-fill: #ecb939; -fx-font-weight: bold;"/>
                             </HBox>
-                            <Button fx:id="btnPaginaSiguiente" text="%main.pagination.next"/>
+                            <Button fx:id="btnPaginaSiguiente" text="%main.pagination.next">
+                                <tooltip><Tooltip text="%main.tooltip.next_page"/></tooltip>
+                            </Button>
                         </HBox>
                     </VBox>
                 </content>
