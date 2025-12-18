@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -104,15 +102,25 @@ public class EditController {
 
     @FXML
     public void initialize() {
-        // Initialize ComboBoxes
-        comboCasa.setItems(FXCollections.observableArrayList(
-                "Gryffindor", "Slytherin", "Hufflepuff", "Ravenclaw", "Unknown", "None"));
+        // Initialize ComboBoxes with houses from main view if available
+        List<String> houses = App.getAvailableHouses();
+        if (houses != null && !houses.isEmpty()) {
+            comboCasa.setItems(FXCollections.observableArrayList(houses));
+        } else {
+            // Fallback
+            comboCasa.setItems(FXCollections.observableArrayList(
+                    "Gryffindor", "Slytherin", "Hufflepuff", "Ravenclaw", "Unknown", "None"));
+        }
 
         comboEstado.setItems(FXCollections.observableArrayList(
                 "Vivo", "Fallecido", "Desconocido"));
 
         comboGenero.setItems(FXCollections.observableArrayList(
                 "Male", "Female", "Other"));
+
+        // Setup auto-formatting for dates
+        setupDateFormatter(txtNacimiento);
+        setupDateFormatter(txtMuerte);
 
         // Setup buttons
         btnCancelar.setOnAction(e -> closeWindow());
@@ -323,6 +331,38 @@ public class EditController {
         }
         lblError.setText("");
         return true;
+    }
+
+    private void setupDateFormatter(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Allow deletion
+            if (newValue == null || (oldValue != null && newValue.length() < oldValue.length())) {
+                return;
+            }
+
+            // Clean noise and limit length
+            String clean = newValue.replaceAll("[^\\d]", "");
+            if (clean.length() > 8) {
+                clean = clean.substring(0, 8);
+            }
+
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < clean.length(); i++) {
+                formatted.append(clean.charAt(i));
+                if ((i == 1 || i == 3) && i < clean.length() - 1) {
+                    formatted.append("-");
+                }
+            }
+
+            // Update only if changed to avoid infinite loop
+            if (!newValue.equals(formatted.toString())) {
+                String finalFormatted = formatted.toString();
+                javafx.application.Platform.runLater(() -> {
+                    textField.setText(finalFormatted);
+                    textField.positionCaret(finalFormatted.length());
+                });
+            }
+        });
     }
 
     private void closeWindow() {

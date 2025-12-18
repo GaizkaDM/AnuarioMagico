@@ -31,6 +31,15 @@ public class App extends Application {
     private static Scene scene;
     private static App instance;
     private static boolean isDarkMode = false;
+    private static java.util.List<String> availableHouses = new java.util.ArrayList<>();
+
+    public static java.util.List<String> getAvailableHouses() {
+        return availableHouses;
+    }
+
+    public static void setAvailableHouses(java.util.List<String> houses) {
+        availableHouses = houses;
+    }
 
     public static boolean isDarkMode() {
         return isDarkMode;
