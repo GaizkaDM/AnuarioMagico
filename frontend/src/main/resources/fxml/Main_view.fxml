@@ -33,7 +33,7 @@
                 <Menu text="%main.menu.help">
                     <items>
                         <MenuItem fx:id="menuManual" text="%main.menu.manual"/>
-                        <MenuItem text="%main.menu.about"/>
+                        <MenuItem fx:id="menuAbout" text="%main.menu.about"/>
                     </items>
                 </Menu>
             </menus>

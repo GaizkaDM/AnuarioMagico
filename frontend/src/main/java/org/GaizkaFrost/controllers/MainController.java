@@ -96,6 +96,8 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem menuExit;
     @FXML
+    private MenuItem menuAbout;
+    @FXML
     private MenuItem menuManual;
     @FXML
     private MenuItem menuLangEn;
@@ -176,6 +178,18 @@ public class MainController implements Initializable {
         if (menuExit != null) {
             menuExit.setOnAction(e -> {
                 Platform.exit();
+            });
+        }
+
+        // Configurar menú About
+        if (menuAbout != null) {
+            menuAbout.setOnAction(e -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                App.setIcon(alert);
+                alert.setTitle(App.getBundle().getString("main.menu.about"));
+                alert.setHeaderText("Aplicación desarrollada por el Equipo Hagrid");
+                alert.setContentText("Desarrolladores:\n\n- Diego\n- Xiker\n- Gaizka\n\n© 2025 Anuario Hogwarts");
+                alert.showAndWait();
             });
         }
 
