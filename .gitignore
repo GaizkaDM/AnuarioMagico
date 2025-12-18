@@ -79,7 +79,7 @@ desktop.ini
 *.swo
 
 # Docker (si no usas docker, puedes mantenerlo)
-# .env
+.env
 
 # Instancias y datos locales
 instance/

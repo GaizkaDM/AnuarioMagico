@@ -126,7 +126,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.diegofg/org.GaizkaFrost.App</mainClass>
+                    <mainClass>org.GaizkaFrost.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>
