@@ -44,8 +44,8 @@
         <CheckBox fx:id="chkRegistro" text="%login.register" styleClass="custom-checkbox"/>
 
         <VBox fx:id="boxMasterPassword" spacing="8" visible="false" managed="false" alignment="CENTER_LEFT" maxWidth="Infinity">
-            <Label text="Código de Director (Master Password)" styleClass="input-label"/>
-            <PasswordField fx:id="txtMasterPassword" promptText="Solo para nuevos registros" styleClass="input-field"/>
+            <Label text="%login.master.label" styleClass="input-label"/>
+            <PasswordField fx:id="txtMasterPassword" promptText="%login.master.prompt" styleClass="input-field"/>
         </VBox>
 
         <Button fx:id="btnAccion" text="%login.button" styleClass="primary-button" maxWidth="Infinity" onAction="#onLoginButtonClick"/>
