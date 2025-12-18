@@ -116,6 +116,7 @@ public class ReportService {
 
     private static void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
+        App.setIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

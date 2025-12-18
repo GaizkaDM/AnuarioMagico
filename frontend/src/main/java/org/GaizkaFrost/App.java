@@ -61,6 +61,8 @@ public class App extends Application {
         instance = this;
         stage = s;
 
+        setWindowIcon(stage);
+
         Parent root = loadFXML("Main_view");
         scene = new Scene(root);
 
@@ -72,6 +74,40 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
+    }
+
+    /**
+     * Establece el icono de la aplicación en el escenario proporcionado.
+     * 
+     * @param stage El escenario al que aplicar el icono.
+     */
+    public static void setWindowIcon(Stage stage) {
+        try {
+            URL iconUrl = App.class.getResource("/images/anuario_magico.png");
+            if (iconUrl != null) {
+                stage.getIcons().clear();
+                stage.getIcons().add(new javafx.scene.image.Image(iconUrl.toExternalForm()));
+            } else {
+                logger.warn("Application icon not found at /images/anuario_magico.png");
+            }
+        } catch (Exception e) {
+            logger.error("Error setting window icon: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Establece el icono de la aplicación en un diálogo.
+     * 
+     * @param dialog El diálogo al que aplicar el icono.
+     */
+    public static void setIcon(javafx.scene.control.Dialog<?> dialog) {
+        try {
+            if (dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+                setWindowIcon((Stage) dialog.getDialogPane().getScene().getWindow());
+            }
+        } catch (Exception e) {
+            logger.error("Error setting dialog icon: {}", e.getMessage());
+        }
     }
 
     /**

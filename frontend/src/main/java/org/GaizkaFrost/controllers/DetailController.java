@@ -268,6 +268,7 @@ public class DetailController {
         // Confirmación
         javafx.scene.control.Alert confirmacion = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        App.setIcon(confirmacion);
         confirmacion.setTitle(App.getBundle().getString("detail.delete.confirm.title"));
         confirmacion.setHeaderText(App.getBundle().getString("detail.delete.confirm.header"));
         confirmacion.setContentText(MessageFormat.format(App.getBundle().getString("detail.delete.confirm.content"),
@@ -330,6 +331,7 @@ public class DetailController {
             App.applyTheme(root, "Edit_view");
 
             javafx.stage.Stage stage = new javafx.stage.Stage();
+            App.setWindowIcon(stage);
             stage.setTitle("Editar Personaje - " + currentPersonaje.getNombre());
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
@@ -353,6 +355,7 @@ public class DetailController {
     private void mostrarAlerta(String titulo, String mensaje) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.INFORMATION);
+        App.setIcon(alert);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);

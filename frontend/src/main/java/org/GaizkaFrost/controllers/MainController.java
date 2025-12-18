@@ -263,6 +263,7 @@ public class MainController implements Initializable {
                 } catch (Throwable t) {
                     logger.error("Error generating character list PDF: {}", t.getMessage(), t);
                     Alert alert = new Alert(Alert.AlertType.ERROR);
+                    App.setIcon(alert);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error al generar PDF");
                     alert.setContentText(
@@ -321,6 +322,7 @@ public class MainController implements Initializable {
             App.applyTheme(root, "Login_view");
 
             Stage stage = new Stage();
+            App.setWindowIcon(stage);
             stage.setTitle("Login / Registro");
 
             // Modal y no redimensionable
@@ -605,6 +607,7 @@ public class MainController implements Initializable {
             App.applyTheme(root, "Edit_view");
 
             Stage stage = new Stage();
+            App.setWindowIcon(stage);
             stage.setTitle("Añadir Personaje");
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
@@ -716,6 +719,7 @@ public class MainController implements Initializable {
      */
     private void mostrarAyuda() {
         Stage helpStage = new Stage();
+        App.setWindowIcon(helpStage);
         helpStage.setTitle(App.getBundle().getString("help.title"));
 
         VBox content = new VBox(20); // Más espacio entre secciones
