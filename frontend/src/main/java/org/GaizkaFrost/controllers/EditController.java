@@ -296,16 +296,32 @@ public class EditController {
         }
 
         boolean success;
+        String characterId = null;
         try {
             if (currentPersonaje != null) {
                 // Editing
-                success = HarryPotterAPI.editCharacter(currentPersonaje.getApiId(), json);
+                characterId = currentPersonaje.getApiId();
+                success = HarryPotterAPI.editCharacter(characterId, json);
             } else {
                 // Adding
-                success = HarryPotterAPI.addCharacter(json);
+                characterId = HarryPotterAPI.addCharacter(json);
+                success = (characterId != null);
             }
 
             if (success) {
+                // If an image was selected, upload it now
+                if (selectedImageFile != null) {
+                    try {
+                        lblError.setText("Subiendo imagen...");
+                        boolean uploadSuccess = HarryPotterAPI.uploadImage(characterId, selectedImageFile);
+                        if (!uploadSuccess) {
+                            logger.warn("Image upload failed for character {}", characterId);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error uploading image: {}", e.getMessage());
+                    }
+                }
+
                 if (onSaveSuccess != null) {
                     onSaveSuccess.run();
                 }

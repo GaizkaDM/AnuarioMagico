@@ -217,20 +217,69 @@ public class HarryPotterAPI {
      * Requiere sesión iniciada (verificación en frontend).
      * 
      * @param personaje El personaje a añadir (como JsonObject).
-     * @return true si se añadió correctamente, false en caso contrario.
+     * @return El ID del personaje si se añadió correctamente, null en caso
+     *         contrario.
      */
-    public static boolean addCharacter(JsonObject personaje) throws Exception {
+    public static String addCharacter(JsonObject personaje) throws Exception {
         if (!isLoggedIn()) {
             logger.error("Error: No session active");
-            return false;
+            return null;
         }
 
         HttpURLConnection conn = createConnection(API_URL, "POST");
         sendJson(conn, personaje);
 
         int responseCode = conn.getResponseCode();
+        if (responseCode == 201 || responseCode == 200) {
+            String response = readResponse(conn);
+            JsonObject res = new Gson().fromJson(response, JsonObject.class);
+            conn.disconnect();
+            return res.has("id") ? res.get("id").getAsString() : null;
+        }
         conn.disconnect();
-        return responseCode == 201 || responseCode == 200;
+        return null;
+    }
+
+    /**
+     * Sube una imagen al servidor para un personaje específico.
+     * 
+     * @param characterId El ID del personaje.
+     * @param imageFile   El archivo de imagen a subir.
+     * @return true si se subió correctamente.
+     */
+    public static boolean uploadImage(String characterId, java.io.File imageFile) throws Exception {
+        if (!isLoggedIn())
+            return false;
+
+        String boundary = "---" + System.currentTimeMillis();
+        String url = API_URL + "/" + characterId + "/upload-image";
+        HttpURLConnection conn = createConnection(url, "POST");
+        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        conn.setDoOutput(true);
+
+        try (java.io.OutputStream os = conn.getOutputStream();
+                java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.OutputStreamWriter(os, "UTF-8"),
+                        true)) {
+
+            writer.append("--" + boundary).append("\r\n");
+            writer.append("Content-Disposition: form-data; name=\"image\"; filename=\"" + imageFile.getName() + "\"")
+                    .append("\r\n");
+            writer.append("Content-Type: image/jpeg").append("\r\n");
+            writer.append("\r\n").flush();
+
+            try (java.io.FileInputStream fis = new java.io.FileInputStream(imageFile)) {
+                byte[] buffer = new byte[4096];
+                int n;
+                while ((n = fis.read(buffer)) != -1) {
+                    os.write(buffer, 0, n);
+                }
+            }
+            os.flush();
+            writer.append("\r\n").flush();
+            writer.append("--" + boundary + "--").append("\r\n").flush();
+        }
+
+        return conn.getResponseCode() == 200;
     }
 
     /**

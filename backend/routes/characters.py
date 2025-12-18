@@ -187,6 +187,30 @@ def add_character():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@characters_bp.route('/characters/<character_id>/upload-image', methods=['POST'])
+def upload_character_image(character_id):
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No image part"}), 400
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+            
+        raw_data = file.read()
+        processed_data = ImageService.process_image_data(raw_data)
+        
+        if not processed_data:
+            return jsonify({"error": "Invalid image data"}), 400
+            
+        success = personaje_service.editar_personaje(character_id, {"image_blob": processed_data})
+        if success:
+            logger_backend.info(f"✓ Image blob updated for character {character_id}")
+            return jsonify({"success": True})
+        return jsonify({"error": "Failed to update character image"}), 500
+    except Exception as e:
+        logger_backend.error(f"Upload error: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @characters_bp.route('/characters/<character_id>/image', methods=['GET'])
 def get_character_image(character_id):
     try:

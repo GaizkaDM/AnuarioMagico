@@ -80,11 +80,24 @@ class ImageService:
             if not raw_data:
                 return None
 
+            return ImageService.process_image_data(raw_data)
+        except Exception as e:
+            print(f"Image processing error: {e}")
+            return None
+
+    @staticmethod
+    def process_image_data(raw_data):
+        """Procesa datos binarios de imagen: convierte a RGB, ajusta calidad y devuelve JPEG."""
+        try:
             img = Image.open(io.BytesIO(raw_data))
             
             if img.mode in ('RGBA', 'LA'):
                 bg = Image.new('RGB', img.size, (255, 255, 255))
-                bg.paste(img, mask=img.split()[-1])
+                # Unmasking if possible, else standard paste
+                try:
+                    bg.paste(img, mask=img.split()[-1])
+                except:
+                    bg.paste(img)
                 img = bg
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
@@ -93,7 +106,7 @@ class ImageService:
             img.save(buf, format='JPEG', quality=85)
             return buf.getvalue()
         except Exception as e:
-            print(f"Image processing error: {e}")
+            print(f"Error processing image data: {e}")
             return None
 
     @staticmethod
