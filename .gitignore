@@ -26,7 +26,10 @@ personajes.xml
 personajes.bin
 *.bin
 *.csv
-*.xml
+*.jasper
+*.jrprint
+*.pdf
+
 
 # Java / Maven
 target/
@@ -76,7 +79,7 @@ desktop.ini
 *.swo
 
 # Docker (si no usas docker, puedes mantenerlo)
-# .env
+.env
 
 # Instancias y datos locales
 instance/

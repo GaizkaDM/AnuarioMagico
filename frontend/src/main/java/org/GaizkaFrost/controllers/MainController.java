@@ -14,17 +14,27 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.Tooltip;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.text.MessageFormat;
 
 import org.GaizkaFrost.App;
 import org.GaizkaFrost.models.Personaje;
 import org.GaizkaFrost.services.HarryPotterAPI;
+import org.GaizkaFrost.services.ReportService;
 
 /**
- * Controlador principal (Renamed from Controlador)
+ * Controlador principal de la aplicación.
+ * Gestiona la interfaz principal, listado de personajes, filtrado y navegación
+ * 
+ * a detalles.
+ * 
+ * @author Gaizka
+ * @author Diego
+ * @author Xiker
  */
 public class MainController implements Initializable {
 
@@ -42,6 +52,8 @@ public class MainController implements Initializable {
     private Button btnSincronizar;
     @FXML
     private Button btnGenerarPDF;
+    @FXML
+    private Button btnAnadir;
 
     @FXML
     private FlowPane contenedorTarjetas;
@@ -78,6 +90,10 @@ public class MainController implements Initializable {
     private MenuItem menuLogin;
     @FXML
     private MenuItem menuManual;
+    @FXML
+    private MenuItem menuLangEn;
+    @FXML
+    private MenuItem menuLangEs;
     @FXML
     private Label lblUsuario;
     @FXML
@@ -123,11 +139,17 @@ public class MainController implements Initializable {
             menuLogin.setOnAction(e -> cerrarSesion());
 
             if (currentUser != null) {
-                lblUsuario.setText("Usuario: " + currentUser);
-                statusBar.setText("Sesión iniciada como " + currentUser + ".");
+                lblUsuario.setText(App.getBundle().getString("main.user.prefix") + " " + currentUser);
+                statusBar
+                        .setText(MessageFormat.format(App.getBundle().getString("main.status.logged_in"), currentUser));
             } else {
-                lblUsuario.setText("Usuario: [Sesión activa]");
-                statusBar.setText("Sesión activa.");
+                lblUsuario.setText(App.getBundle().getString("main.user.prefix") + " "
+                        + App.getBundle().getString("main.session.active"));
+                statusBar.setText(App.getBundle().getString("main.session.active"));
+            }
+            if (btnAnadir != null) {
+                btnAnadir.setVisible(true);
+                btnAnadir.setManaged(true);
             }
         } else {
             // Configurar menú de inicio de sesión
@@ -137,10 +159,16 @@ public class MainController implements Initializable {
             if (menuManual != null) {
                 menuManual.setOnAction(e -> mostrarAyuda());
             }
+            if (btnAnadir != null) {
+                btnAnadir.setVisible(false);
+                btnAnadir.setManaged(false);
+            }
         }
 
         comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
-        comboEstado.getItems().addAll("Vivo", "Fallecido");
+        comboEstado.getItems().addAll(
+                App.getBundle().getString("combo.status.alive"),
+                App.getBundle().getString("combo.status.deceased"));
 
         // Intentar sincronizar datos de la nube al inicio (Pull)
         setCargando(true); // Mostrar spinner mientras se intenta el pull
@@ -174,6 +202,12 @@ public class MainController implements Initializable {
         // Listener para el menú de tema
         menuTemaOscuro.setSelected(App.isDarkMode());
         menuTemaOscuro.setOnAction(e -> toggleTheme());
+
+        // Listener para el menú de idioma
+        if (menuLangEn != null)
+            menuLangEn.setOnAction(e -> changeLanguage(java.util.Locale.ENGLISH));
+        if (menuLangEs != null)
+            menuLangEs.setOnAction(e -> changeLanguage(java.util.Locale.forLanguageTag("es")));
 
         btnLimpiar.setOnAction(e -> {
             txtBuscar.clear();
@@ -211,6 +245,36 @@ public class MainController implements Initializable {
         });
 
         btnSincronizar.setOnAction(e -> sincronizar());
+        if (btnAnadir != null) {
+            btnAnadir.setOnAction(e -> abrirFormularioAnadir());
+        }
+        if (btnGenerarPDF != null) {
+            btnGenerarPDF.setOnAction(e -> {
+                System.out.println("DEBUG: Button PDF clicked in MainController");
+                try {
+                    ReportService.generateListReport(listaFiltrada, (Stage) btnGenerarPDF.getScene().getWindow());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error al generar PDF");
+                    alert.setContentText(
+                            "No se pudo generar el reporte.\nPosible causa: Librerías faltantes o error en plantilla.\n\nDetalle: "
+                                    + t.getMessage());
+                    alert.showAndWait();
+                }
+            });
+        }
+    }
+
+    private void changeLanguage(Locale locale) {
+        App.setLocale(locale);
+        try {
+            // Reload Main_view
+            App.setRoot("Main_view", "Anuario Hogwarts");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -240,7 +304,7 @@ public class MainController implements Initializable {
     @FXML
     private void mostrarLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login_view.fxml"), App.getBundle());
             Parent root = loader.load();
 
             LoginController loginCtrl = loader.getController();
@@ -256,8 +320,15 @@ public class MainController implements Initializable {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.setResizable(false);
 
-            // Tamaño fijo un poco más grande
-            stage.setScene(new Scene(root, 400, 550));
+            // Crear escena y aplicar tema correcto
+            Scene loginScene = new Scene(root, 400, 550);
+            if (App.isDarkMode()) {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login_ravenclaw.css").toExternalForm());
+            } else {
+                loginScene.getStylesheets().add(getClass().getResource("/styles/login.css").toExternalForm());
+            }
+
+            stage.setScene(loginScene);
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
@@ -295,11 +366,15 @@ public class MainController implements Initializable {
         isLoggedIn = true;
         currentUser = username;
         Platform.runLater(() -> {
-            menuLogin.setText("Cerrar Sesión");
+            menuLogin.setText(App.getBundle().getString("main.menu.logout"));
             menuLogin.setOnAction(e -> cerrarSesion());
-            lblUsuario.setText("Usuario: " + username);
-            statusBar.setText("Sesión iniciada como " + username + ". Acceso completo habilitado.");
+            lblUsuario.setText(App.getBundle().getString("main.user.prefix") + " " + username);
+            statusBar.setText(MessageFormat.format(App.getBundle().getString("main.status.logged_in"), username));
             // Aquí se activarían los botones de edición si existieran
+            if (btnAnadir != null) {
+                btnAnadir.setVisible(true);
+                btnAnadir.setManaged(true);
+            }
         });
     }
 
@@ -310,11 +385,15 @@ public class MainController implements Initializable {
         isLoggedIn = false;
         currentUser = null;
         HarryPotterAPI.clearToken(); // Limpiar token de sesión
-        menuLogin.setText("Iniciar Sesión");
+        menuLogin.setText(App.getBundle().getString("main.menu.login"));
         menuLogin.setOnAction(e -> mostrarLogin());
         lblUsuario.setText("");
-        statusBar.setText("Sesión cerrada.");
+        statusBar.setText(App.getBundle().getString("main.status.logged_out"));
         // Aquí se desactivarían los botones de edición
+        if (btnAnadir != null) {
+            btnAnadir.setVisible(false);
+            btnAnadir.setManaged(false);
+        }
     }
 
     /**
@@ -339,8 +418,19 @@ public class MainController implements Initializable {
             boolean coincideCasa = casa == null || casa.isEmpty()
                     || (p.getCasa() != null && p.getCasa().equalsIgnoreCase(casa));
 
-            boolean coincideEstado = estado == null || estado.isEmpty()
-                    || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estado));
+            String estadoFiltro = null;
+            if (estado != null) {
+                if (estado.equals(App.getBundle().getString("combo.status.alive"))) {
+                    estadoFiltro = "Vivo";
+                } else if (estado.equals(App.getBundle().getString("combo.status.deceased"))) {
+                    estadoFiltro = "Fallecido";
+                } else {
+                    estadoFiltro = estado;
+                }
+            }
+
+            boolean coincideEstado = estadoFiltro == null || estadoFiltro.isEmpty()
+                    || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estadoFiltro));
 
             boolean coincideFavorito = !soloFavoritos || p.isFavorite();
 
@@ -368,7 +458,7 @@ public class MainController implements Initializable {
             btnPaginaSiguiente.setDisable(true);
             // Solo mostrar mensaje si no se está cargando
             if (!btnSincronizar.isDisabled()) {
-                statusBar.setText("No se han encontrado personajes.");
+                statusBar.setText(App.getBundle().getString("main.status.no_results"));
             }
             return;
         }
@@ -390,11 +480,11 @@ public class MainController implements Initializable {
         }
 
         txtPagina.setText(String.valueOf(paginaActual + 1));
-        lblTotalPaginas.setText("de " + totalPaginas);
+        lblTotalPaginas.setText(App.getBundle().getString("main.pagination.of") + " " + totalPaginas);
         btnPaginaAnterior.setDisable(paginaActual == 0);
         btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas - 1);
 
-        statusBar.setText("Mostrando " + pagina.size() + " de " + total + " personajes filtrados.");
+        statusBar.setText(App.getBundle().getString("main.status.ready"));
     }
 
     /**
@@ -424,18 +514,28 @@ public class MainController implements Initializable {
         Label lblNombre = new Label(p.getNombre());
         lblNombre.getStyleClass().add("card-title");
 
-        Label lblCasa = new Label("Casa: " + (p.getCasa() == null ? "-" : p.getCasa()));
+        Label lblCasa = new Label(
+                App.getBundle().getString("detail.house") + " " + (p.getCasa() == null ? "-" : p.getCasa()));
         lblCasa.getStyleClass().add("card-meta");
 
-        Label lblEstado = new Label("Estado: " + (p.getEstado() == null ? "-" : p.getEstado()));
+        Label lblEstado = new Label(
+                App.getBundle().getString("edit.label.status") + " " + (p.getEstado() == null ? "-" : p.getEstado()));
         lblEstado.getStyleClass().add("card-meta");
 
-        Label lblPatronus = new Label("Patronus: " + (p.getPatronus() == null ? "-" : p.getPatronus()));
+        Label lblPatronus = new Label(
+                App.getBundle().getString("detail.patronus") + " " + (p.getPatronus() == null ? "-" : p.getPatronus()));
         lblPatronus.getStyleClass().add("card-meta");
 
-        Button btnDetalles = new Button("Ver detalles");
+        Button btnDetalles = new Button(App.getBundle().getString("card.button.details"));
         btnDetalles.getStyleClass().add("card-button");
         btnDetalles.setOnAction(e -> abrirDetalles(p));
+
+        // Tooltips
+        String cardTooltipText = MessageFormat.format(App.getBundle().getString("card.tooltip.info"), p.getNombre());
+        Tooltip.install(tarjeta, new Tooltip(cardTooltipText));
+
+        String btnTooltipText = MessageFormat.format(App.getBundle().getString("card.tooltip.details"), p.getNombre());
+        btnDetalles.setTooltip(new Tooltip(btnTooltipText));
 
         // Espaciador para empujar el botón al fondo
         javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
@@ -467,40 +567,120 @@ public class MainController implements Initializable {
     }
 
     /**
+     * Abre el formulario para añadir un nuevo personaje.
+     */
+    private void abrirFormularioAnadir() {
+        if (!isLoggedIn)
+            return;
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Edit_view.fxml"));
+            Parent root = loader.load();
+
+            EditController controller = loader.getController();
+            controller.setPersonaje(null); // Modo añadir
+
+            App.applyTheme(root, "Edit_view");
+
+            Stage stage = new Stage();
+            stage.setTitle("Añadir Personaje");
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(root, 900, 700);
+            stage.setScene(scene);
+            stage.showAndWait(); // Esperar a que cierre
+
+            // Recargar datos para mostrar el nuevo personaje
+            sincronizar();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            statusBar.setText("Error al abrir formulario de añadir.");
+        }
+    }
+
+    /**
      * Importa personajes desde la API de Harry Potter en un hilo en segundo plano.
      * Actualiza la interfaz gráfica una vez completada la carga.
      */
+    /**
+     * Importa personajes desde la API y sincroniza imágenes.
+     */
     private void sincronizar() {
+        // 1. Carga inicial rápida (datos existentes)
         setCargando(true);
         btnSincronizar.setDisable(true);
-        statusBar.setText("Cargando personajes...");
+        statusBar.setText("Cargando datos locales...");
 
         new Thread(() -> {
             try {
-                List<Personaje> personajesAPI = HarryPotterAPI.fetchCharacters();
+                // Fetch fast
+                List<Personaje> localData = HarryPotterAPI.fetchCharacters();
 
                 Platform.runLater(() -> {
-                    masterData.setAll(personajesAPI);
-                    // Aplicar filtros actuales a los nuevos datos (esto repuebla listaFiltrada)
+                    masterData.setAll(localData);
                     aplicarFiltros();
-
-                    // Restaurar página si corresponde (aplicarFiltros la habrá reseteado a 0)
-                    if (savedPage != -1) {
-                        paginaActual = savedPage;
-                        savedPage = -1;
-                    }
-                    // Si no hay pagina guardada, aplicarFiltros ya la dejó en 0, correcto.
-
                     actualizarPagina();
-                    statusBar.setText("Personajes cargados.");
-                    btnSincronizar.setDisable(false);
-                    setCargando(false);
+                    setCargando(false); // Desbloquear UI inmediatamente
+                    statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
                 });
 
+                // 2. Sincronización en segundo plano (Lento)
+                boolean pullSuccess = HarryPotterAPI.syncPull();
+
+                if (pullSuccess) {
+                    boolean downloading = true;
+                    int noStatusCount = 0;
+
+                    while (downloading) {
+                        try {
+                            com.google.gson.JsonObject status = HarryPotterAPI.getImageSyncStatus();
+
+                            if (status != null) {
+                                boolean running = status.get("running").getAsBoolean();
+                                int current = status.get("current").getAsInt();
+                                int total = status.get("total").getAsInt();
+                                int errors = status.get("errors").getAsInt();
+
+                                Platform.runLater(() -> {
+                                    statusBar.setText(
+                                            String.format("Descargando nuevas imágenes: %d/%d...", current, total));
+                                });
+
+                                if (!running)
+                                    downloading = false;
+                            } else {
+                                noStatusCount++;
+                                if (noStatusCount > 5)
+                                    downloading = false;
+                            }
+
+                            if (downloading)
+                                Thread.sleep(1000); // Polling más lento
+                        } catch (Exception e) {
+                            downloading = false;
+                        }
+                    }
+
+                    // 3. Recarga final tras sincronización
+                    List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
+                    Platform.runLater(() -> {
+                        masterData.setAll(freshData);
+                        aplicarFiltros();
+                        actualizarPagina();
+                        statusBar.setText(App.getBundle().getString("main.status.ready"));
+                        btnSincronizar.setDisable(false);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        statusBar.setText("Modo Offline (Sincronización fallida)");
+                        btnSincronizar.setDisable(false);
+                    });
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
-                    statusBar.setText("Error al cargar datos.");
+                    statusBar.setText("Error al sincronizar.");
                     btnSincronizar.setDisable(false);
                     setCargando(false);
                 });
@@ -514,97 +694,69 @@ public class MainController implements Initializable {
      */
     private void mostrarAyuda() {
         Stage helpStage = new Stage();
-        helpStage.setTitle("Manual de Usuario - Anuario Mágico (Guía Detallada)");
+        helpStage.setTitle(App.getBundle().getString("help.title"));
 
         VBox content = new VBox(20); // Más espacio entre secciones
         content.setPadding(new javafx.geometry.Insets(25));
         content.setStyle("-fx-background-color: #fafafa;");
 
         // Título Principal
-        Label title = new Label("📖 Guía de Uso del Anuario Mágico");
+        Label title = new Label(App.getBundle().getString("help.header"));
         title.setStyle(
                 "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #5a3e1b; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);");
         title.setMaxWidth(Double.MAX_VALUE);
         title.setAlignment(javafx.geometry.Pos.CENTER);
 
         // Intro
-        Label intro = new Label(
-                "¡Hola! Bienvenido a tu enciclopedia mágica. No te preocupes si no eres un experto en ordenadores, esta guía te explicará todo paso a paso.");
+        Label intro = new Label(App.getBundle().getString("help.intro"));
         intro.setWrapText(true);
         intro.setStyle("-fx-font-size: 15px; -fx-padding: 0 0 10 0;");
 
         // Sección 1: La Pantalla Principal
-        Label sec1 = new Label("1. La Pantalla Principal");
+        Label sec1 = new Label(App.getBundle().getString("help.sec1.title"));
         sec1.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text1 = new Label(
-                "Lo primero que ves son las **Tarjetas de Personajes**.\n" +
-                        "• Cada recuadro es un personaje (Harry, Hermione, etc.).\n" +
-                        "• **Para ver más:** Usa la rueda de tu ratón para bajar y subir, o arrastra la barra gris de la derecha.\n"
-                        +
-                        "• **Páginas:** Abajo del todo hay botones 'Anterior' y 'Siguiente'. Si no encuentras a alguien, ¡prueba en la siguiente página!");
+        Label text1 = new Label(App.getBundle().getString("help.sec1.text"));
         text1.setWrapText(true);
         text1.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 
         // Sección 2: Cómo Buscar
-        Label sec2 = new Label("2. ¿Cómo busco a alguien?");
+        Label sec2 = new Label(App.getBundle().getString("help.sec2.title"));
         sec2.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text2 = new Label(
-                "Arriba a la izquierda tienes varias herramientas:\n" +
-                        "• **Casilla 'Buscar':** Haz clic ahí y escribe un nombre (ej. 'Potter'). La lista cambiará sola mientras escribes.\n"
-                        +
-                        "• **Menú 'Casa':** Pincha y elige una casa (ej. 'Gryffindor') para ver solo a sus miembros.\n"
-                        +
-                        "• **Menú 'Estado':** Elige 'Vivo' o 'Fallecido' si quieres filtrar así.\n" +
-                        "• **Botón Limpiar:** Si te lías con tanto filtro, pulsa este botón para borrar todo y ver la lista completa otra vez.");
+        Label text2 = new Label(App.getBundle().getString("help.sec2.text"));
         text2.setWrapText(true);
         text2.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 
         // Sección 3: Ver Detalles y Fotos
-        Label sec3 = new Label("3. Ver Detalles y Fotos");
+        Label sec3 = new Label(App.getBundle().getString("help.sec3.title"));
         sec3.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text3 = new Label(
-                "¿Quieres saber más de un personaje?\n" +
-                        "1. Busca su tarjeta en la lista.\n" +
-                        "2. Pulsa el botón **'Ver detalles'** que tiene cada tarjeta.\n" +
-                        "3. Se abrirá una pantalla nueva con su foto grande, varita, patronus y más datos.\n" +
-                        "4. Para volver, pulsa el botón **'Volver'** arriba a la izquierda.");
+        Label text3 = new Label(App.getBundle().getString("help.sec3.text"));
         text3.setWrapText(true);
         text3.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 
         // Sección 4: Favoritos
-        Label sec4 = new Label("4. Guardar mis Favoritos");
+        Label sec4 = new Label(App.getBundle().getString("help.sec4.title"));
         sec4.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text4 = new Label(
-                "Para no perder de vista a tus preferidos:\n" +
-                        "• Entra en los detalles de un personaje y pulsa el botón **'Corazón / Añadir a Favoritos'**.\n"
-                        +
-                        "• Luego, en la pantalla principal, marca la cajita **'Ver solo favoritos'** (a la izquierda) y solo saldrán ellos.");
+        Label text4 = new Label(App.getBundle().getString("help.sec4.text"));
         text4.setWrapText(true);
         text4.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 
         // Sección 5: Sincronización (La Nube)
-        Label sec5 = new Label("5. Botón Sincronizar (La Nube)");
+        Label sec5 = new Label(App.getBundle().getString("help.sec5.title"));
         sec5.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text5 = new Label(
-                "La aplicación guarda los datos en tu ordenador para que funcione aunque se vaya internet.\n" +
-                        "• Si crees que faltan datos nuevos, pulsa el botón **'Sincronizar'**.\n" +
-                        "• Espérate un poco a que termine la barra de carga.\n" +
-                        "• **Nota:** Las imágenes se descargan la primera vez que las ves, así que si alguna no sale, espera unos segundos con internet conectado.");
+        Label text5 = new Label(App.getBundle().getString("help.sec5.text"));
         text5.setWrapText(true);
         text5.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 
         // Sección 6: Preguntas (FAQ)
-        Label sec6 = new Label("6. Preguntas Frecuentes");
+        Label sec6 = new Label(App.getBundle().getString("help.sec6.title"));
         sec6.setStyle(
                 "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text6 = new Label(
-                "• ¿Por qué algunos no tienen foto? No todos los magos se han hecho fotos para el anuario.\n" +
-                        "• ¿Cómo arreglo un dato mal puesto? Solo los profesores (administradores) pueden cambiar datos.");
+        Label text6 = new Label(App.getBundle().getString("help.sec6.text"));
         text6.setWrapText(true);
         text6.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
 

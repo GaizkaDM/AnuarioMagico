@@ -1,24 +1,59 @@
-/* login.css - Light Hufflepuff Edition */
+/* login.css - Consistent Light Hufflepuff Edition */
 
-/* Fondo general - Clean White/Cream */
-#root {
+/* Fondo general - Matches estilos.css */
+.root-pane {
     -fx-background-color: linear-gradient(to bottom, #ffffff, #fffbf0);
     -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
-    -fx-padding: 20;
 }
 
-/* Titulos */
-.titulo-login {
+/* Background Layer - kept purely for layout structure, transparent */
+.background-layer {
+    -fx-opacity: 0.0;
+}
+
+/* Login Card - Consistent Card Style */
+.login-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-color: #ecb939;
+    /* Yellow Border from theme */
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+    /* Soft shadow like cards */
+    -fx-padding: 40;
+}
+
+/* Titles */
+.app-title {
     -fx-text-fill: #ecb939;
     /* Yellow Title */
+    -fx-font-family: "Georgia", serif;
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+    -fx-alignment: center;
 }
 
-/* Inputs */
-.text-field,
-.password-field {
+.subtitle-label {
+    -fx-text-fill: #5c4033;
+    /* Dark Brown from theme */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10 0;
+    -fx-alignment: center;
+}
+
+/* Labels */
+.input-label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 2 0;
+}
+
+/* Inputs - Matches .text-field in estilos.css */
+.input-field {
     -fx-background-color: #ffffff;
     -fx-background-radius: 4;
     -fx-border-color: #ccc;
@@ -26,31 +61,72 @@
     -fx-border-radius: 4;
     -fx-text-fill: #333;
     -fx-prompt-text-fill: #999;
+    -fx-font-size: 14px;
+    -fx-padding: 5 7;
 }
 
-.text-field:focused,
-.password-field:focused {
+.input-field:focused {
     -fx-border-color: #ecb939;
+    /* Yellow focus */
     -fx-background-color: #fffdf5;
+    /* Subtle yellow tint */
 }
 
-/* Botones */
-.button {
+/* Checkbox */
+.custom-checkbox {
+    -fx-text-fill: #5c4033;
+    /* Dark Brown */
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.custom-checkbox .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-background-radius: 3;
+}
+
+.custom-checkbox:selected .mark {
+    -fx-background-color: #ecb939;
+}
+
+/* Primary Button - Matches #btnImportarAPI or standard .button */
+.primary-button {
     -fx-background-color: #ecb939;
     /* Hufflepuff Yellow */
     -fx-text-fill: #1a1612;
+    /* Dark Brown/Black */
+    -fx-font-family: "Georgia", serif;
     -fx-font-weight: bold;
+    -fx-font-size: 15px;
     -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-padding: 8 16;
     -fx-cursor: hand;
+    -fx-border-color: #d4a017;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
 }
 
-.button:hover {
+.primary-button:hover {
     -fx-background-color: #f0c75e;
+    /* Lighter yellow */
+    -fx-border-color: #f0c75e;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 6, 0, 0, 2);
 }
 
-/* Link/Text Secondary */
-.label-link {
-    -fx-text-fill: #b38600;
-    -fx-underline: true;
-    -fx-cursor: hand;
+.primary-button:pressed {
+    -fx-background-color: #d4a017;
+    /* Darker gold when clicked */
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* Status Label */
+.status-label {
+    -fx-text-fill: #e53935;
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 0 0 0;
 }

@@ -1,10 +1,12 @@
 """
 ExportService.py
-Servicio para exportar datos de personajes a diferentes formatos (CSV, XML, Binario)
+Servicio de exportación de datos.
+Genera reportes en formatos como PDF o CSV con la información de los personajes.
 
-Author: Xiker
+Autores: Diego, Xiker
 """
 
+import os
 import csv
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -28,9 +30,18 @@ class ExportService:
         Author: Xiker
         """
         self.dao = dao
-        self.csv_file = 'personajes.csv'
-        self.xml_file = 'personajes.xml'
-        self.bin_file = 'personajes.bin'
+        
+        # Base data directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        data_dir = os.path.join(base_dir, 'data')
+        
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            
+        self.csv_file = os.path.join(data_dir, 'personajes.csv')
+        self.xml_file = os.path.join(data_dir, 'personajes.xml')
+        self.bin_file = os.path.join(data_dir, 'personajes.bin')
+
     
     def exportar_a_csv(self) -> bool:
         """

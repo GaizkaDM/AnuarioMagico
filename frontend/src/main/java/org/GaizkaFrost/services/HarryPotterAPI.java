@@ -19,14 +19,14 @@ import java.util.List;
  * Maneja solicitudes HTTP para autenticación, obtención de personajes y gestión
  * de favoritos.
  *
- * @author GaizkaFrost
- * @version 1.0
- * @since 2025-12-14
+ * @author Gaizka
+ * @author Xiker
+ * @author Diego
  */
 public class HarryPotterAPI {
 
-    private static final String API_URL = "http://localhost:8000/characters";
-    private static final String AUTH_URL = "http://localhost:8000/auth";
+    private static final String API_URL = "http://127.0.0.1:8000/characters";
+    private static final String AUTH_URL = "http://127.0.0.1:8000/auth";
 
     // Token de sesión para autenticación
     private static String currentToken = null;
@@ -166,6 +166,22 @@ public class HarryPotterAPI {
         boolean pullOk = syncPull();
         System.out.println("Pull status: " + pullOk);
         return pushOk && pullOk;
+    }
+
+    /**
+     * Obtiene el estado de la sincronización de imágenes en segundo plano.
+     */
+    public static JsonObject getImageSyncStatus() {
+        try {
+            HttpURLConnection conn = createConnection("http://localhost:8000/admin/sync-images/status", "GET");
+            if (conn.getResponseCode() == 200) {
+                String response = readResponse(conn);
+                return new Gson().fromJson(response, JsonObject.class);
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking sync status: " + e.getMessage());
+        }
+        return null;
     }
 
     /**

@@ -1,57 +1,132 @@
-/* login.css - Dark Ravenclaw Edition */
+/* login_ravenclaw.css - Consistent Dark Ravenclaw Edition */
 
-/* Fondo general */
-#root {
+/* Root Background - Matches estilos_ravenclaw.css */
+.root-pane {
     -fx-background-color: linear-gradient(to bottom, #0e1a40, #050a1a);
     -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
-    -fx-padding: 20;
 }
 
-/* Titulos */
-.titulo-login {
+/* Background Layer */
+.background-layer {
+    -fx-opacity: 0.0;
+}
+
+/* Login Card */
+.login-card {
+    -fx-background-color: rgba(14, 26, 64, 0.95);
+    /* Deep Blue Glass */
+    -fx-background-radius: 8;
+    -fx-border-color: #5d4037;
+    /* Dark Bronze/Brown */
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 0, 4);
+    -fx-padding: 40;
+}
+
+/* Titles */
+.app-title {
     -fx-text-fill: #946b2d;
     /* Bronze */
+    -fx-font-family: "Georgia", serif;
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 2, 0, 0, 1);
+    -fx-alignment: center;
+}
+
+.subtitle-label {
+    -fx-text-fill: #c0c0c0;
+    /* Silver */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10 0;
+    -fx-alignment: center;
+}
+
+/* Labels */
+.input-label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 2 0;
 }
 
 /* Inputs */
-.text-field,
-.password-field {
+.input-field {
     -fx-background-color: #0a122e;
+    /* Very Dark Blue */
     -fx-background-radius: 4;
     -fx-border-color: #5d4037;
     -fx-border-width: 1;
     -fx-border-radius: 4;
     -fx-text-fill: #e0e0e0;
     -fx-prompt-text-fill: rgba(224, 224, 224, 0.4);
+    -fx-font-size: 14px;
+    -fx-padding: 5 7;
 }
 
-.text-field:focused,
-.password-field:focused {
+.input-field:focused {
     -fx-border-color: #946b2d;
+    /* Bronze focus */
     -fx-background-color: #0e1a40;
 }
 
-/* Botones */
-.button {
+/* Checkbox */
+.custom-checkbox {
+    -fx-text-fill: #946b2d;
+    /* Bronze */
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.custom-checkbox .box {
+    -fx-background-color: #0a122e;
+    -fx-border-color: #5d4037;
+    -fx-background-radius: 3;
+}
+
+.custom-checkbox:selected .mark {
+    -fx-background-color: #946b2d;
+}
+
+/* Primary Button */
+.primary-button {
     -fx-background-color: #946b2d;
     /* Bronze */
     -fx-text-fill: #0e1a40;
     /* Dark Blue */
+    -fx-font-family: "Georgia", serif;
     -fx-font-weight: bold;
+    -fx-font-size: 15px;
     -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-padding: 8 16;
     -fx-cursor: hand;
+    -fx-border-color: #0e1a40;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 4, 0, 0, 1);
 }
 
-.button:hover {
+.primary-button:hover {
     -fx-background-color: #c0a060;
+    /* Lighter Bronze */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 6, 0, 0, 2);
 }
 
-/* Link/Text Secondary */
-.label-link {
-    -fx-text-fill: #c0a060;
-    -fx-underline: true;
-    -fx-cursor: hand;
+.primary-button:pressed {
+    -fx-background-color: #7a5825;
+    /* Darker Bronze */
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* Status Label */
+.status-label {
+    -fx-text-fill: #ff6b6b;
+    /* Light Red for visibility */
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 0 0 0;
 }

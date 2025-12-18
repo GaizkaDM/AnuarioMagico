@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -28,14 +29,18 @@
                 <Insets top="15" right="15" bottom="15" left="15"/>
             </padding>
             <Button fx:id="btnVolver"
-                    text="← Volver"
-                    styleClass="volver-btn"/>
+                    text="%detail.back"
+                    styleClass="volver-btn">
+                <tooltip><Tooltip text="%detail.tooltip.back"/></tooltip>
+            </Button>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button fx:id="btnFavorite"
-                    text="☆ Marcar como Favorito"
-                    styleClass="favorito-btn"/>
+                    text="%detail.favorite.add"
+                    styleClass="favorito-btn">
+                <tooltip><Tooltip text="%detail.tooltip.favorite"/></tooltip>
+            </Button>
         </HBox>
     </top>
 
@@ -81,45 +86,52 @@
                                 <RowConstraints vgrow="SOMETIMES" minHeight="-Infinity"/>
                             </rowConstraints>
 
-                            <Label text="Nacimiento:"/>
+                            <Label text="%detail.born"/>
                             <Label fx:id="lblBorn" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Fallecimiento:" GridPane.rowIndex="1"/>
+                            <Label text="%detail.died" GridPane.rowIndex="1"/>
                             <Label fx:id="lblDied" GridPane.rowIndex="1" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Género:" GridPane.rowIndex="2"/>
+                            <Label text="%detail.gender" GridPane.rowIndex="2"/>
                             <Label fx:id="lblGender" GridPane.rowIndex="2" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Especie:" GridPane.rowIndex="3"/>
+                            <Label text="%detail.species" GridPane.rowIndex="3"/>
                             <Label fx:id="lblSpecies" GridPane.rowIndex="3" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Animago:" GridPane.rowIndex="4"/>
+                            <Label text="%detail.animagus" GridPane.rowIndex="4"/>
                             <Label fx:id="lblAnimagus" GridPane.rowIndex="4" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Nacionalidad:" GridPane.rowIndex="5"/>
+                            <Label text="%detail.nationality" GridPane.rowIndex="5"/>
                             <Label fx:id="lblNationality" GridPane.rowIndex="5" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Casa:" GridPane.rowIndex="6"/>
+                            <Label text="%detail.house" GridPane.rowIndex="6"/>
                             <Label fx:id="lblHouse" GridPane.rowIndex="6" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Patronus:" GridPane.rowIndex="7"/>
+                            <Label text="%detail.patronus" GridPane.rowIndex="7"/>
                             <Label fx:id="lblPatronus" GridPane.rowIndex="7" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Alias:" GridPane.rowIndex="8"/>
+                            <Label text="%detail.alias" GridPane.rowIndex="8"/>
                             <Label fx:id="lblAlias" GridPane.rowIndex="8" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Títulos:" GridPane.rowIndex="9"/>
+                            <Label text="%detail.titles" GridPane.rowIndex="9"/>
                             <Label fx:id="lblTitles" GridPane.rowIndex="9" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
 
-                            <Label text="Varita:" GridPane.rowIndex="10"/>
+                            <Label text="%detail.wand" GridPane.rowIndex="10"/>
                             <Label fx:id="lblWand" GridPane.rowIndex="10" GridPane.columnIndex="1" wrapText="true" minHeight="-Infinity"/>
                         </GridPane>
 
                         <HBox alignment="BOTTOM_RIGHT" spacing="10">
-                            <Button fx:id="btnEditar" text="Editar" styleClass="secondary-button"/>
-                            <Button fx:id="btnEliminar" text="Eliminar" styleClass="secondary-button"/>
-                            <Button fx:id="btnGenerarPDFDetail" text="Generar PDF" styleClass="secondary-button"/>
+                            <Button fx:id="btnEditar" text="%detail.button.edit" styleClass="secondary-button">
+                                <tooltip><Tooltip text="%detail.tooltip.edit"/></tooltip>
+                            </Button>
+                            <Button fx:id="btnEliminar" text="%detail.button.delete" styleClass="secondary-button">
+                                <tooltip><Tooltip text="%detail.tooltip.delete"/></tooltip>
+                            </Button>
+                            <Button fx:id="btnGenerarPDFDetail" text="%detail.button.pdf" styleClass="secondary-button">
+                                <tooltip><Tooltip text="%detail.tooltip.pdf"/></tooltip>
+                            </Button>
                         </HBox>
+
 
                     </VBox>
                 </StackPane>

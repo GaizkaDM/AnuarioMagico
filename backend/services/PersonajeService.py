@@ -1,9 +1,9 @@
 """
 PersonajeService.py
-Servicio de negocio para gestionar operaciones de personajes
-Orquesta las llamadas a sync_sqlite y ExportService en el orden correcto
+Servicio para la lógica de negocio relacionada con Personajes.
+Gestiona la obtención de datos desde la API externa y la sincronización con la base de datos local.
 
-Author: Xiker
+Autores: Xiker
 """
 
 from typing import Dict, Optional
@@ -297,3 +297,87 @@ class PersonajeService:
 
 
 
+    def importar_personajes_desde_csv(self, csv_path: str) -> Dict:
+        """
+        Importa personajes masivamente desde un archivo CSV.
+        
+        Args:
+            csv_path: Ruta al archivo CSV
+            
+        Returns:
+            Diccionario con estadísticas de la importación
+        """
+        import csv
+        import json
+        
+        stats = {
+            "total": 0,
+            "added": 0,
+            "failed": 0,
+            "errors": []
+        }
+        
+        print(f"\n{'='*60}")
+        print(f"IMPORTANDO PERSONAJES DESDE CSV")
+        print(f"{'='*60}")
+        
+        try:
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                
+                # Campos que necesitan ser parseados de JSON str a lista/dict
+                json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
+                
+                for row in reader:
+                    stats['total'] += 1
+                    try:
+                        personaje = dict(row)
+                        
+                        # Limpiar y convertir campos JSON
+                        for field in json_fields:
+                            if field in personaje and personaje[field]:
+                                try:
+                                    # Intentar parsear si parece JSON (empieza con [ o {)
+                                    val = personaje[field].strip()
+                                    if val.startswith('[') or val.startswith('{'):
+                                        personaje[field] = json.loads(val)
+                                    else:
+                                        # Si no es JSON pero esperamos lista, ponerlo en lista si no está vacío
+                                        if val:
+                                            personaje[field] = [val]
+                                        else:
+                                            personaje[field] = []
+                                except json.JSONDecodeError:
+                                    # Fallback: tratar como string simple en lista
+                                    personaje[field] = [personaje[field]]
+                            else:
+                                personaje[field] = []
+                        
+                        # Añadir a SQLite
+                        if self.dao.añadir_personaje(personaje):
+                            stats['added'] += 1
+                        else:
+                            stats['failed'] += 1
+                            stats['errors'].append(f"Fila {stats['total']}: Error al guardar en BD (ID: {personaje.get('id', 'N/A')})")
+                            
+                    except Exception as e:
+                        stats['failed'] += 1
+                        stats['errors'].append(f"Fila {stats['total']}: {str(e)}")
+            
+            # Regenerar exportaciones (solo una vez al final)
+            if stats['added'] > 0:
+                print("\n[INFO] Regenerando archivos de exportación...")
+                self.export_service.exportar_a_csv()
+                self.export_service.exportar_a_xml()
+                self.export_service.exportar_a_binario()
+            
+            print(f"\nResultados de importación:")
+            print(f"  Total procesados: {stats['total']}")
+            print(f"  Añadidos: {stats['added']}")
+            print(f"  Fallidos: {stats['failed']}")
+            
+            return stats
+            
+        except Exception as e:
+            print(f"Error fatal durante importación CSV: {str(e)}")
+            raise e

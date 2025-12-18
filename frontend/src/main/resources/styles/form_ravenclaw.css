@@ -1,0 +1,217 @@
+/* form_ravenclaw.css - Premium Dark Ravenclaw Edition */
+
+.form-root {
+    -fx-background-color: linear-gradient(to bottom, #0e1a40, #050a1a);
+    /* Deep Ravenclaw Blue */
+    -fx-font-family: "Georgia", "Segoe UI", serif;
+}
+
+.form-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.form-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* --- Scrollbar Styling (Dark) --- */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #946b2d;
+    /* Bronze */
+    -fx-background-radius: 5em;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #c08a3e;
+}
+
+/* --- Typography & Headings --- */
+.form-title {
+    -fx-font-size: 28px;
+    -fx-font-family: "Cinzel", "Georgia", serif;
+    -fx-font-weight: 700;
+    -fx-text-fill: #946b2d;
+    /* Bronze */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 0, 0, 0, 2);
+    -fx-padding: 10 0 20 0;
+    -fx-alignment: center-left;
+}
+
+.section-header {
+    -fx-font-family: "Cinzel Decorative", "Georgia", serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #a0aab5;
+    /* Silver/Grey */
+    -fx-background-color: transparent;
+    -fx-padding: 15 0 5 0;
+    -fx-border-color: transparent transparent #405070 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 0, 1, 0, 1);
+}
+
+.label,
+.field-label {
+    -fx-text-fill: #b8c0d0;
+    /* Light Grey Blue */
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+.required-label {
+    -fx-text-fill: #ff6b6b;
+    /* Soft Red */
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* --- Inputs (TextField, TextArea, ComboBox) --- */
+.text-field,
+.text-area,
+.combo-box {
+    -fx-background-color: #0a122e;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #5d4037;
+    /* Bronze-ish dark */
+    -fx-border-width: 1px;
+    -fx-padding: 8 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: rgba(224, 224, 224, 0.4);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+}
+
+.text-area {
+    -fx-padding: 5;
+}
+
+/* Focus States */
+.text-field:focused,
+.text-area:focused,
+.combo-box:focused {
+    -fx-border-color: #946b2d;
+    /* Bronze highlight */
+    -fx-background-color: #0e1a40;
+    -fx-effect: dropshadow(three-pass-box, rgba(148, 107, 45, 0.4), 8, 0, 0, 0);
+}
+
+.text-field:hover,
+.text-area:hover,
+.combo-box:hover {
+    -fx-border-color: #7a5620;
+}
+
+
+.combo-box-popup .list-view {
+    -fx-background-color: #0a122e;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 8 10;
+}
+
+.combo-box-popup .list-cell:filled:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: #946b2d;
+    -fx-text-fill: #0e1a40;
+}
+
+/* Fix for the display node text color */
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* --- Image Section --- */
+.image-preview {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 2);
+    -fx-background-color: #080f20;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: #405070;
+    -fx-border-width: 2px;
+}
+
+/* --- Buttons --- */
+.button {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-background-radius: 6px;
+    -fx-padding: 8 20;
+    -fx-transition: all 0.3s;
+}
+
+.save-button {
+    -fx-background-color: linear-gradient(to bottom right, #946b2d, #7a5620);
+    -fx-text-fill: #e0e0e0;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 5, 0, 0, 1);
+}
+
+.save-button:hover {
+    -fx-background-color: linear-gradient(to bottom right, #b8863b, #946b2d);
+    -fx-effect: dropshadow(three-pass-box, rgba(184, 134, 59, 0.6), 8, 0, 0, 1);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.save-button:pressed {
+    -fx-background-color: #5d4037;
+    -fx-translate-y: 1;
+}
+
+.cancel-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #405070;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #a0aab5;
+}
+
+.cancel-button:hover {
+    -fx-background-color: rgba(64, 80, 112, 0.3);
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #5d7090;
+}
+
+.secondary-button {
+    -fx-background-color: #1c2b4a;
+    -fx-text-fill: #a0aab5;
+    -fx-font-weight: normal;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* --- Layout --- */
+.form-container {
+    -fx-spacing: 20px;
+}
+
+.form-footer {
+    -fx-background-color: #0e1a40;
+    -fx-border-color: #405070 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.3), 0, -5, 0, 0);
+}
+
+.error-label {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI Semibold";
+}
