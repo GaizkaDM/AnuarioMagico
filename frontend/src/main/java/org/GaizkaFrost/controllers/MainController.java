@@ -603,6 +603,7 @@ public class MainController implements Initializable {
 
             EditController controller = loader.getController();
             controller.setPersonaje(null); // Modo añadir
+            controller.setOnSaveSuccess(this::sincronizar);
 
             App.applyTheme(root, "Edit_view");
 
@@ -614,9 +615,6 @@ public class MainController implements Initializable {
             Scene scene = new Scene(root, 900, 700);
             stage.setScene(scene);
             stage.showAndWait(); // Esperar a que cierre
-
-            // Recargar datos para mostrar el nuevo personaje
-            sincronizar();
 
         } catch (IOException e) {
             logger.error("Error opening add character form: {}", e.getMessage(), e);

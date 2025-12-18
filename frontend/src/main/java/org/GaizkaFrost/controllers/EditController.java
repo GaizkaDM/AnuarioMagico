@@ -99,6 +99,11 @@ public class EditController {
     private Personaje currentPersonaje;
     private String currentImageUrl;
     private File selectedImageFile;
+    private Runnable onSaveSuccess;
+
+    public void setOnSaveSuccess(Runnable onSaveSuccess) {
+        this.onSaveSuccess = onSaveSuccess;
+    }
 
     @FXML
     public void initialize() {
@@ -301,6 +306,9 @@ public class EditController {
             }
 
             if (success) {
+                if (onSaveSuccess != null) {
+                    onSaveSuccess.run();
+                }
                 closeWindow();
             } else {
                 lblError.setText(App.getBundle().getString("edit.error.server"));
