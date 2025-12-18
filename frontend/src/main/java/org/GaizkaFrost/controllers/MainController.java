@@ -94,6 +94,8 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem menuLogin;
     @FXML
+    private MenuItem menuExit;
+    @FXML
     private MenuItem menuManual;
     @FXML
     private MenuItem menuLangEn;
@@ -168,6 +170,13 @@ public class MainController implements Initializable {
                 btnAnadir.setVisible(false);
                 btnAnadir.setManaged(false);
             }
+        }
+
+        // Configurar menú salir
+        if (menuExit != null) {
+            menuExit.setOnAction(e -> {
+                Platform.exit();
+            });
         }
 
         // House and Status combos will be populated dynamically or locally

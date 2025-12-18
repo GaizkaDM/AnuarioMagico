@@ -16,7 +16,7 @@
                 <Menu text="%main.menu.file">
                     <items>
                             <MenuItem fx:id="menuLogin" text="%main.menu.login"/>
-                        <MenuItem text="%main.menu.exit"/>
+                        <MenuItem fx:id="menuExit" text="%main.menu.exit"/>
                     </items>
                 </Menu>
                 <Menu text="%main.menu.view">
