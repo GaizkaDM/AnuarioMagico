@@ -6,6 +6,7 @@
     requires java.logging;
     requires jasperreports;
     requires java.sql;
+    requires org.slf4j;
 
     exports org.GaizkaFrost;
     exports org.GaizkaFrost.controllers;

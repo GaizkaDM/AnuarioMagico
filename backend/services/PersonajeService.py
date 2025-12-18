@@ -10,6 +10,7 @@ from typing import Dict, Optional
 from typing import Dict, Optional
 from backend.services.sync_sqlite import DaoSQLite
 from backend.services.ExportService import ExportService
+from backend.logging_config import logger_backend
 
 
 class PersonajeService:
@@ -45,34 +46,30 @@ class PersonajeService:
             
         Author: Xiker
         """
-        print(f"\n{'='*60}")
-        print(f"AÑADIENDO PERSONAJE: {personaje.get('name', 'Sin nombre')}")
-        print(f"{'='*60}")
+        logger_backend.info(f"AÑADIENDO PERSONAJE: {personaje.get('name', 'Sin nombre')}")
         
         # 1. Actualizar SQLite
-        print("\n[1/4] Actualizando base de datos SQLite...")
+        logger_backend.debug("[1/4] Actualizando base de datos SQLite...")
         if not self.dao.añadir_personaje(personaje):
-            print("✗ Error al añadir personaje a SQLite. Operación cancelada.")
+            logger_backend.error("✗ Error al añadir personaje a SQLite. Operación cancelada.")
             return False
         
         # 2. Exportar a CSV
-        print("\n[2/4] Exportando a CSV...")
+        logger_backend.debug("[2/4] Exportando a CSV...")
         if not self.export_service.exportar_a_csv():
-            print("⚠ Advertencia: Error al exportar a CSV")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
         
         # 3. Exportar a XML
-        print("\n[3/4] Exportando a XML...")
+        logger_backend.debug("[3/4] Exportando a XML...")
         if not self.export_service.exportar_a_xml():
-            print("⚠ Advertencia: Error al exportar a XML")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
         
         # 4. Exportar a Binario
-        print("\n[4/4] Exportando a Binario...")
+        logger_backend.debug("[4/4] Exportando a Binario...")
         if not self.export_service.exportar_a_binario():
-            print("⚠ Advertencia: Error al exportar a Binario")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
         
-        print(f"\n{'='*60}")
-        print(f"✓ PERSONAJE AÑADIDO EXITOSAMENTE")
-        print(f"{'='*60}\n")
+        logger_backend.info(f"✓ PERSONAJE AÑADIDO EXITOSAMENTE: {personaje.get('name')}")
         
         return True
     
@@ -95,34 +92,30 @@ class PersonajeService:
             
         Author: Xiker
         """
-        print(f"\n{'='*60}")
-        print(f"EDITANDO PERSONAJE: {personaje_id}")
-        print(f"{'='*60}")
+        logger_backend.info(f"EDITANDO PERSONAJE: {personaje_id}")
         
         # 1. Actualizar SQLite
-        print("\n[1/4] Actualizando base de datos SQLite...")
+        logger_backend.debug("[1/4] Actualizando base de datos SQLite...")
         if not self.dao.editar_personaje(personaje_id, datos_actualizados):
-            print("✗ Error al editar personaje en SQLite. Operación cancelada.")
+            logger_backend.error(f"✗ Error al editar personaje {personaje_id} en SQLite. Operación cancelada.")
             return False
         
         # 2. Exportar a CSV
-        print("\n[2/4] Exportando a CSV...")
+        logger_backend.debug("[2/4] Exportando a CSV...")
         if not self.export_service.exportar_a_csv():
-            print("⚠ Advertencia: Error al exportar a CSV")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
         
         # 3. Exportar a XML
-        print("\n[3/4] Exportando a XML...")
+        logger_backend.debug("[3/4] Exportando a XML...")
         if not self.export_service.exportar_a_xml():
-            print("⚠ Advertencia: Error al exportar a XML")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
         
         # 4. Exportar a Binario
-        print("\n[4/4] Exportando a Binario...")
+        logger_backend.debug("[4/4] Exportando a Binario...")
         if not self.export_service.exportar_a_binario():
-            print("⚠ Advertencia: Error al exportar a Binario")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
         
-        print(f"\n{'='*60}")
-        print(f"✓ PERSONAJE EDITADO EXITOSAMENTE")
-        print(f"{'='*60}\n")
+        logger_backend.info(f"✓ PERSONAJE EDITADO EXITOSAMENTE: {personaje_id}")
         
         return True
     
@@ -144,34 +137,30 @@ class PersonajeService:
             
         Author: Xiker
         """
-        print(f"\n{'='*60}")
-        print(f"ELIMINANDO PERSONAJE: {personaje_id}")
-        print(f"{'='*60}")
+        logger_backend.info(f"ELIMINANDO PERSONAJE: {personaje_id}")
         
         # 1. Actualizar SQLite
-        print("\n[1/4] Eliminando de base de datos SQLite...")
+        logger_backend.debug("[1/4] Eliminando de base de datos SQLite...")
         if not self.dao.eliminar_personaje(personaje_id):
-            print("✗ Error al eliminar personaje de SQLite. Operación cancelada.")
+            logger_backend.error(f"✗ Error al eliminar personaje {personaje_id} de SQLite. Operación cancelada.")
             return False
         
         # 2. Exportar a CSV
-        print("\n[2/4] Exportando a CSV...")
+        logger_backend.debug("[2/4] Exportando a CSV...")
         if not self.export_service.exportar_a_csv():
-            print("⚠ Advertencia: Error al exportar a CSV")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
         
         # 3. Exportar a XML
-        print("\n[3/4] Exportando a XML...")
+        logger_backend.debug("[3/4] Exportando a XML...")
         if not self.export_service.exportar_a_xml():
-            print("⚠ Advertencia: Error al exportar a XML")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
         
         # 4. Exportar a Binario
-        print("\n[4/4] Exportando a Binario...")
+        logger_backend.debug("[4/4] Exportando a Binario...")
         if not self.export_service.exportar_a_binario():
-            print("⚠ Advertencia: Error al exportar a Binario")
+            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
         
-        print(f"\n{'='*60}")
-        print(f"✓ PERSONAJE ELIMINADO EXITOSAMENTE")
-        print(f"{'='*60}\n")
+        logger_backend.info(f"✓ PERSONAJE ELIMINADO EXITOSAMENTE: {personaje_id}")
         
         return True
     

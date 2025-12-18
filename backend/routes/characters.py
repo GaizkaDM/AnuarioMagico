@@ -7,6 +7,7 @@ from backend.extensions import db
 from backend.services.PersonajeService import PersonajeService
 from backend.services.ImageService import ImageService
 from backend.config import POTTERDB_API, DB_FILE
+from backend.logging_config import logger_backend
 
 characters_bp = Blueprint('characters', __name__)
 personaje_service = PersonajeService(DB_FILE)
@@ -21,7 +22,7 @@ def get_characters():
         local_characters = personaje_service.dao.obtener_todos_personajes()
         
         if local_characters:
-            print(f"✓ Returning {len(local_characters)} characters from local SQLite DB")
+            logger_backend.info(f"✓ Returning {len(local_characters)} characters from local SQLite DB")
             if request.args.get('filter') == 'favorites':
                 # Fetch favorites ids
                 favs = Favorite.query.filter_by(is_favorite=True).all()
@@ -64,11 +65,11 @@ def get_characters():
             return jsonify(characters)
         
         # If empty, fetch from API (Logic copied from app.py)
-        print("⟳ Local DB empty. Fetching fresh data from PotterDB API...")
+        logger_backend.info("⟳ Local DB empty. Fetching fresh data from PotterDB API...")
         all_characters = []
         page = 1
         while True:
-            print(f"  Fetching page {page}...")
+            logger_backend.debug(f"  Fetching page {page}...")
             response = requests.get(f"{POTTERDB_API}?page[number]={page}")
             if response.status_code != 200: return jsonify({"error": "Failed to fetch"}), 500
             data = response.json()
@@ -141,8 +142,7 @@ def get_characters():
         return get_characters()
         
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger_backend.error(f"Error in get_characters: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 @characters_bp.route('/characters', methods=['POST'])

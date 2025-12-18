@@ -21,6 +21,8 @@ import java.net.URL;
 import java.util.*;
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.GaizkaFrost.App;
 import org.GaizkaFrost.models.Personaje;
 import org.GaizkaFrost.services.HarryPotterAPI;
@@ -37,6 +39,8 @@ import org.GaizkaFrost.services.ReportService;
  * @author Xiker
  */
 public class MainController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @FXML
     private TextField txtBuscar;
@@ -173,13 +177,13 @@ public class MainController implements Initializable {
         // Intentar sincronizar datos de la nube al inicio (Pull)
         setCargando(true); // Mostrar spinner mientras se intenta el pull
         new Thread(() -> {
-            System.out.println("Intentando sincronización inicial (Pull)...");
+            logger.info("Attempting initial synchronization (Pull)...");
             boolean synced = HarryPotterAPI.syncPull();
             if (synced) {
-                System.out.println("Sincronización completada. Recargando datos locales...");
+                logger.info("Synchronization complete. Reloading local data...");
                 Platform.runLater(this::sincronizar);
             } else {
-                System.out.println("No se pudo sincronizar (¿Offline?). Cargando local...");
+                logger.warn("Sync failed (Offline?). Loading local data...");
                 Platform.runLater(this::sincronizar);
             }
         }).start();
@@ -250,7 +254,7 @@ public class MainController implements Initializable {
         }
         if (btnGenerarPDF != null) {
             btnGenerarPDF.setOnAction(e -> {
-                System.out.println("DEBUG: Button PDF clicked in MainController");
+                logger.debug("Button PDF clicked in MainController");
                 try {
                     ReportService.generateListReport(listaFiltrada, (Stage) btnGenerarPDF.getScene().getWindow());
                 } catch (Throwable t) {

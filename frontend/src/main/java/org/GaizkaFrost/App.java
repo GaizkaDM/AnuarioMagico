@@ -6,10 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.io.File;
 import java.net.URL;
 
@@ -22,6 +22,8 @@ import java.net.URL;
  * @author Xiker
  */
 public class App extends Application {
+
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
 
     /** El escenario principal de la aplicación. */
 
@@ -46,7 +48,7 @@ public class App extends Application {
      */
     @Override
     public void start(Stage s) throws IOException {
-        setupLogging(); // Initialize logging
+        logger.info("Starting frontend application...");
         instance = this;
         stage = s;
 
@@ -183,23 +185,5 @@ public class App extends Application {
     public static void main(String[] args) {
         java.util.Locale.setDefault(java.util.Locale.ENGLISH); // Force English default
         launch(args);
-    }
-
-    private void setupLogging() {
-        try {
-            // Ensure logs directory exists
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                logDir.mkdirs();
-            }
-
-            FileHandler fh = new FileHandler("logs/frontend.%g.log", 1024 * 1024, 3, true);
-            fh.setFormatter(new SimpleFormatter());
-            Logger logger = Logger.getLogger("");
-            logger.addHandler(fh);
-            logger.info("Frontend Logging Initialized");
-        } catch (IOException e) {
-            System.err.println("Failed to setup logging: " + e.getMessage());
-        }
     }
 }

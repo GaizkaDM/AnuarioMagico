@@ -18,6 +18,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Import Extensions and Config
 from backend.config import DB_FILE
 from backend.extensions import db
+from backend.logging_config import logger_backend
 
 # Import Blueprints
 from backend.routes.auth import auth_bp
@@ -33,19 +34,14 @@ def create_app():
     CORS(app)
     
     # Config
-    # Config
     from backend.config import MYSQL_CONFIG, DB_FILE
     
     if MYSQL_CONFIG:
-        # Construct MySQL URI
-        # mysql+pymysql://user:password@host:port/dbname
-        print(f"--> Usando base de datos MySQL Remota: {MYSQL_CONFIG['host']}")
+        logger_backend.info(f"--> Usando base de datos MySQL Remota: {MYSQL_CONFIG['host']}")
         db_uri = f"mysql+pymysql://{MYSQL_CONFIG['user']}:{MYSQL_CONFIG['password']}@{MYSQL_CONFIG['host']}:{MYSQL_CONFIG['port']}/{MYSQL_CONFIG['database']}"
         app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 280} # Solo para MySQL
     else:
-        # Construct SQLite URI (Local)
-        print(f"--> Usando base de datos SQLite Local: {DB_FILE}")
-        # Ensure URI is compatible with Windows paths
+        logger_backend.info(f"--> Usando base de datos SQLite Local: {DB_FILE}")
         db_uri = f'sqlite:///{DB_FILE}'
         if os.name == 'nt':
             db_uri = f"sqlite:///{DB_FILE.replace('\\', '/')}"
@@ -56,9 +52,6 @@ def create_app():
     
     # Init Extensions
     db.init_app(app)
-    
-    # Logging
-    setup_logging(app)
     
     # Register Blueprints
     app.register_blueprint(auth_bp)
@@ -77,6 +70,7 @@ def create_app():
             conn.close()
             db_status = "connected"
         except Exception as e:
+            logger_backend.error(f"Health check database error: {str(e)}", exc_info=True)
             db_status = f"error: {str(e)}"
             count = 0
             
@@ -92,23 +86,6 @@ def create_app():
         db.create_all()
         
     return app
-
-def setup_logging(app):
-    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs')
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-        
-    log_file = os.path.join(log_dir, 'backend.log')
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    
-    file_handler = RotatingFileHandler(log_file, maxBytes=1_000_000, backupCount=3)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(file_handler)
-    
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-    logger.addHandler(console_handler)
 
 app = create_app()
 

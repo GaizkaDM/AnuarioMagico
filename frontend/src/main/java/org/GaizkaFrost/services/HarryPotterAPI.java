@@ -7,6 +7,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -25,6 +28,7 @@ import java.util.List;
  */
 public class HarryPotterAPI {
 
+    private static final Logger logger = LoggerFactory.getLogger(HarryPotterAPI.class);
     private static final String API_URL = "http://127.0.0.1:8000/characters";
     private static final String AUTH_URL = "http://127.0.0.1:8000/auth";
 
@@ -49,10 +53,10 @@ public class HarryPotterAPI {
     public static void setToken(String token, String username) {
         currentToken = token;
         currentUsername = username;
-        System.out.println("Token guardado: "
-                + (token != null ? token.substring(0, Math.min(8, token.length())) + "..." : "null"));
+        logger.info("Token saved: {}",
+                (token != null ? token.substring(0, Math.min(8, token.length())) + "..." : "null"));
         if (username != null) {
-            System.out.println("Usuario: " + username);
+            logger.info("User: {}", username);
         }
     }
 
@@ -76,7 +80,7 @@ public class HarryPotterAPI {
     public static void clearToken() {
         currentToken = null;
         currentUsername = null;
-        System.out.println("Token eliminado");
+        logger.info("Token eliminated");
     }
 
     /**
@@ -151,7 +155,7 @@ public class HarryPotterAPI {
             HttpURLConnection conn = createConnection(url, "POST");
             return conn.getResponseCode() == 200;
         } catch (Exception e) {
-            System.err.println("Sync Error (" + url + "): " + e.getMessage());
+            logger.error("Sync Error ({}): {}", url, e.getMessage());
             return false;
         }
     }
@@ -160,11 +164,11 @@ public class HarryPotterAPI {
      * Sincronización completa (Push + Pull).
      */
     public static boolean fullSync() {
-        System.out.println("Iniciando Full Sync...");
+        logger.info("Starting Full Sync...");
         boolean pushOk = syncPush();
-        System.out.println("Push status: " + pushOk);
+        logger.info("Push status: {}", pushOk);
         boolean pullOk = syncPull();
-        System.out.println("Pull status: " + pullOk);
+        logger.info("Pull status: {}", pullOk);
         return pushOk && pullOk;
     }
 
@@ -179,7 +183,7 @@ public class HarryPotterAPI {
                 return new Gson().fromJson(response, JsonObject.class);
             }
         } catch (Exception e) {
-            System.err.println("Error checking sync status: " + e.getMessage());
+            logger.error("Error checking sync status: {}", e.getMessage());
         }
         return null;
     }
@@ -217,7 +221,7 @@ public class HarryPotterAPI {
      */
     public static boolean addCharacter(JsonObject personaje) throws Exception {
         if (!isLoggedIn()) {
-            System.err.println("Error: No hay sesión iniciada");
+            logger.error("Error: No session active");
             return false;
         }
 
@@ -239,7 +243,7 @@ public class HarryPotterAPI {
      */
     public static boolean editCharacter(String characterId, JsonObject datosActualizados) throws Exception {
         if (!isLoggedIn()) {
-            System.err.println("Error: No hay sesión iniciada");
+            logger.error("Error: No session active");
             return false;
         }
 
@@ -261,7 +265,7 @@ public class HarryPotterAPI {
      */
     public static boolean deleteCharacter(String characterId) throws Exception {
         if (!isLoggedIn()) {
-            System.err.println("Error: No hay sesión iniciada");
+            logger.error("Error: No session active");
             return false;
         }
 
