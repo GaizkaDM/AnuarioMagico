@@ -49,6 +49,8 @@ public class MainController implements Initializable {
     @FXML
     private ComboBox<String> comboEstado;
     @FXML
+    private TextField txtPatronus;
+    @FXML
     private CheckBox checkFavoritos;
     @FXML
     private Button btnLimpiar;
@@ -81,7 +83,6 @@ public class MainController implements Initializable {
     private List<Personaje> listaFiltrada = new ArrayList<>();
 
     private int paginaActual = 0;
-    private static int savedPage = -1;
     // Estado de filtros guardado
     private static String savedSearch = "";
     private static String savedHouse = null;
@@ -169,7 +170,7 @@ public class MainController implements Initializable {
             }
         }
 
-        comboCasa.getItems().addAll("Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff");
+        // House and Status combos will be populated dynamically or locally
         comboEstado.getItems().addAll(
                 App.getBundle().getString("combo.status.alive"),
                 App.getBundle().getString("combo.status.deceased"));
@@ -192,6 +193,7 @@ public class MainController implements Initializable {
         txtBuscar.textProperty().addListener((obs, o, n) -> aplicarFiltros());
         comboCasa.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
         comboEstado.valueProperty().addListener((obs, o, n) -> aplicarFiltros());
+        txtPatronus.textProperty().addListener((obs, o, n) -> aplicarFiltros());
         checkFavoritos.selectedProperty().addListener((obs, o, n) -> aplicarFiltros());
 
         // Restaurar estado de filtros si existe
@@ -217,6 +219,7 @@ public class MainController implements Initializable {
             txtBuscar.clear();
             comboCasa.getSelectionModel().clearSelection();
             comboEstado.getSelectionModel().clearSelection();
+            txtPatronus.clear();
             checkFavoritos.setSelected(false);
             aplicarFiltros();
         });
@@ -408,19 +411,32 @@ public class MainController implements Initializable {
     private void aplicarFiltros() {
         String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
         String casa = comboCasa.getValue();
+        String unknownLabel = App.getBundle().getString("combo.house.unknown");
+        String noneLabel = App.getBundle().getString("combo.house.none");
         String estado = comboEstado.getValue();
+        String patronusBusqueda = txtPatronus.getText() != null ? txtPatronus.getText().toLowerCase().trim() : "";
         boolean soloFavoritos = checkFavoritos.isSelected();
 
         List<Personaje> filtrados = new ArrayList<>();
 
         for (Personaje p : masterData) {
             boolean coincideTexto = texto.isEmpty()
-                    || p.getNombre().toLowerCase().contains(texto)
-                    || (p.getCasa() != null && p.getCasa().toLowerCase().contains(texto))
-                    || (p.getPatronus() != null && p.getPatronus().toLowerCase().contains(texto));
+                    || p.getNombre().toLowerCase().contains(texto);
 
-            boolean coincideCasa = casa == null || casa.isEmpty()
-                    || (p.getCasa() != null && p.getCasa().equalsIgnoreCase(casa));
+            boolean coincideCasa = casa == null || casa.isEmpty();
+            if (!coincideCasa) {
+                if (casa.equals(noneLabel)) {
+                    // "Sin casa" matches null or empty
+                    coincideCasa = (p.getCasa() == null || p.getCasa().trim().isEmpty());
+                } else if (casa.equals(unknownLabel)) {
+                    // "Desconocido" matches explicit "unknown" or "desconocido"
+                    coincideCasa = (p.getCasa() != null && (p.getCasa().toLowerCase().contains("unknown")
+                            || p.getCasa().toLowerCase().contains("desconocido")));
+                } else {
+                    // Regular house name match
+                    coincideCasa = (p.getCasa() != null && p.getCasa().toLowerCase().contains(casa.toLowerCase()));
+                }
+            }
 
             String estadoFiltro = null;
             if (estado != null) {
@@ -438,7 +454,10 @@ public class MainController implements Initializable {
 
             boolean coincideFavorito = !soloFavoritos || p.isFavorite();
 
-            if (coincideTexto && coincideCasa && coincideEstado && coincideFavorito) {
+            boolean coincidePatronus = patronusBusqueda.isEmpty()
+                    || (p.getPatronus() != null && p.getPatronus().toLowerCase().contains(patronusBusqueda));
+
+            if (coincideTexto && coincideCasa && coincideEstado && coincideFavorito && coincidePatronus) {
                 filtrados.add(p);
             }
         }
@@ -556,7 +575,6 @@ public class MainController implements Initializable {
      */
     private void abrirDetalles(Personaje p) {
         // Guardar estado
-        savedPage = paginaActual;
         savedSearch = txtBuscar.getText();
         savedHouse = comboCasa.getValue();
         savedStatus = comboEstado.getValue();
@@ -623,6 +641,7 @@ public class MainController implements Initializable {
 
                 Platform.runLater(() -> {
                     masterData.setAll(localData);
+                    actualizarComboCasas();
                     aplicarFiltros();
                     actualizarPagina();
                     setCargando(false); // Desbloquear UI inmediatamente
@@ -644,8 +663,6 @@ public class MainController implements Initializable {
                                 boolean running = status.get("running").getAsBoolean();
                                 int current = status.get("current").getAsInt();
                                 int total = status.get("total").getAsInt();
-                                int errors = status.get("errors").getAsInt();
-
                                 Platform.runLater(() -> {
                                     statusBar.setText(
                                             String.format("Descargando nuevas imágenes: %d/%d...", current, total));
@@ -670,6 +687,7 @@ public class MainController implements Initializable {
                     List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
                     Platform.runLater(() -> {
                         masterData.setAll(freshData);
+                        actualizarComboCasas();
                         aplicarFiltros();
                         actualizarPagina();
                         statusBar.setText(App.getBundle().getString("main.status.ready"));
@@ -800,5 +818,83 @@ public class MainController implements Initializable {
             comboCasa.setDisable(cargando);
         if (comboEstado != null)
             comboEstado.setDisable(cargando);
+        if (txtPatronus != null)
+            txtPatronus.setDisable(cargando);
+    }
+
+    /**
+     * Extrae todas las casas/instituciones únicas de masterData y las añade al
+     * ComboBox.
+     */
+    private void actualizarComboCasas() {
+        if (comboCasa == null)
+            return;
+
+        String currentSelection = comboCasa.getValue();
+
+        // Usar un Set para evitar duplicados y ordenar alfabéticamente
+        Set<String> casas = new TreeSet<>();
+        boolean hasNone = false;
+        boolean hasUnknownExplicit = false;
+
+        for (Personaje p : masterData) {
+            String rawCasa = p.getCasa();
+            if (rawCasa == null || rawCasa.trim().isEmpty()) {
+                hasNone = true;
+                continue;
+            }
+
+            // Separadores comunes: " or ", " y ", " / ", ",", " & "
+            String[] parts = rawCasa.split("(?i)\\s+or\\s+|\\s+y\\s+|/|,|\\s*&\\s*");
+
+            for (String part : parts) {
+                String cleanCasa = part.trim();
+                // Limpiar: truncar en el primer paréntesis o corchete
+                int posParen = cleanCasa.indexOf('(');
+                int posBracket = cleanCasa.indexOf('[');
+                int splitPos = -1;
+
+                if (posParen != -1 && posBracket != -1)
+                    splitPos = Math.min(posParen, posBracket);
+                else if (posParen != -1)
+                    splitPos = posParen;
+                else if (posBracket != -1)
+                    splitPos = posBracket;
+
+                if (splitPos != -1) {
+                    cleanCasa = cleanCasa.substring(0, splitPos).trim();
+                }
+
+                if (!cleanCasa.isEmpty()) {
+                    String lower = cleanCasa.toLowerCase();
+                    if (lower.equals("unknown") || lower.equals("desconocido")) {
+                        hasUnknownExplicit = true;
+                    } else {
+                        casas.add(cleanCasa);
+                    }
+                }
+            }
+        }
+
+        final boolean finalHasNone = hasNone;
+        final boolean finalHasUnknown = hasUnknownExplicit;
+        String unknownLabel = App.getBundle().getString("combo.house.unknown");
+        String noneLabel = App.getBundle().getString("combo.house.none");
+
+        Platform.runLater(() -> {
+            comboCasa.getItems().clear();
+            comboCasa.getItems().addAll(casas);
+            if (finalHasUnknown) {
+                comboCasa.getItems().add(unknownLabel);
+            }
+            if (finalHasNone) {
+                comboCasa.getItems().add(noneLabel);
+            }
+            // Intentar restaurar la selección previa
+            if (currentSelection != null && (casas.contains(currentSelection) || currentSelection.equals(unknownLabel)
+                    || currentSelection.equals(noneLabel))) {
+                comboCasa.setValue(currentSelection);
+            }
+        });
     }
 }
