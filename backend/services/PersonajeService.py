@@ -181,38 +181,40 @@ class PersonajeService:
             
         Author: Xiker
         """
-        print(f"\n{'='*60}")
-        print(f"IMPORTACIÓN MASIVA DESDE CSV: {ruta_csv}")
-        print(f"{'='*60}")
+        if not ruta_csv:
+            logger_backend.error("No se ha proporcionado la ruta del CSV.")
+            return {"total": 0, "exitosos": 0, "fallidos": 0}
+
+        logger_backend.info(f"IMPORTACIÓN MASIVA DESDE CSV: {ruta_csv}")
         
         resultados = {"total": 0, "exitosos": 0, "fallidos": 0}
         
         # 1. Leer CSV
-        print("\n[1/3] Leyendo archivo CSV...")
+        logger_backend.debug("[1/3] Leyendo archivo CSV...")
         personajes = self.export_service.importar_desde_csv(ruta_csv)
         
         if not personajes:
-            print("✗ No se pudieron leer personajes del CSV.")
+            logger_backend.error("✗ No se pudieron leer personajes del CSV.")
             return resultados
             
         resultados["total"] = len(personajes)
-        print(f"✓ Leídos {resultados['total']} personajes.")
+        logger_backend.info(f"✓ Leídos {resultados['total']} personajes.")
         
         # 2. Insertar en SQLite
-        print("\n[2/3] Importando a base de datos SQLite...")
+        logger_backend.debug("[2/3] Importando a base de datos SQLite...")
         for i, personaje in enumerate(personajes, 1):
             
             # --- VALIDACIÓN OBLIGATORIA ---
             # Nombre obligatorio
             if not personaje.get('name'):
-                print(f"  ✗ [Fila {i}] OMITIDO: Falta el nombre (campo obligatorio).")
+                logger_backend.warning(f"  ✗ [Fila {i}] OMITIDO: Falta el nombre (campo obligatorio).")
                 resultados["fallidos"] += 1
                 continue
                 
             # Imagen (blob) obligatoria y válida
             # Nota: ExportService ya convierte el blob. Si es None, es que no había o era inválido.
             if not personaje.get('image_blob'):
-                print(f"  ✗ [Fila {i}] OMITIDO: Peronaje '{personaje.get('name')}' no tiene imagen (blob) válida.")
+                logger_backend.warning(f"  ✗ [Fila {i}] OMITIDO: Peronaje '{personaje.get('name')}' no tiene imagen (blob) válida.")
                 resultados["fallidos"] += 1
                 continue
             # -------------------------------
@@ -230,32 +232,27 @@ class PersonajeService:
                 # El usuario dijo "añade todos". Si ya existe, update parece razonable para "importar".
                 # Intentamos editar si tiene ID
                 if 'id' in personaje and personaje['id']:
-                    print(f"  ⚠ El ID {personaje['id']} ya existe. Intentando actualizar...")
+                    logger_backend.debug(f"  ⚠ El ID {personaje['id']} ya existe. Intentando actualizar...")
                     if self.dao.editar_personaje(personaje['id'], personaje):
                         resultados["exitosos"] += 1
-                        print(f"  ✓ Personaje actualizado correctamente.")
+                        logger_backend.debug(f"  ✓ Personaje actualizado correctamente.")
                     else:
                         resultados["fallidos"] += 1
                 else:
                     resultados["fallidos"] += 1
             
             if i % 10 == 0:
-                print(f"  Procesados {i}/{resultados['total']}...")
+                logger_backend.debug(f"  Procesados {i}/{resultados['total']}...")
 
         # 3. Regenerar exportaciones
-        print("\n[3/3] Regenerando archivos de exportación...")
+        logger_backend.debug("[3/3] Regenerando archivos de exportación...")
         if resultados["exitosos"] > 0:
             self.export_service.exportar_todo()
-            print("✓ Archivos regenerados con exito.")
+            logger_backend.info("✓ Archivos regenerados con exito.")
         else:
-            print("⚠ No se importaron nuevos datos, se omite regeneración de archivos.")
+            logger_backend.warning("⚠ No se importaron nuevos datos, se omite regeneración de archivos.")
             
-        print(f"\n{'='*60}")
-        print(f"RESUMEN DE IMPORTACIÓN")
-        print(f"Total leídos: {resultados['total']}")
-        print(f"Importados/Actualizados: {resultados['exitosos']}")
-        print(f"Fallidos: {resultados['fallidos']}")
-        print(f"{'='*60}\n")
+        logger_backend.info(f"RESUMEN DE IMPORTACIÓN - Total: {resultados['total']}, Exitosos: {resultados['exitosos']}, Fallidos: {resultados['fallidos']}")
         
         return resultados
     
@@ -286,87 +283,4 @@ class PersonajeService:
 
 
 
-    def importar_personajes_desde_csv(self, csv_path: str) -> Dict:
-        """
-        Importa personajes masivamente desde un archivo CSV.
-        
-        Args:
-            csv_path: Ruta al archivo CSV
-            
-        Returns:
-            Diccionario con estadísticas de la importación
-        """
-        import csv
-        import json
-        
-        stats = {
-            "total": 0,
-            "added": 0,
-            "failed": 0,
-            "errors": []
-        }
-        
-        print(f"\n{'='*60}")
-        print(f"IMPORTANDO PERSONAJES DESDE CSV")
-        print(f"{'='*60}")
-        
-        try:
-            with open(csv_path, 'r', encoding='utf-8') as f:
-                reader = csv.DictReader(f)
-                
-                # Campos que necesitan ser parseados de JSON str a lista/dict
-                json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
-                
-                for row in reader:
-                    stats['total'] += 1
-                    try:
-                        personaje = dict(row)
-                        
-                        # Limpiar y convertir campos JSON
-                        for field in json_fields:
-                            if field in personaje and personaje[field]:
-                                try:
-                                    # Intentar parsear si parece JSON (empieza con [ o {)
-                                    val = personaje[field].strip()
-                                    if val.startswith('[') or val.startswith('{'):
-                                        personaje[field] = json.loads(val)
-                                    else:
-                                        # Si no es JSON pero esperamos lista, ponerlo en lista si no está vacío
-                                        if val:
-                                            personaje[field] = [val]
-                                        else:
-                                            personaje[field] = []
-                                except json.JSONDecodeError:
-                                    # Fallback: tratar como string simple en lista
-                                    personaje[field] = [personaje[field]]
-                            else:
-                                personaje[field] = []
-                        
-                        # Añadir a SQLite
-                        if self.dao.añadir_personaje(personaje):
-                            stats['added'] += 1
-                        else:
-                            stats['failed'] += 1
-                            stats['errors'].append(f"Fila {stats['total']}: Error al guardar en BD (ID: {personaje.get('id', 'N/A')})")
-                            
-                    except Exception as e:
-                        stats['failed'] += 1
-                        stats['errors'].append(f"Fila {stats['total']}: {str(e)}")
-            
-            # Regenerar exportaciones (solo una vez al final)
-            if stats['added'] > 0:
-                print("\n[INFO] Regenerando archivos de exportación...")
-                self.export_service.exportar_a_csv()
-                self.export_service.exportar_a_xml()
-                self.export_service.exportar_a_binario()
-            
-            print(f"\nResultados de importación:")
-            print(f"  Total procesados: {stats['total']}")
-            print(f"  Añadidos: {stats['added']}")
-            print(f"  Fallidos: {stats['failed']}")
-            
-            return stats
-            
-        except Exception as e:
-            print(f"Error fatal durante importación CSV: {str(e)}")
-            raise e
+

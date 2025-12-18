@@ -11,6 +11,7 @@ from backend.services.ImageService import ImageService
 from backend.services.sync_mysql import sync_sqlite_to_mysql, sync_mysql_to_sqlite
 from backend.services.PersonajeService import PersonajeService
 from backend.config import DB_FILE
+from backend.logging_config import logger_backend
 
 admin_bp = Blueprint('admin', __name__)
 personaje_service = PersonajeService(DB_FILE)
@@ -88,11 +89,11 @@ def import_csv():
                 # Asegurar limpieza en caso de error
                 if os.path.exists(abs_temp_path):
                     os.remove(abs_temp_path)
-                print(f"Service Error: {str(e)}")
+                logger_backend.error(f"Service Error during import: {str(e)}", exc_info=True)
                 raise e
         else:
             return jsonify({'error': 'Invalid file type. Must be CSV'}), 400
            
     except Exception as e:
-        print(f"Import Error: {e}")
+        logger_backend.error(f"Import Error: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500

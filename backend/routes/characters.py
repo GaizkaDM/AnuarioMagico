@@ -220,8 +220,7 @@ def manage_character(character_id):
                 return jsonify({"success": True})
             return jsonify({"error": "Failed to update"}), 500
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger_backend.error(f"Error updating character {character_id}: {str(e)}", exc_info=True)
             return jsonify({"error": str(e)}), 500
 
     elif request.method == 'DELETE':
@@ -232,6 +231,5 @@ def manage_character(character_id):
                 return jsonify({"success": True})
             return jsonify({"error": "Failed to delete"}), 500
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger_backend.error(f"Error deleting character {character_id}: {str(e)}", exc_info=True)
             return jsonify({"error": str(e)}), 500

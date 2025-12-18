@@ -261,7 +261,7 @@ public class MainController implements Initializable {
                 try {
                     ReportService.generateListReport(listaFiltrada, (Stage) btnGenerarPDF.getScene().getWindow());
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    logger.error("Error generating character list PDF: {}", t.getMessage(), t);
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error al generar PDF");
@@ -280,7 +280,7 @@ public class MainController implements Initializable {
             // Reload Main_view
             App.setRoot("Main_view", "Anuario Hogwarts");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error changing language: {}", e.getMessage(), e);
         }
     }
 
@@ -338,7 +338,7 @@ public class MainController implements Initializable {
             stage.setScene(loginScene);
             stage.showAndWait();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error displaying login view: {}", e.getMessage(), e);
         }
     }
 
@@ -531,7 +531,7 @@ public class MainController implements Initializable {
                 img.setImage(image);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error loading image for {}: {}", p.getNombre(), e.getMessage());
         }
 
         Label lblNombre = new Label(p.getNombre());
@@ -584,7 +584,7 @@ public class MainController implements Initializable {
             DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
             controller.setPersonaje(p);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error opening character details for {}: {}", p.getNombre(), e.getMessage(), e);
         }
     }
 
@@ -616,7 +616,7 @@ public class MainController implements Initializable {
             sincronizar();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error opening add character form: {}", e.getMessage(), e);
             statusBar.setText("Error al abrir formulario de añadir.");
         }
     }
@@ -700,7 +700,7 @@ public class MainController implements Initializable {
                     });
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error during synchronization: {}", e.getMessage(), e);
                 Platform.runLater(() -> {
                     statusBar.setText("Error al sincronizar.");
                     btnSincronizar.setDisable(false);

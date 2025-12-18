@@ -32,7 +32,7 @@ def setup_backend_logging():
     # 1. backend-all.log (INFO and above)
     all_log_path = os.path.join(log_dir, 'backend-all.log')
     all_handler = RotatingFileHandler(all_log_path, maxBytes=max_bytes, backupCount=backup_count, encoding='utf-8')
-    all_handler.setLevel(logging.INFO)
+    all_handler.setLevel(logging.DEBUG)
     all_handler.setFormatter(detailed_formatter)
 
     # 2. backend-error.log (ERROR and above)

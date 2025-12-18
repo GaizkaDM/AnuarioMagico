@@ -15,6 +15,7 @@ import json
 import base64
 from typing import List, Dict
 from backend.services.sync_sqlite import DaoSQLite
+from backend.logging_config import logger_backend
 
 
 class ExportService:
@@ -56,7 +57,7 @@ class ExportService:
             personajes = self.dao.obtener_todos_personajes()
             
             if not personajes:
-                print("⚠ No hay personajes para exportar a CSV")
+                logger_backend.warning("⚠ No hay personajes para exportar a CSV")
                 return False
             
             # Definir las columnas del CSV
@@ -92,11 +93,11 @@ class ExportService:
                     
                     writer.writerow(row)
             
-            print(f"✓ Exportados {len(personajes)} personajes a {self.csv_file}")
+            logger_backend.info(f"✓ Exportados {len(personajes)} personajes a {self.csv_file}")
             return True
             
         except Exception as e:
-            print(f"✗ Error al exportar a CSV: {str(e)}")
+            logger_backend.error(f"✗ Error al exportar a CSV: {str(e)}", exc_info=True)
             return False
     
     def exportar_a_xml(self) -> bool:
@@ -112,7 +113,7 @@ class ExportService:
             personajes = self.dao.obtener_todos_personajes()
             
             if not personajes:
-                print("⚠ No hay personajes para exportar a XML")
+                logger_backend.warning("⚠ No hay personajes para exportar a XML")
                 return False
             
             # Crear el elemento raíz
@@ -151,11 +152,11 @@ class ExportService:
             with open(self.xml_file, 'w', encoding='utf-8') as f:
                 f.write(xml_str)
             
-            print(f"✓ Exportados {len(personajes)} personajes a {self.xml_file}")
+            logger_backend.info(f"✓ Exportados {len(personajes)} personajes a {self.xml_file}")
             return True
             
         except Exception as e:
-            print(f"✗ Error al exportar a XML: {str(e)}")
+            logger_backend.error(f"✗ Error al exportar a XML: {str(e)}", exc_info=True)
             return False
     
     def exportar_a_binario(self) -> bool:
@@ -173,10 +174,10 @@ class ExportService:
                 tree = ET.parse(self.xml_file)
                 root = tree.getroot()
             except FileNotFoundError:
-                print(f"✗ Error: No se encuentra el archivo {self.xml_file}")
+                logger_backend.error(f"✗ Error: No se encuentra el archivo {self.xml_file}")
                 return False
             except ET.ParseError as e:
-                print(f"✗ Error al parsear XML: {str(e)}")
+                logger_backend.error(f"✗ Error al parsear XML: {str(e)}")
                 return False
             
             # Convertir XML a estructura de datos Python
@@ -201,11 +202,11 @@ class ExportService:
             with open(self.bin_file, 'wb') as f:
                 pickle.dump(personajes, f)
             
-            print(f"✓ Exportados {len(personajes)} personajes a {self.bin_file}")
+            logger_backend.info(f"✓ Exportados {len(personajes)} personajes a {self.bin_file}")
             return True
             
         except Exception as e:
-            print(f"✗ Error al exportar a binario: {str(e)}")
+            logger_backend.error(f"✗ Error al exportar a binario: {str(e)}", exc_info=True)
             return False
     
     
@@ -222,14 +223,14 @@ class ExportService:
             with open(self.bin_file, 'rb') as f:
                 personajes = pickle.load(f)
             
-            print(f"✓ Importados {len(personajes)} personajes desde {self.bin_file}")
+            logger_backend.info(f"✓ Importados {len(personajes)} personajes desde {self.bin_file}")
             return personajes
             
         except FileNotFoundError:
-            print(f"✗ Error: No se encuentra el archivo {self.bin_file}")
+            logger_backend.warning(f"✗ Error: No se encuentra el archivo {self.bin_file}")
             return []
         except Exception as e:
-            print(f"✗ Error al importar desde binario: {str(e)}")
+            logger_backend.error(f"✗ Error al importar desde binario: {str(e)}", exc_info=True)
             return []
 
     def importar_desde_csv(self, archivo_csv: str) -> List[Dict]:
@@ -298,14 +299,14 @@ class ExportService:
                                 
                     personajes.append(personaje)
             
-            print(f"✓ Leídos {len(personajes)} personajes desde {archivo_csv}")
+            logger_backend.info(f"✓ Leídos {len(personajes)} personajes desde {archivo_csv}")
             return personajes
             
         except FileNotFoundError:
-            print(f"✗ Error: No se encuentra el archivo {archivo_csv}")
+            logger_backend.error(f"✗ Error: No se encuentra el archivo {archivo_csv}")
             return []
         except Exception as e:
-            print(f"✗ Error al importar desde CSV: {str(e)}")
+            logger_backend.error(f"✗ Error al importar desde CSV: {str(e)}", exc_info=True)
             return []
     
     def exportar_todo(self) -> bool:
@@ -317,12 +318,12 @@ class ExportService:
             
         Author: Xiker
         """
-        print("\n=== Iniciando exportación completa ===")
+        logger_backend.info("=== Iniciando exportación completa ===")
         
         csv_ok = self.exportar_a_csv()
         xml_ok = self.exportar_a_xml()
         bin_ok = self.exportar_a_binario()
         
-        print("=== Exportación completa finalizada ===\n")
+        logger_backend.info("=== Exportación completa finalizada ===")
         
         return csv_ok and xml_ok and bin_ok

@@ -12,6 +12,8 @@ import org.GaizkaFrost.services.HarryPotterAPI;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.GaizkaFrost.App;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ import java.util.List;
  * @author Xiker
  */
 public class EditController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EditController.class);
 
     @FXML
     private Label lblTitulo;
@@ -168,7 +172,7 @@ public class EditController {
             try {
                 imgPreview.setImage(new Image(currentImageUrl, true));
             } catch (Exception e) {
-                System.err.println("Error loading image: " + e.getMessage());
+                logger.error("Error loading image from URL {}: {}", currentImageUrl, e.getMessage());
             }
         }
     }
@@ -294,7 +298,7 @@ public class EditController {
                 lblError.setText(App.getBundle().getString("edit.error.server"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error saving character: {}", e.getMessage(), e);
             lblError.setText(App.getBundle().getString("error.title") + ": " + e.getMessage());
         }
     }

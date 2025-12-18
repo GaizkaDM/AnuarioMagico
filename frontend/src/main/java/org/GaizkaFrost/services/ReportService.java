@@ -21,9 +21,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReportService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
     private static final String REPORT_DIR = "/reports/";
 
     public static void generateCharacterReport(Personaje p, Stage owner) {
@@ -54,7 +57,7 @@ public class ReportService {
         new Thread(() -> {
             try {
                 // Notify start (Optional, but good for logs)
-                System.out.println("Starting PDF generation for " + file.getName() + "...");
+                logger.info("Starting PDF generation for {}...", file.getName());
 
                 // 1. Load Template
                 InputStream reportStream = ReportService.class.getResourceAsStream(REPORT_DIR + templateName);
@@ -100,11 +103,11 @@ public class ReportService {
                         "PDF generado correctamente:\n" + file.getAbsolutePath()));
 
             } catch (JRException e) {
-                e.printStackTrace();
+                logger.error("Error generating report: {}", e.getMessage(), e);
                 javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error JasperReports",
                         "Error al generar el reporte: " + e.getMessage()));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Unexpected error during report generation: {}", e.getMessage(), e);
                 javafx.application.Platform.runLater(
                         () -> showAlert(Alert.AlertType.ERROR, "Error", "Error inesperado: " + e.getMessage()));
             }

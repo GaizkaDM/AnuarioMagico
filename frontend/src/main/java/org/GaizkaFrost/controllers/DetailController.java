@@ -4,6 +4,8 @@ import org.GaizkaFrost.models.Personaje;
 import org.GaizkaFrost.services.HarryPotterAPI;
 import org.GaizkaFrost.App;
 import org.GaizkaFrost.services.ReportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -32,6 +34,8 @@ import java.text.MessageFormat;
  * @author Xiker
  */
 public class DetailController {
+
+    private static final Logger logger = LoggerFactory.getLogger(DetailController.class);
 
     @FXML
     private Button btnVolver;
@@ -85,7 +89,7 @@ public class DetailController {
             try {
                 App.setRoot("Main_view", "Anuario Hogwarts");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error returning to main view: {}", e.getMessage(), e);
             }
         });
 
@@ -102,14 +106,15 @@ public class DetailController {
 
         if (btnGenerarPDFDetail != null) {
             btnGenerarPDFDetail.setOnAction(event -> {
-                System.out.println("DEBUG: Button PDF clicked in DetailController");
+                logger.info("Generating PDF for character {}",
+                        currentPersonaje != null ? currentPersonaje.getNombre() : "null");
                 try {
                     if (currentPersonaje != null) {
                         ReportService.generateCharacterReport(currentPersonaje,
                                 (javafx.stage.Stage) btnGenerarPDFDetail.getScene().getWindow());
                     }
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    logger.error("Error generating character report: {}", t.getMessage(), t);
                     mostrarAlerta("Error", "No se pudo generar el reporte.\n" + t.getMessage());
                 }
             });
@@ -138,27 +143,27 @@ public class DetailController {
      */
     private void toggleFavorite() {
         if (currentPersonaje == null) {
-            System.out.println("DEBUG: currentPersonaje is null");
+            logger.warn("toggleFavorite called with currentPersonaje null");
             return;
         }
 
-        System.out.println("DEBUG: Toggling favorite for ID: " + currentPersonaje.getApiId());
+        logger.info("Toggling favorite for ID: {}", currentPersonaje.getApiId());
 
         try {
             boolean success = HarryPotterAPI.toggleFavorite(currentPersonaje.getApiId());
-            System.out.println("DEBUG: API call success? " + success);
+            logger.debug("API call success? {}", success);
 
             if (success) {
                 boolean oldState = currentPersonaje.isFavorite();
                 currentPersonaje.setFavorite(!oldState);
-                System.out.println("DEBUG: Toggled state from " + oldState + " to " + !oldState);
+                logger.info("Toggled favorite state from {} to {} for {}", oldState, !oldState,
+                        currentPersonaje.getNombre());
                 updateFavoriteUI();
             } else {
-                System.out.println("DEBUG: Request failed with non-200 code");
+                logger.warn("Toggle favorite API request failed for {}", currentPersonaje.getApiId());
             }
         } catch (Exception e) {
-            System.out.println("DEBUG: Exception in toggleFavorite: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Exception in toggleFavorite: {}", e.getMessage(), e);
         }
     }
 
@@ -280,7 +285,7 @@ public class DetailController {
                             try {
                                 App.setRoot("Main_view", "Anuario Hogwarts");
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                logger.error("Error returning to main view after deletion: {}", e.getMessage(), e);
                             }
                         } else {
                             mostrarAlerta(App.getBundle().getString("error.title"),
@@ -291,7 +296,7 @@ public class DetailController {
                     javafx.application.Platform.runLater(() -> {
                         mostrarAlerta(App.getBundle().getString("error.title"), "Error: " + e.getMessage());
                     });
-                    e.printStackTrace();
+                    logger.error("Error during character deletion: {}", e.getMessage(), e);
                 }
             }).start();
         }
@@ -336,7 +341,7 @@ public class DetailController {
             setPersonaje(currentPersonaje);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error opening edit form: {}", e.getMessage(), e);
             mostrarAlerta(App.getBundle().getString("error.title"), App.getBundle().getString("detail.edit.error"));
         }
     }

@@ -25,6 +25,7 @@ except ImportError:
     # Fallback si se ejecuta como script standalone sin contexto de paquete
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from config import DB_FILE, MYSQL_CONFIG
+from backend.logging_config import logger_backend
 
 # Asignar alias para compatibilidad interna
 SQLITE_DB = DB_FILE
@@ -39,7 +40,7 @@ def get_sqlite_connection():
     try:
         return sqlite3.connect(SQLITE_DB)
     except sqlite3.Error as e:
-        print(f"Error connecting to SQLite: {e}")
+        logger_backend.error(f"Error connecting to SQLite: {e}")
         return None
 
 def get_mysql_connection():
@@ -56,7 +57,7 @@ def get_mysql_connection():
         if connection.is_connected():
             return connection
     except Error as e:
-        print(f"Error connecting to MySQL: {e}")
+        logger_backend.error(f"Error connecting to MySQL: {e}")
         return None
 
 def create_mysql_tables(cursor):
@@ -104,7 +105,7 @@ def create_mysql_tables(cursor):
     )
     """)
     cursor.execute("DESCRIBE characters")
-    print("DEBUG: MySQL Table Schema:", cursor.fetchall())
+    logger_backend.debug(f"MySQL Table Schema: {cursor.fetchall()}")
     
     # Tabla de Favoritos
     cursor.execute("DROP TABLE IF EXISTS favorites")
@@ -115,20 +116,20 @@ def create_mysql_tables(cursor):
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
     """)
-    print("[OK] MySQL tables checked/created.")
+    logger_backend.info("[OK] MySQL tables checked/created.")
 
 def sync_sqlite_to_mysql():
     """
     Función principal de sincronización.
     Lee datos de SQLite y los inserta/actualiza en MySQL.
     """
-    print("Starting sync: SQLite -> MySQL...")
+    logger_backend.info("Starting sync: SQLite -> MySQL...")
     
     sqlite_conn = get_sqlite_connection()
     mysql_conn = get_mysql_connection()
     
     if not sqlite_conn or not mysql_conn:
-        print("✗ Connection failed. Aborting sync.")
+        logger_backend.error("✗ Connection failed. Aborting sync.")
         return
 
     try:
@@ -139,13 +140,13 @@ def sync_sqlite_to_mysql():
         create_mysql_tables(mysql_cursor)
         
         # 2. Sincronizar Personajes
-        print("  Syncing characters...")
+        logger_backend.debug("  Syncing characters...")
         sqlite_cursor.execute("SELECT * FROM characters")
         characters = sqlite_cursor.fetchall()
         
         # Obtener nombres de columnas de SQLite para mapear dinámicamente
         col_names = [description[0] for description in sqlite_cursor.description]
-        print("DEBUG: SQLite Columns:", col_names)
+        logger_backend.debug(f"SQLite Columns: {col_names}")
         
         count = 0
         for char in characters:
@@ -168,10 +169,10 @@ def sync_sqlite_to_mysql():
             mysql_cursor.execute(sql, list(char_dict.values()))
             count += 1
             
-        print(f"  [OK] Synced {count} characters to MySQL.")
+        logger_backend.info(f"  [OK] Synced {count} characters to MySQL.")
         
         # 3. Sincronizar Favoritos
-        print("  Syncing favorites...")
+        logger_backend.debug("  Syncing favorites...")
         sqlite_cursor.execute("SELECT * FROM favorites")
         favorites = sqlite_cursor.fetchall()
         
@@ -185,15 +186,15 @@ def sync_sqlite_to_mysql():
             """, (c_id, is_fav))
             fav_count += 1
             
-        print(f"  [OK] Synced {fav_count} favorites to MySQL.")
+        logger_backend.info(f"  [OK] Synced {fav_count} favorites to MySQL.")
         
         mysql_conn.commit()
-        print("[OK] Synchronization complete!")
+        logger_backend.info("[OK] Synchronization complete!")
         
     except Error as e:
-        print(f"[ERROR] MySQL Error: {e}")
+        logger_backend.error(f"[ERROR] MySQL Error: {e}")
     except sqlite3.Error as e:
-        print(f"[ERROR] SQLite Error: {e}")
+        logger_backend.error(f"[ERROR] SQLite Error: {e}")
     finally:
         if mysql_conn: mysql_conn.close()
 
@@ -202,13 +203,13 @@ def sync_mysql_to_sqlite():
     Descarga cambios de MySQL y actualiza la base de datos local SQLite (Pull).
     Estrategia 'Smart Merge': Actualiza lo local con lo remoto.
     """
-    print("Starting sync: MySQL -> SQLite (Pull)...")
+    logger_backend.info("Starting sync: MySQL -> SQLite (Pull)...")
     
     sqlite_conn = get_sqlite_connection()
     mysql_conn = get_mysql_connection()
     
     if not sqlite_conn or not mysql_conn:
-        print("✗ Connection failed. Aborting pull.")
+        logger_backend.error("✗ Connection failed. Aborting pull.")
         return
 
     try:
@@ -216,7 +217,7 @@ def sync_mysql_to_sqlite():
         mysql_cursor = mysql_conn.cursor(dictionary=True)
         
         # 1. Pull Users
-        print("  Pulling users...")
+        logger_backend.debug("  Pulling users...")
         mysql_cursor.execute("SELECT * FROM users")
         users = mysql_cursor.fetchall()
         
@@ -226,10 +227,10 @@ def sync_mysql_to_sqlite():
                 VALUES (?, ?, ?)
             """, (u['username'], u['password_hash'], u['created_at']))
             
-        print(f"  [OK] Pulled {len(users)} users.")
+        logger_backend.info(f"  [OK] Pulled {len(users)} users.")
 
         # 2. Pull Favorites
-        print("  Pulling favorites...")
+        logger_backend.debug("  Pulling favorites...")
         mysql_cursor.execute("SELECT * FROM favorites")
         favorites = mysql_cursor.fetchall()
         
@@ -246,12 +247,12 @@ def sync_mysql_to_sqlite():
                 # Si en MySQL dice que no es favorito, lo quitamos de local
                 sqlite_cursor.execute("DELETE FROM favorites WHERE character_id = ?", (char_id,))
                 
-        print(f"  [OK] Pulled {len(favorites)} favorites.")
+        logger_backend.info(f"  [OK] Pulled {len(favorites)} favorites.")
 
         # 3. Pull Characters
         # Solo actualizamos metadatos para no machacar BLOBs locales si en la nube están vacíos
         # (Asumiendo que la nube puede no tener las imágenes pesadas)
-        print("  Pulling characters...")
+        logger_backend.debug("  Pulling characters...")
         mysql_cursor.execute("SELECT * FROM characters")
         characters = mysql_cursor.fetchall()
         
@@ -289,15 +290,15 @@ def sync_mysql_to_sqlite():
             ))
             count += 1
             
-        print(f"  [OK] Pulled {count} characters.")
+        logger_backend.info(f"  [OK] Pulled {count} characters.")
         
         sqlite_conn.commit()
-        print("[OK] Pull complete!")
+        logger_backend.info("[OK] Pull complete!")
         
     except Error as e:
-        print(f"[ERROR] MySQL Error: {e}")
+        logger_backend.error(f"[ERROR] MySQL Error: {e}")
     except sqlite3.Error as e:
-        print(f"[ERROR] SQLite Error: {e}")
+        logger_backend.error(f"[ERROR] SQLite Error: {e}")
     finally:
         if sqlite_conn: sqlite_conn.close()
         if mysql_conn: mysql_conn.close()

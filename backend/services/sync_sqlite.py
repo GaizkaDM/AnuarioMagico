@@ -11,6 +11,7 @@ from typing import Dict, List, Optional
 import json
 from typing import Dict, List, Optional
 from backend.services.sync_mysql import get_sqlite_connection
+from backend.logging_config import logger_backend
 
 
 class DaoSQLite:
@@ -106,14 +107,14 @@ class DaoSQLite:
             
             conn.commit()
             conn.close()
-            print(f"✓ Personaje '{personaje.get('name')}' añadido a SQLite")
+            logger_backend.debug(f"✓ Personaje '{personaje.get('name')}' añadido a SQLite")
             return True
             
         except sqlite3.IntegrityError as e:
-            print(f"✗ Error: El personaje con ID '{personaje.get('id')}' ya existe")
+            logger_backend.warning(f"✗ Error: El personaje con ID '{personaje.get('id')}' ya existe")
             return False
         except Exception as e:
-            print(f"✗ Error al añadir personaje: {str(e)}")
+            logger_backend.error(f"✗ Error al añadir personaje: {str(e)}", exc_info=True)
             return False
     
     def editar_personaje(self, personaje_id: str, datos_actualizados: Dict) -> bool:
@@ -136,7 +137,7 @@ class DaoSQLite:
             # Verificar que el personaje existe
             cursor.execute('SELECT id FROM characters WHERE id = ?', (personaje_id,))
             if not cursor.fetchone():
-                print(f"✗ Error: No existe personaje con ID '{personaje_id}'")
+                logger_backend.error(f"✗ Error: No existe personaje con ID '{personaje_id}'")
                 conn.close()
                 return False
             
@@ -165,7 +166,7 @@ class DaoSQLite:
                     valores.append(json.dumps(datos_actualizados[campo]))
             
             if not campos_actualizar:
-                print("⚠ No hay campos para actualizar")
+                logger_backend.warning("⚠ No hay campos para actualizar")
                 conn.close()
                 return False
             
@@ -177,11 +178,11 @@ class DaoSQLite:
             
             conn.commit()
             conn.close()
-            print(f"✓ Personaje '{personaje_id}' editado en SQLite")
+            logger_backend.debug(f"✓ Personaje '{personaje_id}' editado en SQLite")
             return True
             
         except Exception as e:
-            print(f"✗ Error al editar personaje: {str(e)}")
+            logger_backend.error(f"✗ Error al editar personaje: {str(e)}", exc_info=True)
             return False
     
     def eliminar_personaje(self, personaje_id: str) -> bool:
@@ -203,7 +204,7 @@ class DaoSQLite:
             # Verificar que el personaje existe
             cursor.execute('SELECT id FROM characters WHERE id = ?', (personaje_id,))
             if not cursor.fetchone():
-                print(f"✗ Error: No existe personaje con ID '{personaje_id}'")
+                logger_backend.error(f"✗ Error: No existe personaje con ID '{personaje_id}'")
                 conn.close()
                 return False
             
@@ -215,11 +216,11 @@ class DaoSQLite:
             
             conn.commit()
             conn.close()
-            print(f"✓ Personaje '{personaje_id}' eliminado de SQLite")
+            logger_backend.debug(f"✓ Personaje '{personaje_id}' eliminado de SQLite")
             return True
             
         except Exception as e:
-            print(f"✗ Error al eliminar personaje: {str(e)}")
+            logger_backend.error(f"✗ Error al eliminar personaje: {str(e)}", exc_info=True)
             return False
     
     def obtener_personaje(self, personaje_id: str) -> Optional[Dict]:
@@ -261,7 +262,7 @@ class DaoSQLite:
             return personaje
             
         except Exception as e:
-            print(f"✗ Error al obtener personaje: {str(e)}")
+            logger_backend.error(f"✗ Error al obtener personaje: {str(e)}", exc_info=True)
             return None
     
     def obtener_todos_personajes(self) -> List[Dict]:
@@ -301,5 +302,5 @@ class DaoSQLite:
             return personajes
             
         except Exception as e:
-            print(f"✗ Error al obtener personajes: {str(e)}")
+            logger_backend.error(f"✗ Error al obtener personajes: {str(e)}", exc_info=True)
             return []
