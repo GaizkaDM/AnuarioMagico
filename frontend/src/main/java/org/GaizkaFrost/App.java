@@ -82,19 +82,22 @@ public class App extends Application {
                 return;
             }
 
-            javafx.scene.image.ImageView splashImage = new javafx.scene.image.ImageView(imageUrl.toExternalForm());
-            splashImage.setPreserveRatio(true);
-            splashImage.setFitHeight(600);
+            // Usar StackPane con imagen de fondo
+            javafx.scene.layout.StackPane splashRoot = new javafx.scene.layout.StackPane();
+            splashRoot.setStyle("-fx-background-image: url('" + imageUrl.toExternalForm() + "'); " +
+                    "-fx-background-size: cover; " +
+                    "-fx-background-position: center center; " +
+                    "-fx-background-repeat: no-repeat;");
 
-            // Usar un StackPane negro de fondo
-            javafx.scene.layout.StackPane splashRoot = new javafx.scene.layout.StackPane(splashImage);
-            splashRoot.setStyle("-fx-background-color: #000000;");
+            // Crear la escena UNA SOLA VEZ
+            scene = new Scene(splashRoot, 850, 700);
+            stage.setScene(scene);
 
-            Scene splashScene = new Scene(splashRoot, 1000, 700);
-            stage.setScene(splashScene);
+            // Mostrar maximizado
             stage.show();
+            stage.setMaximized(true);
 
-            // Transición de 2 segundos
+            // Transición
             javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
                     javafx.util.Duration.seconds(2));
             delay.setOnFinished(event -> {
@@ -118,21 +121,31 @@ public class App extends Application {
 
     private void showMainView() throws IOException {
         Parent root = loadFXML("Main_view");
-        scene = new Scene(root);
 
-        // CSS global una sola vez
+        // Si la escena ya existe (viniendo del splash), solo cambiamos la raíz
+        if (scene != null) {
+            scene.setRoot(root);
+        } else {
+            // Si por alguna razón no existe (ej: fallo splash), la creamos
+            scene = new Scene(root);
+            stage.setScene(scene);
+        }
+
+        // CSS global
         URL cssUrl = App.class.getResource("/styles/estilos.css");
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         }
 
-        stage.setScene(scene);
-
-        // Establecer tamaños mínimos para evitar rotura de layout
+        // Configurar mínimos
         stage.setMinWidth(850);
         stage.setMinHeight(700);
 
-        stage.setMaximized(true);
+        // Asegurar maximizado (sin parpadeo, ya que la ventana ya lo estaba)
+        if (!stage.isMaximized()) {
+            stage.setMaximized(true);
+        }
+
         if (!stage.isShowing()) {
             stage.show();
         }
