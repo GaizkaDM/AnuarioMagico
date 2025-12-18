@@ -36,19 +36,20 @@ def create_app():
     # Config
     from backend.config import MYSQL_CONFIG, DB_FILE
     
-    if MYSQL_CONFIG:
-        logger_backend.info(f"--> Usando base de datos MySQL Remota: {MYSQL_CONFIG['host']}")
-        db_uri = f"mysql+pymysql://{MYSQL_CONFIG['user']}:{MYSQL_CONFIG['password']}@{MYSQL_CONFIG['host']}:{MYSQL_CONFIG['port']}/{MYSQL_CONFIG['database']}"
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 280} # Solo para MySQL
-    else:
-        logger_backend.info(f"--> Usando base de datos SQLite Local: {DB_FILE}")
-        db_uri = f'sqlite:///{DB_FILE}'
-        if os.name == 'nt':
-            db_uri = f"sqlite:///{DB_FILE.replace('\\', '/')}"
+    # Configuración de Base de Datos: SIEMPRE SQLite Local para la app principal (Offline First)
+    logger_backend.info(f"--> Usando base de datos SQLite Local: {DB_FILE}")
+    db_uri = f'sqlite:///{DB_FILE}'
+    if os.name == 'nt':
+        db_uri = f"sqlite:///{DB_FILE.replace('\\', '/')}"
     
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 280} # Evitar desconexiones por inactividad
+    
+    # Pool configuration para SQLite (optimización de conexiones locales)
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 3600
+    }
     
     # Init Extensions
     db.init_app(app)

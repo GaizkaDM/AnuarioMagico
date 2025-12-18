@@ -40,12 +40,19 @@ def sync_mysql_pull():
     try:
         sync_mysql_to_sqlite()
         
+        # Regenerar archivos de exportación (CSV, XML, BIN) para que coincidan con los nuevos datos
+        try:
+            personaje_service.export_service.exportar_todo()
+            logger_backend.info("Export files regenerated after Sync Pull.")
+        except Exception as ex:
+            logger_backend.error(f"Error regenerating export files after sync: {ex}")
+        
         # Auto-trigger background image sync to ensure offline availability
         thread = threading.Thread(target=ImageService.cache_all_images_background)
         thread.daemon = True
         thread.start()
         
-        return jsonify({"success": True, "message": "Pull from MySQL completed. Image caching started in background."})
+        return jsonify({"success": True, "message": "Pull from MySQL completed. Export files updated. Image caching started in background."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -791,6 +791,18 @@ public class MainController implements Initializable {
 
         Scene scene = new Scene(scroll, 700, 800);
         helpStage.setScene(scene);
+
+        // Centrar en pantalla
+        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        helpStage.setX((screenBounds.getWidth() - 700) / 2);
+        helpStage.setY((screenBounds.getHeight() - 800) / 2);
+
+        // Evitar que sea más alta que la pantalla
+        if (800 > screenBounds.getHeight()) {
+            helpStage.setHeight(screenBounds.getHeight() * 0.9);
+            helpStage.setY((screenBounds.getHeight() - helpStage.getHeight()) / 2);
+        }
+
         helpStage.show();
     }
 

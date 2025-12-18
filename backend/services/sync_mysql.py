@@ -1,10 +1,8 @@
 import sqlite3
-import mysql.connector
-from mysql.connector import Error
+import pymysql
+import pymysql.cursors
 import sys
 import os
-
-
 
 """
 Módulo de sincronización con MySQL.
@@ -12,9 +10,6 @@ Permite volcar los datos locales (SQLite) a una base de datos MySQL remota o loc
 
 Autores: Diego, Gaizka
 """
-
-__author__ = "GaizkaFrost"
-__version__ = "1.0"
 
 from datetime import datetime
 # Ensure backend dir is in path to import config
@@ -50,13 +45,11 @@ def get_mysql_connection():
     Returns:
         Connection: Objeto de conexión MySQL o None si falla.
     """
-
-        
     try:
-        connection = mysql.connector.connect(**MYSQL_CONFIG)
-        if connection.is_connected():
-            return connection
-    except Error as e:
+        # pymysql usa argumentos similares a MYSQL_CONFIG
+        connection = pymysql.connect(**MYSQL_CONFIG)
+        return connection
+    except pymysql.MySQLError as e:
         logger_backend.error(f"Error connecting to MySQL: {e}")
         return None
 
@@ -191,7 +184,7 @@ def sync_sqlite_to_mysql():
         mysql_conn.commit()
         logger_backend.info("[OK] Synchronization complete!")
         
-    except Error as e:
+    except pymysql.MySQLError as e:
         logger_backend.error(f"[ERROR] MySQL Error: {e}")
     except sqlite3.Error as e:
         logger_backend.error(f"[ERROR] SQLite Error: {e}")
@@ -214,7 +207,8 @@ def sync_mysql_to_sqlite():
 
     try:
         sqlite_cursor = sqlite_conn.cursor()
-        mysql_cursor = mysql_conn.cursor(dictionary=True)
+        # pymysql dictionary cursor
+        mysql_cursor = mysql_conn.cursor(pymysql.cursors.DictCursor)
         
         # 1. Pull Users
         logger_backend.debug("  Pulling users...")
@@ -295,7 +289,7 @@ def sync_mysql_to_sqlite():
         sqlite_conn.commit()
         logger_backend.info("[OK] Pull complete!")
         
-    except Error as e:
+    except pymysql.MySQLError as e:
         logger_backend.error(f"[ERROR] MySQL Error: {e}")
     except sqlite3.Error as e:
         logger_backend.error(f"[ERROR] SQLite Error: {e}")
