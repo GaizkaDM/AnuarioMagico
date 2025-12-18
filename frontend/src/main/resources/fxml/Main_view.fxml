@@ -61,6 +61,11 @@
                 <tooltip><Tooltip text="%main.tooltip.status"/></tooltip>
             </ComboBox>
 
+            <Label text="%main.patronus.label"/>
+            <TextField fx:id="txtPatronus" promptText="%main.patronus.prompt">
+                <tooltip><Tooltip text="%main.tooltip.patronus_search"/></tooltip>
+            </TextField>
+
             <HBox spacing="10" alignment="CENTER">
                 <Label text="%main.page.label"/>
                 <TextField fx:id="txtPaginaSidebar" promptText="#" prefWidth="60">
