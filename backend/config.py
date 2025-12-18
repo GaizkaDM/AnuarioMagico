@@ -7,8 +7,14 @@ Autores: Gaizka, Diego
 """
 import os
 
-# Directorio base del proyecto (un nivel arriba de config.py)
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Directorio base del proyecto (un nivel arriba de config.py) or executable dir
+import sys
+if getattr(sys, 'frozen', False):
+    # Si se ejecuta como EXE (PyInstaller), usar la carpeta del ejecutable
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # Si se ejecuta como script, usar estructura normal
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Archivo de base de datos SQLite (ruta absoluta)
 DB_PATH = os.path.join(BASE_DIR, 'data')

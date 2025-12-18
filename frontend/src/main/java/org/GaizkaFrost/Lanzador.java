@@ -51,9 +51,21 @@ public class Lanzador {
 
                 // Hook para cerrar el backend cuando se cierre Java
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    if (backendProcess != null) {
+                    if (backendProcess != null && backendProcess.isAlive()) {
                         System.out.println("Cerrando backend...");
-                        backendProcess.destroy();
+                        try {
+                            // Intentar matar el árbol de procesos en Windows (Backend + Subprocesos)
+                            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                                long pid = backendProcess.pid();
+                                System.out.println("Matando proceso backend PID: " + pid);
+                                Runtime.getRuntime().exec("taskkill /F /T /PID " + pid);
+                            }
+                            // Fallback estándar (kill -9 o SIGKILL)
+                            backendProcess.destroyForcibly();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            backendProcess.destroyForcibly();
+                        }
                     }
                 }));
 

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manual de Usuario - Anuario Hogwarts</title>
+    <style>
+        body {
+            font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+            background-color: #fffbf0;
+            /* Pergamino claro */
+            color: #3e2723;
+            /* Marrón oscuro */
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #d4af37;
+            /* Dorado */
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 10px;
+            font-family: "Cinzel", "Georgia", serif;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px #000000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ecc94b;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        li::before {
+            content: "⚡";
+            color: #d4af37;
+            display: inline-block;
+            width: 1.5em;
+            /* espacio entre el rayo y el texto */
+        }
+
+        strong {
+            color: #5a3e1b;
+        }
+
+        .tip {
+            background-color: #fefcbf;
+            border-left: 5px solid #d69e2e;
+            padding: 15px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Anuario de Hogwarts</h1>
+        <p style="text-align: center; font-size: 1.2em;">Tu guía definitiva para explorar el mundo mágico.</p>
+
+        <div class="section">
+            <h2><span class="icon">🏰</span>Introducción</h2>
+            <p>Bienvenido al <strong>Anuario de Hogwarts</strong>. Esta aplicación te permite explorar, gestionar y
+                descubrir información detallada sobre los personajes del universo de Harry Potter. Ya seas un estudiante
+                de primero o un Auror experimentado, esta herramienta es para ti.</p>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔍</span>Explorando Personajes</h2>
+            <p>La pantalla principal es tu ventana al mundo mágico. Aquí encontrarás:</p>
+            <ul>
+                <li><strong>Búsqueda:</strong> Usa la barra lateral izquierda para encontrar personajes por nombre o
+                    patronus.</li>
+                <li><strong>Filtros:</strong> Filtra por Casa (Gryffindor, Slytherin, etc.) o Estado (Vivo, Fallecido).
+                </li>
+                <li><strong>Favoritos:</strong> Marca la casilla "Solo Favoritos" para ver tus personajes preferidos.
+                </li>
+                <li><strong>Navegación:</strong> Usa los botones de "Anterior" y "Siguiente" o escribe el número de
+                    página para navegar rápidamente.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📖</span>Detalles del Personaje</h2>
+            <p>Haz clic en el botón <strong>"Ver Detalles"</strong> de cualquier tarjeta para ver la ficha completa del
+                personaje. En esta vista podrás:</p>
+            <ul>
+                <li>Ver una imagen en alta resolución.</li>
+                <li>Consultar datos biográficos como varita, patronus, pelaje, etc.</li>
+                <li>Exportar la ficha individual a PDF.</li>
+                <li>Si has iniciado sesión, podrás <strong>Editar</strong> o <strong>Eliminar</strong> el personaje.
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">☁️</span>Sincronización y Modo Offline</h2>
+            <p>La aplicación está diseñada para funcionar siempre, incluso sin internet:</p>
+            <ul>
+                <li><strong>Sincronización Automática:</strong> Al iniciar, la app intenta descargar los últimos datos
+                    de la base de datos central.</li>
+                <li><strong>Modo Offline:</strong> Si no hay conexión, trabajarás con la copia local de los datos.</li>
+                <li><strong>Botón Sincronizar:</strong> Usa este botón en la barra izquierda para forzar una
+                    actualización manual de datos e imágenes.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔐</span>Gestión de Usuarios</h2>
+            <p>Para añadir, editar o borrar personajes, necesitas iniciar sesión:</p>
+            <ul>
+                <li>Ve al menú <strong>Archivo > Iniciar Sesión</strong>.</li>
+                <li>Si no tienes cuenta, puedes registrarte (requiere una contraseña maestra proporcionada por el
+                    administrador).</li>
+                <li>Una vez dentro, aparecerá el botón "Añadir Personaje" en la barra lateral.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📄</span>Generación de Informes</h2>
+            <p>¿Necesitas un listado impreso?</p>
+            <ul>
+                <li>Usa el botón <strong>"Generar PDF"</strong> en la barra lateral para crear un listado de los
+                    personajes que estás viendo actualmente (según tus filtros).</li>
+                <li>También puedes generar un PDF individual desde la vista de detalle de cada personaje.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Consejo Mágico:</strong> Activa el "Modo Oscuro" en el menú Vista para una experiencia de lectura
+            más cómoda por la noche o para sentirte como en las mazmorras de Slytherin.
+        </div>
+    </div>
+
+</body>
+
+</html>

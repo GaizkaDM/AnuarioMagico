@@ -720,83 +720,28 @@ public class MainController implements Initializable {
         App.setWindowIcon(helpStage);
         helpStage.setTitle(App.getBundle().getString("help.title"));
 
-        VBox content = new VBox(20); // Más espacio entre secciones
-        content.setPadding(new javafx.geometry.Insets(25));
-        content.setStyle("-fx-background-color: #fafafa;");
+        javafx.scene.web.WebView webView = new javafx.scene.web.WebView();
+        javafx.scene.web.WebEngine webEngine = webView.getEngine();
 
-        // Título Principal
-        Label title = new Label(App.getBundle().getString("help.header"));
-        title.setStyle(
-                "-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #5a3e1b; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);");
-        title.setMaxWidth(Double.MAX_VALUE);
-        title.setAlignment(javafx.geometry.Pos.CENTER);
+        String lang = App.getLocale().getLanguage();
+        String manualFile = "manual_en.html";
+        if ("es".equalsIgnoreCase(lang)) {
+            manualFile = "manual_es.html";
+        }
 
-        // Intro
-        Label intro = new Label(App.getBundle().getString("help.intro"));
-        intro.setWrapText(true);
-        intro.setStyle("-fx-font-size: 15px; -fx-padding: 0 0 10 0;");
+        URL url = getClass().getResource("/docs/" + manualFile);
+        if (url != null) {
+            webEngine.load(url.toExternalForm());
+        } else {
+            webEngine.loadContent("<h1>Error</h1><p>Manual not found.</p>");
+        }
 
-        // Sección 1: La Pantalla Principal
-        Label sec1 = new Label(App.getBundle().getString("help.sec1.title"));
-        sec1.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text1 = new Label(App.getBundle().getString("help.sec1.text"));
-        text1.setWrapText(true);
-        text1.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        // Sección 2: Cómo Buscar
-        Label sec2 = new Label(App.getBundle().getString("help.sec2.title"));
-        sec2.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text2 = new Label(App.getBundle().getString("help.sec2.text"));
-        text2.setWrapText(true);
-        text2.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        // Sección 3: Ver Detalles y Fotos
-        Label sec3 = new Label(App.getBundle().getString("help.sec3.title"));
-        sec3.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text3 = new Label(App.getBundle().getString("help.sec3.text"));
-        text3.setWrapText(true);
-        text3.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        // Sección 4: Favoritos
-        Label sec4 = new Label(App.getBundle().getString("help.sec4.title"));
-        sec4.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text4 = new Label(App.getBundle().getString("help.sec4.text"));
-        text4.setWrapText(true);
-        text4.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        // Sección 5: Sincronización (La Nube)
-        Label sec5 = new Label(App.getBundle().getString("help.sec5.title"));
-        sec5.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text5 = new Label(App.getBundle().getString("help.sec5.text"));
-        text5.setWrapText(true);
-        text5.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        // Sección 6: Preguntas (FAQ)
-        Label sec6 = new Label(App.getBundle().getString("help.sec6.title"));
-        sec6.setStyle(
-                "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-border-color: transparent transparent #d4af37 transparent; -fx-border-width: 0 0 2 0;");
-        Label text6 = new Label(App.getBundle().getString("help.sec6.text"));
-        text6.setWrapText(true);
-        text6.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 0 10;");
-
-        content.getChildren().addAll(title, intro, sec1, text1, sec2, text2, sec3, text3, sec4, text4, sec5, text5,
-                sec6, text6);
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background: #fafafa; -fx-border-color: transparent;");
-
-        Scene scene = new Scene(scroll, 700, 800);
+        Scene scene = new Scene(webView, 950, 800);
         helpStage.setScene(scene);
 
         // Centrar en pantalla
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
-        helpStage.setX((screenBounds.getWidth() - 700) / 2);
+        helpStage.setX((screenBounds.getWidth() - 950) / 2);
         helpStage.setY((screenBounds.getHeight() - 800) / 2);
 
         // Evitar que sea más alta que la pantalla

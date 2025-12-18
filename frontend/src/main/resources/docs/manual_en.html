@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Manual - Hogwarts Yearbook</title>
+    <style>
+        body {
+            font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+            background-color: #fffbf0;
+            /* Light Parchment */
+            color: #3e2723;
+            /* Dark Brown */
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #d4af37;
+            /* Gold */
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 10px;
+            font-family: "Cinzel", "Georgia", serif;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px #000000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ecc94b;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        li::before {
+            content: "⚡";
+            color: #d4af37;
+            display: inline-block;
+            width: 1.5em;
+        }
+
+        strong {
+            color: #5a3e1b;
+        }
+
+        .tip {
+            background-color: #fefcbf;
+            border-left: 5px solid #d69e2e;
+            padding: 15px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Hogwarts Yearbook</h1>
+        <p style="text-align: center; font-size: 1.2em;">Your definitive guide to exploring the wizarding world.</p>
+
+        <div class="section">
+            <h2><span class="icon">🏰</span>Introduction</h2>
+            <p>Welcome to the <strong>Hogwarts Yearbook</strong>. This application allows you to explore, manage, and
+                discover detailed information about characters from the Harry Potter universe. Whether you are a
+                first-year student or a seasoned Auror, this tool is for you.</p>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔍</span>Exploring Characters</h2>
+            <p>The main screen is your window to the magical world. Here you will find:</p>
+            <ul>
+                <li><strong>Search:</strong> Use the left sidebar to find characters by name or Patronus.</li>
+                <li><strong>Filters:</strong> Filter by House (Gryffindor, Slytherin, etc.) or Status (Alive, Deceased).
+                </li>
+                <li><strong>Favorites:</strong> Check the "Favorites Only" box to see your preferred characters.</li>
+                <li><strong>Navigation:</strong> Use the "Previous" and "Next" buttons or type a page number to navigate
+                    quickly.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📖</span>Character Details</h2>
+            <p>Click the <strong>"View Details"</strong> button on any card to see the character's full profile. In this
+                view you can:</p>
+            <ul>
+                <li>View a high-resolution image.</li>
+                <li>Consult biographical data such as wand, patronus, hair color, etc.</li>
+                <li>Export the individual profile to PDF.</li>
+                <li>If you are logged in, you can <strong>Edit</strong> or <strong>Delete</strong> the character.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">☁️</span>Sync & Offline Mode</h2>
+            <p>The app is designed to work always, even without internet:</p>
+            <ul>
+                <li><strong>Auto Sync:</strong> Upon startup, the app attempts to download the latest data from the
+                    central database.</li>
+                <li><strong>Offline Mode:</strong> If there is no connection, you will work with the local copy of the
+                    data.</li>
+                <li><strong>Sync Button:</strong> Use this button in the left sidebar to force a manual update of data
+                    and images.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔐</span>User Management</h2>
+            <p>To add, edit, or delete characters, you need to log in:</p>
+            <ul>
+                <li>Go to the menu <strong>File > Login</strong>.</li>
+                <li>If you don't have an account, you can register (requires a master password provided by the
+                    administrator).</li>
+                <li>Once inside, the "Add Character" button will appear in the sidebar.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📄</span>Report Generation</h2>
+            <p>Need a printed list?</p>
+            <ul>
+                <li>Use the <strong>"Generate PDF"</strong> button in the sidebar to create a list of the characters you
+                    are currently viewing (based on your filters).</li>
+                <li>You can also generate an individual PDF from each character's detail view.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Magical Tip:</strong> Enable "Dark Mode" in the View menu for a more comfortable reading experience
+            at night or to feel like you're in the Slytherin dungeons.
+        </div>
+    </div>
+
+</body>
+
+</html>

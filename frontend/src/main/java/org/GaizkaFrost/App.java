@@ -55,6 +55,12 @@ public class App extends Application {
      * @param s El escenario (Stage) inicial.
      * @throws IOException Si falla la carga del archivo FXML.
      */
+    /**
+     * Punto de entrada principal para la aplicación JavaFX.
+     *
+     * @param s El escenario (Stage) inicial.
+     * @throws IOException Si falla la carga del archivo FXML.
+     */
     @Override
     public void start(Stage s) throws IOException {
         logger.info("Starting frontend application...");
@@ -62,22 +68,80 @@ public class App extends Application {
         stage = s;
 
         setWindowIcon(stage);
+        stage.setTitle("Anuario Hogwarts");
 
+        // Mostrar portada (Splash Screen) antes de la app principal
+        showSplashScreen();
+    }
+
+    private void showSplashScreen() {
+        try {
+            URL imageUrl = App.class.getResource("/images/portada.png");
+            if (imageUrl == null) {
+                showMainView();
+                return;
+            }
+
+            javafx.scene.image.ImageView splashImage = new javafx.scene.image.ImageView(imageUrl.toExternalForm());
+            splashImage.setPreserveRatio(true);
+            splashImage.setFitHeight(600);
+
+            // Usar un StackPane negro de fondo
+            javafx.scene.layout.StackPane splashRoot = new javafx.scene.layout.StackPane(splashImage);
+            splashRoot.setStyle("-fx-background-color: #000000;");
+
+            Scene splashScene = new Scene(splashRoot, 1000, 700);
+            stage.setScene(splashScene);
+            stage.show();
+
+            // Transición de 2 segundos
+            javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
+                    javafx.util.Duration.seconds(2));
+            delay.setOnFinished(event -> {
+                try {
+                    showMainView();
+                } catch (IOException e) {
+                    logger.error("Error transitioning to main view", e);
+                }
+            });
+            delay.play();
+
+        } catch (Exception e) {
+            logger.error("Splash screen error", e);
+            try {
+                showMainView();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+    }
+
+    private void showMainView() throws IOException {
         Parent root = loadFXML("Main_view");
         scene = new Scene(root);
 
         // CSS global una sola vez
-        scene.getStylesheets().add(
-                App.class.getResource("/styles/estilos.css").toExternalForm());
+        URL cssUrl = App.class.getResource("/styles/estilos.css");
+        if (cssUrl != null) {
+            scene.getStylesheets().add(cssUrl.toExternalForm());
+        }
 
-        stage.setTitle("Anuario Hogwarts");
         stage.setScene(scene);
+
+        // Establecer tamaños mínimos para evitar rotura de layout
+        stage.setMinWidth(850);
+        stage.setMinHeight(700);
+
         stage.setMaximized(true);
-        stage.show();
+        if (!stage.isShowing()) {
+            stage.show();
+        }
     }
 
     /**
      * Establece el icono de la aplicación en el escenario proporcionado.
+     * Carga múltiples resoluciones para asegurar que se vea bien en todas partes
+     * (barra de tareas, ventana, etc).
      * 
      * @param stage El escenario al que aplicar el icono.
      */
@@ -85,8 +149,15 @@ public class App extends Application {
         try {
             URL iconUrl = App.class.getResource("/images/anuario_magico.png");
             if (iconUrl != null) {
+                String url = iconUrl.toExternalForm();
                 stage.getIcons().clear();
-                stage.getIcons().add(new javafx.scene.image.Image(iconUrl.toExternalForm()));
+                stage.getIcons().addAll(
+                        new javafx.scene.image.Image(url, 16, 16, true, true),
+                        new javafx.scene.image.Image(url, 32, 32, true, true),
+                        new javafx.scene.image.Image(url, 48, 48, true, true),
+                        new javafx.scene.image.Image(url, 64, 64, true, true),
+                        new javafx.scene.image.Image(url, 128, 128, true, true),
+                        new javafx.scene.image.Image(url, 256, 256, true, true));
             } else {
                 logger.warn("Application icon not found at /images/anuario_magico.png");
             }
@@ -220,6 +291,17 @@ public class App extends Application {
         Parent root = fxmlLoader.load();
         applyTheme(root, fxml);
         return root;
+    }
+
+    /**
+     * Se llama cuando la aplicación se detiene.
+     * Forzamos la salida del sistema para asegurar que el Lanzador mate el backend.
+     */
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.out.println("Applicación FX detenida. Forzando salida del sistema...");
+        System.exit(0);
     }
 
     /**

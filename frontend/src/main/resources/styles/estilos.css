@@ -155,7 +155,8 @@
 
 /* Botón Limpiar y Generar PDF */
 #btnLimpiar,
-#btnGenerarPDF {
+#btnGenerarPDF,
+#btnSync {
     -fx-background-color: #ffffff;
     -fx-text-fill: #b38600;
     /* Dark Yellow text */

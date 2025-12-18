@@ -111,6 +111,69 @@ def create_mysql_tables(cursor):
     """)
     logger_backend.info("[OK] MySQL tables checked/created.")
 
+def create_sqlite_tables(cursor):
+    """
+    Crea las tablas necesarias en SQLite si no existen.
+    Evita error 'no such table' si la inicialización de SQLAlchemy falló o no se ejecutó.
+    
+    Args:
+        cursor: Cursor de la conexión SQLite.
+    """
+    try:
+        # Tabla de Personajes
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS characters (
+            id VARCHAR(255) PRIMARY KEY,
+            name VARCHAR(255),
+            house VARCHAR(255),
+            image TEXT,
+            died VARCHAR(255),
+            born VARCHAR(255),
+            patronus VARCHAR(255),
+            gender VARCHAR(50),
+            species VARCHAR(100),
+            blood_status VARCHAR(100),
+            role TEXT,
+            wiki TEXT,
+            slug VARCHAR(255),
+            image_blob BLOB,
+            alias_names TEXT,
+            animagus TEXT,
+            boggart TEXT,
+            eye_color VARCHAR(100),
+            family_member TEXT,
+            hair_color VARCHAR(100),
+            height VARCHAR(50),
+            jobs TEXT,
+            nationality VARCHAR(100),
+            romances TEXT,
+            skin_color VARCHAR(100),
+            titles TEXT,
+            wand TEXT,
+            weight VARCHAR(50)
+        )
+        """)
+        
+        # Tabla de Favoritos
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS favorites (
+            character_id VARCHAR(255) PRIMARY KEY,
+            is_favorite BOOLEAN DEFAULT 0
+        )
+        """)
+        
+        # Tabla de Usuarios
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username VARCHAR(255) PRIMARY KEY,
+            password_hash VARCHAR(255),
+            created_at TEXT
+        )
+        """)
+        logger_backend.debug("[OK] SQLite tables checked/created.")
+    except Exception as e:
+        logger_backend.error(f"Error creating SQLite tables: {e}")
+
 def sync_sqlite_to_mysql():
     """
     Función principal de sincronización.
@@ -193,7 +256,7 @@ def sync_sqlite_to_mysql():
 
 def sync_mysql_to_sqlite():
     """
-    Descarga cambios de MySQL y actualiza la base de datos local SQLite (Pull).
+    descarga cambios de MySQL y actualiza la base de datos local SQLite (Pull).
     Estrategia 'Smart Merge': Actualiza lo local con lo remoto.
     """
     logger_backend.info("Starting sync: MySQL -> SQLite (Pull)...")
@@ -207,6 +270,9 @@ def sync_mysql_to_sqlite():
 
     try:
         sqlite_cursor = sqlite_conn.cursor()
+        # Ensure tables exist locally before pulling
+        create_sqlite_tables(sqlite_cursor)
+
         # pymysql dictionary cursor
         mysql_cursor = mysql_conn.cursor(pymysql.cursors.DictCursor)
         
