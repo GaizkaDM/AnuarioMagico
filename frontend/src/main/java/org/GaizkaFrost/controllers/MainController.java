@@ -596,7 +596,7 @@ public class MainController implements Initializable {
             return;
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Edit_view.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Edit_view.fxml"), App.getBundle());
             Parent root = loader.load();
 
             EditController controller = loader.getController();

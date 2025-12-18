@@ -47,8 +47,20 @@ def add_character():
              
         # Generar UUID si no existe
         if 'id' not in data:
-            import uuid
-            data['id'] = str(uuid.uuid4())
+            import re
+            from backend.models.Character import Character
+            name = data.get('name', 'character')
+            base_slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+            if not base_slug: base_slug = "character"
+            
+            new_id = base_slug
+            counter = 1
+            while Character.query.get(new_id):
+                new_id = f"{base_slug}{counter}"
+                counter += 1
+            data['id'] = new_id
+            if 'slug' not in data or not data['slug']:
+                data['slug'] = new_id
         
         success = service.añadir_personaje(data)
         

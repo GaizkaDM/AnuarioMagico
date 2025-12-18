@@ -319,7 +319,8 @@ public class DetailController {
 
         // OPEN EDIT FORM
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/Edit_view.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/Edit_view.fxml"),
+                    App.getBundle());
             javafx.scene.Parent root = loader.load();
 
             EditController controller = loader.getController();

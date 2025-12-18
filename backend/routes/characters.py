@@ -12,9 +12,31 @@ from backend.logging_config import logger_backend
 characters_bp = Blueprint('characters', __name__)
 personaje_service = PersonajeService(DB_FILE)
 
-def generate_id(slug):
-    if slug: return slug
-    return hashlib.md5(str(slug).encode()).hexdigest()[:16]
+import re
+
+def slugify(text):
+    if not text:
+        return "character"
+    # Convert to lowercase and replace non-alphanumeric with hyphens
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9]+', '-', text)
+    text = text.strip('-')
+    return text if text else "character"
+
+def generate_id(name, slug=None):
+    """Generates a unique ID (slug) by checking the database and appending suffixes if needed."""
+    # Use slug as base if provided (API cases), otherwise slugify the name (User cases)
+    base_slug = slug if slug else slugify(name)
+    
+    candidate = base_slug
+    counter = 1
+    
+    # Check for existence using SQLAlchemy model
+    while Character.query.get(candidate):
+        candidate = f"{base_slug}{counter}"
+        counter += 1
+        
+    return candidate
 
 @characters_bp.route('/characters', methods=['GET'])
 def get_characters():
@@ -92,7 +114,7 @@ def get_characters():
             if any(k.lower() in name.lower() for k in exclude_keywords): continue
             
             slug = attr.get('slug', '')
-            char_id = generate_id(slug)
+            char_id = generate_id(name, slug)
             
             char_obj = {
                 'id': char_id, 'name': name, 'house': attr.get('house') or '', 'image': img,
@@ -151,13 +173,16 @@ def add_character():
         data = request.get_json()
         if not data: return jsonify({"error": "No data"}), 400
         
-        # Generate ID if missing
+        # Generate UNIQUE ID if missing
         if 'id' not in data:
-            data['id'] = generate_id(data.get('slug') or data.get('name'))
+            data['id'] = generate_id(data.get('name', 'character'), data.get('slug'))
+            # Ensure slug matches the final ID if it was missing or generated
+            if 'slug' not in data or not data['slug']:
+                data['slug'] = data['id']
             
         success = personaje_service.añadir_personaje(data)
         if success:
-            return jsonify({"success": True, "id": data['id']})
+            return jsonify({"success": True, "id": data['id']}), 201
         return jsonify({"error": "Failed to add"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
