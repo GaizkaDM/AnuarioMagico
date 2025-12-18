@@ -17,14 +17,23 @@ if not os.path.exists(DB_PATH):
 
 DB_FILE = os.path.join(DB_PATH, 'anuario.db')
 
-# Configuración de base de datos MySQL
-MYSQL_CONFIG = {
-    'host': '127.0.0.1',
-    'port': 3309,
-    'database': 'hogwarts',
-    'user': 'appuser',
-    'password': 'appPass123'
-}
+# Configuración de base de datos
+from dotenv import load_dotenv
+load_dotenv()  # Cargar variables del .env
+
+DB_TYPE = os.getenv('DB_TYPE', 'sqlite') # Por defecto sqlite si no dice nada
+
+if DB_TYPE == 'mysql':
+    MYSQL_CONFIG = {
+        'host': os.getenv('DB_HOST', '127.0.0.1'),
+        'port': int(os.getenv('DB_PORT', 3306)),
+        'database': os.getenv('DB_NAME', 'hogwarts'),
+        'user': os.getenv('DB_USER', 'root'),
+        'password': os.getenv('DB_PASSWORD', '')
+    }
+else:
+    # Configuración por defecto (SQLite) si DB_TYPE no es 'mysql'
+    MYSQL_CONFIG = None # Indicador para app.py de usar SQLite
 
 # Configuración de Autenticación
 MASTER_PASSWORD = "HogwartsMaster"
