@@ -14,6 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.control.Tooltip;
 
 import java.io.IOException;
 import java.net.URL;
@@ -528,6 +529,13 @@ public class MainController implements Initializable {
         Button btnDetalles = new Button(App.getBundle().getString("card.button.details"));
         btnDetalles.getStyleClass().add("card-button");
         btnDetalles.setOnAction(e -> abrirDetalles(p));
+
+        // Tooltips
+        String cardTooltipText = MessageFormat.format(App.getBundle().getString("card.tooltip.info"), p.getNombre());
+        Tooltip.install(tarjeta, new Tooltip(cardTooltipText));
+
+        String btnTooltipText = MessageFormat.format(App.getBundle().getString("card.tooltip.details"), p.getNombre());
+        btnDetalles.setTooltip(new Tooltip(btnTooltipText));
 
         // Espaciador para empujar el botón al fondo
         javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
