@@ -628,15 +628,15 @@ public class MainController implements Initializable {
         lblNombre.getStyleClass().add("card-title");
 
         Label lblCasa = new Label(
-                App.getBundle().getString("detail.house") + " " + (p.getCasa() == null ? "-" : p.getCasa()));
+                App.getBundle().getString("detail.house") + " " + formatField(p.getCasa()));
         lblCasa.getStyleClass().add("card-meta");
 
         Label lblEstado = new Label(
-                App.getBundle().getString("edit.label.status") + " " + (p.getEstado() == null ? "-" : p.getEstado()));
+                App.getBundle().getString("edit.label.status") + " " + formatField(p.getEstado()));
         lblEstado.getStyleClass().add("card-meta");
 
         Label lblPatronus = new Label(
-                App.getBundle().getString("detail.patronus") + " " + (p.getPatronus() == null ? "-" : p.getPatronus()));
+                App.getBundle().getString("detail.patronus") + " " + formatField(p.getPatronus()));
         lblPatronus.getStyleClass().add("card-meta");
 
         Button btnDetalles = new Button(App.getBundle().getString("card.button.details"));
@@ -656,6 +656,10 @@ public class MainController implements Initializable {
 
         tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, spacer, btnDetalles);
         return tarjeta;
+    }
+
+    private String formatField(String value) {
+        return (value == null || value.trim().isEmpty()) ? "-" : value;
     }
 
     /**
