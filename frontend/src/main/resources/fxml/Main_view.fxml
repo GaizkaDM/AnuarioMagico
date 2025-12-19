@@ -28,6 +28,17 @@
                                     <MenuItem fx:id="menuLangEs" text="Español"/>
                                 </items>
                             </Menu>
+                            <Menu text="%main.menu.fontSize">
+                                <items>
+                                    <RadioMenuItem fx:id="menuFontSmall" text="%main.font.small">
+                                        <toggleGroup>
+                                            <ToggleGroup fx:id="fontGroup"/>
+                                        </toggleGroup>
+                                    </RadioMenuItem>
+                                    <RadioMenuItem fx:id="menuFontMedium" text="%main.font.medium" selected="true" toggleGroup="$fontGroup"/>
+                                    <RadioMenuItem fx:id="menuFontLarge" text="%main.font.large" toggleGroup="$fontGroup"/>
+                                </items>
+                            </Menu>
                         </items>
                     </Menu>
                     <Menu text="%main.menu.help">

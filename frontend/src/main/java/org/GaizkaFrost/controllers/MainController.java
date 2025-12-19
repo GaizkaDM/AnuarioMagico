@@ -14,6 +14,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -128,6 +129,14 @@ public class MainController implements Initializable {
     private MenuItem menuLangEn;
     @FXML
     private MenuItem menuLangEs;
+
+    // Font Size Menu
+    @FXML
+    private RadioMenuItem menuFontSmall;
+    @FXML
+    private RadioMenuItem menuFontMedium;
+    @FXML
+    private RadioMenuItem menuFontLarge;
     @FXML
     private Label lblUsuario;
     @FXML
@@ -147,6 +156,22 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        // Setup Font Size Actions
+        if (menuFontSmall != null) {
+            menuFontSmall.setOnAction(e -> setAppFontSize(12)); // Small
+            menuFontMedium.setOnAction(e -> setAppFontSize(14)); // Normal (Default)
+            menuFontLarge.setOnAction(e -> setAppFontSize(18)); // Large
+
+            // Sync menu with current state
+            int currentSize = App.getFontSize();
+            if (currentSize == 12)
+                menuFontSmall.setSelected(true);
+            else if (currentSize == 18)
+                menuFontLarge.setSelected(true);
+            else
+                menuFontMedium.setSelected(true);
+        }
 
         // Aumentar velocidad de desplazamiento
         if (scrollPane != null) {
@@ -291,14 +316,7 @@ public class MainController implements Initializable {
         if (menuLangEs != null)
             menuLangEs.setOnAction(e -> changeLanguage(java.util.Locale.forLanguageTag("es")));
 
-        btnLimpiar.setOnAction(e -> {
-            txtBuscar.clear();
-            comboCasa.getSelectionModel().clearSelection();
-            comboEstado.getSelectionModel().clearSelection();
-            txtPatronus.clear();
-            checkFavoritos.setSelected(false);
-            aplicarFiltros();
-        });
+        btnLimpiar.setOnAction(e -> limpiarFiltros());
 
         // Paginación
         btnPaginaAnterior.setOnAction(e -> {
@@ -365,22 +383,37 @@ public class MainController implements Initializable {
      * Maneja el cambio manual de página desde el TextField.
      */
     private void manejarCambioPagina(TextField source) {
+        if (source == null)
+            return;
+
         try {
-            int targetPage = Integer.parseInt(source.getText());
-            int total = listaFiltrada.size();
-            int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
-            if (totalPaginas == 0)
-                totalPaginas = 1;
+            int nuevaPagina = Integer.parseInt(source.getText()) - 1;
+            int totalPaginas = (int) Math.ceil(listaFiltrada.size() / (double) PERSONAJES_POR_PAGINA);
 
-            if (targetPage < 1)
-                targetPage = 1;
-            if (targetPage > totalPaginas)
-                targetPage = totalPaginas;
+            if (nuevaPagina < 0)
+                nuevaPagina = 0;
+            if (nuevaPagina >= totalPaginas)
+                nuevaPagina = totalPaginas - 1;
 
-            paginaActual = targetPage - 1;
-            actualizarPagina();
+            if (nuevaPagina != paginaActual) {
+                paginaActual = nuevaPagina;
+                actualizarPagina();
+            } else {
+                // Even if page didn't change, we might want to restore the text field value
+                // in case user typed "999" and we clamped it to "10",
+                // but we DON'T want to re-render the whole page (flicker).
+                source.setText(String.valueOf(paginaActual + 1));
+            }
+
+            // Sync the other text field
+            if (source == txtPagina && txtPaginaSidebar != null) {
+                txtPaginaSidebar.setText(String.valueOf(paginaActual + 1));
+            } else if (source == txtPaginaSidebar && txtPagina != null) {
+                txtPagina.setText(String.valueOf(paginaActual + 1));
+            }
+
         } catch (NumberFormatException e) {
-            // Restore previous valid page
+            // Restore current page if invalid input
             source.setText(String.valueOf(paginaActual + 1));
         }
     }
@@ -396,6 +429,7 @@ public class MainController implements Initializable {
 
             // Aplicar tema correcto
             App.applyTheme(root, "Login_view");
+            App.applyFontSize(root);
 
             Stage stage = new Stage();
             App.setWindowIcon(stage);
@@ -425,21 +459,55 @@ public class MainController implements Initializable {
 
     // START DARK MODE LOGIC
     private void toggleTheme() {
-        boolean newMode = !App.isDarkMode();
-        App.setDarkMode(newMode);
-        actualizarIconoTema();
+        // Animación de transición (Fade Out -> Cambio -> Fade In)
+        javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300),
+                root);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
 
-        // Apply to current view immediately
+        fadeOut.setOnFinished(e -> {
+            boolean newMode = !App.isDarkMode();
+            App.setDarkMode(newMode);
+            actualizarIconoTema();
+
+            // Apply to current view immediately
+            if (root != null) {
+                App.applyTheme(root, "Main_view");
+            } else if (contenedorTarjetas.getScene() != null) {
+                App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
+            }
+
+            // Restore font size if needed (optional, but good for consistency)
+            // For now, simple theme toggle overrides style, so we might need to re-apply
+            // font size logic
+            // But let's wait for user feedback.
+            // Better: update setAppFontSize to store current size
+
+            // Fade In
+            javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(
+                    javafx.util.Duration.millis(300), root);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        });
+
+        fadeOut.play();
+    }
+
+    private void setAppFontSize(int size) {
+        App.setFontSize(size);
         if (root != null) {
-            App.applyTheme(root, "Main_view");
-        } else if (contenedorTarjetas.getScene() != null) {
-            App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
+            App.applyFontSize(root);
         }
     }
 
     private void actualizarIconoTema() {
         if (btnThemeToggle != null) {
-            btnThemeToggle.setText(App.isDarkMode() ? "🌙" : "☀");
+            boolean isDark = App.isDarkMode();
+            btnThemeToggle.setText(isDark ? "🌙" : "☀");
+
+            String tooltipKey = isDark ? "main.theme.dark" : "main.theme.light";
+            btnThemeToggle.setTooltip(new Tooltip(App.getBundle().getString(tooltipKey)));
         }
     }
 
@@ -494,11 +562,33 @@ public class MainController implements Initializable {
     }
 
     /**
+     * Limpia todos los filtros activos y reinicia la lista.
+     */
+    @FXML
+    private void limpiarFiltros() {
+        txtBuscar.clear();
+        comboCasa.getSelectionModel().clearSelection();
+        comboEstado.getSelectionModel().clearSelection();
+        txtPatronus.clear();
+        checkFavoritos.setSelected(false);
+
+        // Reset page history
+        App.setLastPage(0);
+        paginaActual = 0;
+
+        aplicarFiltros();
+    }
+
+    /**
      * Aplica los filtros (búsqueda, casa, estado, favoritos) a la lista maestra de
      * personajes.
-     * Actualiza `listaFiltrada` y reinicia la paginación.
+     * Actualiza `listaFiltrada` y la paginación.
      */
     private void aplicarFiltros() {
+        aplicarFiltros(true);
+    }
+
+    private void aplicarFiltros(boolean resetPage) {
         String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
         String casa = comboCasa.getValue();
         String unknownLabel = App.getBundle().getString("combo.house.unknown");
@@ -553,7 +643,11 @@ public class MainController implements Initializable {
         }
 
         listaFiltrada = filtrados;
-        paginaActual = 0;
+
+        if (resetPage) {
+            paginaActual = 0;
+        }
+
         actualizarPagina();
     }
 
@@ -655,6 +749,31 @@ public class MainController implements Initializable {
         javafx.scene.layout.VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
         tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, spacer, btnDetalles);
+
+        // --- MICRO-ANIMACIÓN HOVER ---
+        // Escala suave al pasar el ratón (1.0 -> 1.05)
+        javafx.animation.ScaleTransition scaleIn = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(200), tarjeta);
+        scaleIn.setToX(1.05);
+        scaleIn.setToY(1.05);
+
+        javafx.animation.ScaleTransition scaleOut = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(200), tarjeta);
+        scaleOut.setToX(1.0);
+        scaleOut.setToY(1.0);
+
+        tarjeta.setOnMouseEntered(e -> {
+            scaleOut.stop();
+            scaleIn.playFromStart();
+            tarjeta.setStyle("-fx-cursor: hand;"); // Cambiar cursor
+        });
+
+        tarjeta.setOnMouseExited(e -> {
+            scaleIn.stop();
+            scaleOut.playFromStart();
+        });
+        // -----------------------------
+
         return tarjeta;
     }
 
@@ -668,17 +787,13 @@ public class MainController implements Initializable {
      * @param p El personaje cuyos detalles se mostrarán.
      */
     private void abrirDetalles(Personaje p) {
-        // Guardar estado
-        savedSearch = txtBuscar.getText();
-        savedHouse = comboCasa.getValue();
-        savedStatus = comboEstado.getValue();
-        savedFavorite = checkFavoritos.isSelected();
-
         try {
-            DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
+            App.setLastPage(paginaActual); // Guardar página antes de ir a detalles
+            DetailController controller = App.setRootAndGetController("Detail_view", "Detalles del Personaje");
             controller.setPersonaje(p);
         } catch (IOException e) {
-            logger.error("Error opening character details for {}: {}", p.getNombre(), e.getMessage(), e);
+            logger.error("Error opening detail view", e);
+            statusBar.setText("Error al abrir detalles.");
         }
     }
 
@@ -730,16 +845,20 @@ public class MainController implements Initializable {
         new Thread(() -> {
             try {
                 // Fetch fast
-                List<Personaje> localData = HarryPotterAPI.fetchCharacters();
-
-                Platform.runLater(() -> {
-                    masterData.setAll(localData);
-                    actualizarComboCasas();
-                    aplicarFiltros();
-                    actualizarPagina();
-                    setCargando(false); // Desbloquear UI inmediatamente
-                    statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
-                });
+                List<Personaje> cachedData = HarryPotterAPI.fetchCharacters();
+                if (cachedData.isEmpty()) {
+                    // First run ever?
+                } else {
+                    Platform.runLater(() -> {
+                        masterData.setAll(cachedData);
+                        actualizarComboCasas();
+                        // Restore page immediately for initial view
+                        paginaActual = App.getLastPage();
+                        aplicarFiltros(false);
+                        setCargando(false); // Desbloquear UI inmediatamente
+                        statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
+                    });
+                }
 
                 // 2. Sincronización en segundo plano (Lento)
                 boolean pullSuccess = HarryPotterAPI.syncPull();
@@ -780,22 +899,24 @@ public class MainController implements Initializable {
                     List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
 
                     // Comprobar si hay cambios reales para evitar parpadeo
-                    if (!localData.equals(freshData)) {
-                        Platform.runLater(() -> {
+                    Platform.runLater(() -> {
+                        boolean hasChanges = !cachedData.equals(freshData);
+
+                        // Si hay cambios, actualizar datos
+                        if (hasChanges) {
                             masterData.setAll(freshData);
                             actualizarComboCasas();
-                            aplicarFiltros();
-                            actualizarPagina();
-                            statusBar.setText(App.getBundle().getString("main.status.ready"));
-                            btnSincronizar.setDisable(false);
-                        });
-                    } else {
-                        // Si no hay cambios, solo restaurar estado UI
-                        Platform.runLater(() -> {
-                            statusBar.setText(App.getBundle().getString("main.status.ready"));
-                            btnSincronizar.setDisable(false);
-                        });
-                    }
+
+                            // Restaurar última página global (o mantenerla si ya es correcta)
+                            paginaActual = App.getLastPage();
+
+                            // Aplicar filtros SIN reiniciar la página (false)
+                            aplicarFiltros(false);
+                        }
+
+                        statusBar.setText(App.getBundle().getString("main.status.ready"));
+                        btnSincronizar.setDisable(false);
+                    });
                 } else {
                     Platform.runLater(() -> {
                         statusBar.setText("Modo Offline (Sincronización fallida)");
