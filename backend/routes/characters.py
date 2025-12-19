@@ -160,8 +160,39 @@ def get_characters():
         # Trigger exports
         personaje_service.export_service.exportar_todo()
         
-        # Recursively call to get formatted list
-        return get_characters()
+        # Recursively call to get formatted list -> CAUTION: This creates a new request context/session potentially.
+        # Better to return the list we just processed, but formatted correctly.
+        # Re-querying the DB is safer to ensure correct format.
+        local_characters = personaje_service.dao.obtener_todos_personajes()
+        
+        # Manually enrich (Copy-paste logic from above to avoid recursion, or refactor into helper)
+        # Using a helper would be cleaner, but for minimal diff, let's re-query using the main logic flow?
+        # Recursion here is risky if the transaction wasn't committed fully or connection pool is tight.
+        # But db.session.commit() was called.
+        
+        # Let's return the recently saved list directly formatted.
+        results = db.session.query(Character, Favorite.is_favorite).\
+                outerjoin(Favorite, Character.id == Favorite.character_id).all()
+            
+        characters = []
+        for char, is_fav in results:
+            char_dict = {c.name: getattr(char, c.name) for c in char.__table__.columns}
+            if 'image_blob' in char_dict: del char_dict['image_blob']
+            char_dict['image'] = f"http://localhost:8000/characters/{char.id}/image"
+            
+            import json
+            json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
+            for field in json_fields:
+                val = char_dict.get(field)
+                try:
+                    char_dict[field] = json.loads(val) if val else []
+                except:
+                    char_dict[field] = []
+            
+            char_dict['is_favorite'] = bool(is_fav)
+            characters.append(char_dict)
+            
+        return jsonify(characters)
         
     except Exception as e:
         logger_backend.error(f"Error in get_characters: {str(e)}", exc_info=True)

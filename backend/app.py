@@ -82,13 +82,20 @@ def create_app():
             "cached_characters": count
         })
         
-    # Init DB
-    with app.app_context():
-        db.create_all()
-        
     return app
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(port=8000, debug=True)
+    # Asegurar que el directorio de datos existe
+    if not os.path.exists(os.path.dirname(DB_FILE)):
+        os.makedirs(os.path.dirname(DB_FILE))
+        
+    with app.app_context():
+        # Crear tablas SQLite si no existen (Fresh Install)
+        db.create_all()
+        logger_backend.info(f"✓ Local database checked at: {DB_FILE}")
+        
+    logger_backend.info("🚀 Starting Flask Backend...")
+    # debug=False para producción/exe
+    app.run(host='0.0.0.0', port=8000, debug=False)

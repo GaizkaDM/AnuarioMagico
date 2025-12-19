@@ -28,6 +28,15 @@ public class Lanzador {
 
     private static void startBackend() {
         try {
+            // LIMPIEZA PREVIA: Matar cualquier instancia huérfana anterior
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                try {
+                    new ProcessBuilder("taskkill", "/F", "/IM", "backend_server.exe").start().waitFor();
+                    System.out.println("Limpieza: Procesos antiguos cerrados.");
+                } catch (Exception ignored) {
+                }
+            }
+
             String[] possiblePaths = {
                     "backend_server.exe",
                     "dist/backend_server.exe",

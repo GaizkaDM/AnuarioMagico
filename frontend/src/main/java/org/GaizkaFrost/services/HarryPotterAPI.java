@@ -334,8 +334,9 @@ public class HarryPotterAPI {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
-        conn.setConnectTimeout(10000); // Default 10s
-        conn.setReadTimeout(10000); // Default 10s
+        // Aumentar timeouts por defecto para evitar problemas en cargas iniciales lentas (EXE)
+        conn.setConnectTimeout(60000); // 60s
+        conn.setReadTimeout(60000);    // 60s
 
         // Incluir token de autenticación si existe
         if (currentToken != null && !currentToken.isEmpty()) {
