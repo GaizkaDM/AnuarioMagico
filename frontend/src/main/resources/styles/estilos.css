@@ -18,9 +18,14 @@
 }
 
 /* Menu */
-.menu-bar {
+.top-bar {
     -fx-background-color: rgba(255, 255, 255, 0.3);
-    /* Soft background for better hit detection */
+    -fx-border-color: rgba(236, 185, 57, 0.4);
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu-bar {
+    -fx-background-color: transparent;
     -fx-padding: 2 10;
 }
 
@@ -29,6 +34,27 @@
     -fx-font-family: "Georgia", serif;
     -fx-padding: 5 10;
     /* Increase interaction area */
+}
+
+.theme-toggle-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-background-radius: 50%;
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-width: 34px;
+    -fx-max-height: 34px;
+    -fx-text-fill: #5c4033;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-border-color: #ecb939;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 50%;
+    -fx-alignment: center;
+}
+
+.theme-toggle-btn:hover {
+    -fx-background-color: #fff8e1;
+    -fx-effect: dropshadow(gaussian, rgba(236, 185, 57, 0.4), 10, 0, 0, 0);
 }
 
 .menu-item .label {

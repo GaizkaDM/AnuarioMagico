@@ -92,6 +92,8 @@ public class MainController implements Initializable {
     private Label statusBar;
     @FXML
     private VBox loadingBox;
+    @FXML
+    private Button btnThemeToggle;
 
     private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
     private List<Personaje> listaFiltrada = new ArrayList<>();
@@ -242,9 +244,9 @@ public class MainController implements Initializable {
             comboEstado.setValue(savedStatus);
         checkFavoritos.setSelected(savedFavorite);
 
-        // Listener para el menú de tema
-        menuTemaOscuro.setSelected(App.isDarkMode());
-        menuTemaOscuro.setOnAction(e -> toggleTheme());
+        // Listener para el botón de tema
+        actualizarIconoTema();
+        btnThemeToggle.setOnAction(e -> toggleTheme());
 
         // Listener para el menú de idioma
         if (menuLangEn != null)
@@ -385,19 +387,22 @@ public class MainController implements Initializable {
     private javafx.scene.layout.BorderPane root; // Injected root
 
     // START DARK MODE LOGIC
-    @FXML
-    private javafx.scene.control.CheckMenuItem menuTemaOscuro;
-
     private void toggleTheme() {
-        boolean newMode = menuTemaOscuro.isSelected();
+        boolean newMode = !App.isDarkMode();
         App.setDarkMode(newMode);
+        actualizarIconoTema();
 
         // Apply to current view immediately
         if (root != null) {
             App.applyTheme(root, "Main_view");
         } else if (contenedorTarjetas.getScene() != null) {
-            // Fallback if root not injected for some reason
             App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
+        }
+    }
+
+    private void actualizarIconoTema() {
+        if (btnThemeToggle != null) {
+            btnThemeToggle.setText(App.isDarkMode() ? "🌙" : "☀");
         }
     }
     // END DARK MODE LOGIC

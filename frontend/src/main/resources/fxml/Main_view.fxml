@@ -11,33 +11,44 @@
             stylesheets="@../styles/estilos.css">
 
     <top>
-        <MenuBar>
-            <menus>
-                <Menu text="%main.menu.file">
-                    <items>
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
+            <MenuBar HBox.hgrow="NEVER">
+                <menus>
+                    <Menu text="%main.menu.file">
+                        <items>
                             <MenuItem fx:id="menuLogin" text="%main.menu.login"/>
-                        <MenuItem fx:id="menuExit" text="%main.menu.exit"/>
-                    </items>
-                </Menu>
-                <Menu text="%main.menu.view">
-                    <items>
-                        <CheckMenuItem fx:id="menuTemaOscuro" text="%main.menu.dark_mode"/>
-                        <Menu text="Language / Idioma">
-                            <items>
-                                <MenuItem fx:id="menuLangEn" text="English"/>
-                                <MenuItem fx:id="menuLangEs" text="Español"/>
-                            </items>
-                        </Menu>
-                    </items>
-                </Menu>
-                <Menu text="%main.menu.help">
-                    <items>
-                        <MenuItem fx:id="menuManual" text="%main.menu.manual"/>
-                        <MenuItem fx:id="menuAbout" text="%main.menu.about"/>
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
+                            <MenuItem fx:id="menuExit" text="%main.menu.exit"/>
+                        </items>
+                    </Menu>
+                    <Menu text="%main.menu.view">
+                        <items>
+                            <Menu text="Language / Idioma">
+                                <items>
+                                    <MenuItem fx:id="menuLangEn" text="English"/>
+                                    <MenuItem fx:id="menuLangEs" text="Español"/>
+                                </items>
+                            </Menu>
+                        </items>
+                    </Menu>
+                    <Menu text="%main.menu.help">
+                        <items>
+                            <MenuItem fx:id="menuManual" text="%main.menu.manual"/>
+                            <MenuItem fx:id="menuAbout" text="%main.menu.about"/>
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnThemeToggle" styleClass="theme-toggle-btn">
+                <padding>
+                    <Insets top="0" right="0" bottom="0" left="0"/>
+                </padding>
+                <tooltip><Tooltip text="%main.menu.dark_mode"/></tooltip>
+            </Button>
+            <padding>
+                <Insets right="10" />
+            </padding>
+        </HBox>
     </top>
 
     <left>
