@@ -597,6 +597,14 @@ public class MainController implements Initializable {
         String patronusBusqueda = txtPatronus.getText() != null ? txtPatronus.getText().toLowerCase().trim() : "";
         boolean soloFavoritos = checkFavoritos.isSelected();
 
+        // 1. Guardar estado para persistencia entre vistas
+        savedSearch = texto;
+        savedHouse = casa;
+        savedStatus = estado;
+        savedFavorite = soloFavoritos;
+        // savedPatronus se podría añadir si se crea la variable estática, por ahora
+        // persistimos lo básico
+
         List<Personaje> filtrados = new ArrayList<>();
 
         for (Personaje p : masterData) {
@@ -621,9 +629,9 @@ public class MainController implements Initializable {
             String estadoFiltro = null;
             if (estado != null) {
                 if (estado.equals(App.getBundle().getString("combo.status.alive"))) {
-                    estadoFiltro = "Vivo";
+                    estadoFiltro = "Alive";
                 } else if (estado.equals(App.getBundle().getString("combo.status.deceased"))) {
-                    estadoFiltro = "Fallecido";
+                    estadoFiltro = "Deceased";
                 } else {
                     estadoFiltro = estado;
                 }
@@ -646,6 +654,8 @@ public class MainController implements Initializable {
 
         if (resetPage) {
             paginaActual = 0;
+            // Resetear también la página global de App para no confundir
+            App.setLastPage(0);
         }
 
         actualizarPagina();
