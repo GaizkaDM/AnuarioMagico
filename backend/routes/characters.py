@@ -24,21 +24,21 @@ import re
 def slugify(text):
     if not text:
         return "character"
-    # Convertir a minúsculas y reemplazar no alfanuméricos con guiones
+    # Convert to lowercase and replace non-alphanumeric with hyphens
     text = text.lower()
     text = re.sub(r'[^a-z0-9]+', '-', text)
     text = text.strip('-')
     return text if text else "character"
 
 def generate_id(name, slug=None):
-    """Genera un ID único (slug) verificando la base de datos y añadiendo sufijos si es necesario."""
-    # Usar slug como base si se proporciona (casos API), de lo contrario slugify el nombre (casos usuario)
+    """Generates a unique ID (slug) by checking the database and appending suffixes if needed."""
+    # Use slug as base if provided (API cases), otherwise slugify the name (User cases)
     base_slug = slug if slug else slugify(name)
     
     candidate = base_slug
     counter = 1
     
-    # Comprobar existencia usando el modelo SQLAlchemy
+    # Check for existence using SQLAlchemy model
     while Character.query.get(candidate):
         candidate = f"{base_slug}{counter}"
         counter += 1
@@ -51,21 +51,21 @@ def get_characters():
         local_characters = personaje_service.dao.obtener_todos_personajes()
         
         if local_characters:
-            logger_backend.info(f"✓ Devolviendo {len(local_characters)} personajes de la BD local SQLite")
+            logger_backend.info(f"✓ Returning {len(local_characters)} characters from local SQLite DB")
             if request.args.get('filter') == 'favorites':
-                # Obtener IDs de favoritos
+                # Fetch favorites ids
                 favs = Favorite.query.filter_by(is_favorite=True).all()
                 fav_ids = {f.character_id for f in favs}
                 local_characters = [c for c in local_characters if c['id'] in fav_ids]
                 
-            # Añadir flag is_favorite (DaoSQLite devuelve dicts, necesitamos enriquecer)
-            # Esto es un poco ineficiente, pero mantiene la lógica. Sería mejor un JOIN en DAO.
-            # En refactorización, ¿usamos modelo SQLAlchemy para consultas más simples?
-            # Manteniendo coherencia con la lógica original que usaba DAO personalizado + carga manual.
+            # Add is_favorite flag (DaoSQLite returns dicts, need to enrich)
+            # This is a bit inefficient, but maintains logic. Better would be join in DAO.
+            # In refactoring, we use SQLAlchemy model for simpler querying?
+            # Keeping consistent with original logic which used custom DAO + manual loading.
             # Actually, app.py had `load_characters_from_db` using SQLAlchemy query with join.
             # Let's reproduce THAT logic here using SQLAlchemy for better consistency with Models.
             
-            # REEMPLAZANDO LLAMADA DAO CON LÓGICA JOIN DE SQLALCHEMY DESDE APP.PY
+            # REPLACING DAO CALL WITH SQLALCHEMY JOIN LOGIC FROM APP.PY
             results = db.session.query(Character, Favorite.is_favorite).\
                 outerjoin(Favorite, Character.id == Favorite.character_id).all()
             
@@ -75,7 +75,7 @@ def get_characters():
                 if 'image_blob' in char_dict: del char_dict['image_blob']
                 char_dict['image'] = f"http://localhost:8000/characters/{char.id}/image"
                 
-                # Parsear campos JSON
+                # Parse JSON fields
                 import json
                 json_fields = ['alias_names', 'family_member', 'jobs', 'romances', 'titles', 'wand']
                 for field in json_fields:
@@ -93,14 +93,14 @@ def get_characters():
                 
             return jsonify(characters)
         
-        # Si está vacío, obtener de la API (Lógica copiada de app.py)
-        logger_backend.info("⟳ BD Local vacía. Obteniendo datos frescos de la API PotterDB...")
+        # If empty, fetch from API (Logic copied from app.py)
+        logger_backend.info("⟳ Local DB empty. Fetching fresh data from PotterDB API...")
         all_characters = []
         page = 1
         while True:
-            logger_backend.debug(f"  Obteniendo página {page}...")
+            logger_backend.debug(f"  Fetching page {page}...")
             response = requests.get(f"{POTTERDB_API}?page[number]={page}")
-            if response.status_code != 200: return jsonify({"error": "Fallo al obtener"}), 500
+            if response.status_code != 200: return jsonify({"error": "Failed to fetch"}), 500
             data = response.json()
             chars = data.get('data', [])
             if not chars: break
@@ -109,7 +109,7 @@ def get_characters():
             if page >= meta.get('pagination', {}).get('last', 1): break
             page += 1
             
-        # Filtrar y guardar
+        # Filter and save
         exclude_keywords = ['unidentified', 'unknown', 'student', 'girl', 'boy', 'man', 'woman', 'baby', 'child', 'spectator', 'team', 'gang', 'group', 'troll', 'portrait', 'house-elf', 'ghost', 'ghosts', 'champion', 'mentor', 'creature', 'abraxan', 'actor', 'announcer', 'cat', 'killer', 'enemy', 'antipodean', 'shopkeeper', 'ashwinder', 'reserve', 'augurey', 'aunt', 'mascot', 'grandmother', 'beggar', 'bespectacled', 'corridor', 'boa constrictor', 'ministry', 'hagrid\'s', 'enthusiast', 'fiancee', 'fianceé', 'friends', 'chief', 'victim', 'guard', 'guards', 'witch', 'wizard', 'waiter', 'deer', 'cousin', 'cousins', 'sister', 'sisters', 'brother', 'brothers', 'father', 'grandfather', 'parents', 'great-grandmother']
         filtered_characters = []
         
@@ -139,12 +139,12 @@ def get_characters():
             }
             filtered_characters.append(char_obj)
             
-        # Guardar vía Servicio (Usa DAO) -> En realidad app.py usaba `save_characters_to_db` (SQLAlchemy).
-        # ¿Deberíamos usar `personaje_service.add_character`? No, eso hace insert único + exportación.
-        # Necesitamos insert masivo. app.py tenía `save_characters_to_db`.
-        # Para refactorización, debería reimplementar `save_characters_to_db` en algún lugar.
-        # Idealmente en PersonajeService o utilidades genéricas, pero PersonajeService parece atado al DAO antiguo.
-        # Incluiré lógica de guardado SQLAlchemy simplificada aquí por ahora para evitar roturas.
+        # Save via Service (Uses DAO) -> Actually app.py used `save_characters_to_db` (SQLAlchemy).
+        # We should use `personaje_service.add_character` ? No, that does single insert + exports.
+        # We need bulk insert. app.py had `save_characters_to_db`.
+        # For Refactoring, I should reimplement `save_characters_to_db` somewhere.
+        # Ideally in PersonajeService or a generic utils, but PersonajeService seems tied to legacy DAO.
+        # I will inline simplified SQLAlchemy save logic here for now to avoid breaking.
         
         import json
         for c in filtered_characters:
@@ -156,28 +156,28 @@ def get_characters():
             for k, v in c.items():
                 if k == 'id': continue
                 if isinstance(v, (dict, list)):
-                    setattr(existing, k if k != 'family_member' else 'family_member', json.dumps(v)) # Corrección de mapeo (clave en dict es family_member, modelo es family_member)
-                elif k == 'wand': # Verificación de mapeo de clave
+                    setattr(existing, k if k != 'family_member' else 'family_member', json.dumps(v)) # Mapping fix (key in dict is family_member, model is family_member)
+                elif k == 'wand': # Key mapping check
                      setattr(existing, 'wand', json.dumps(v))
                 else:
                     if hasattr(existing, k):
                         setattr(existing, k, v)
         db.session.commit()
         
-        # Disparar exportaciones
+        # Trigger exports
         personaje_service.export_service.exportar_todo()
         
-        # Llamada recursiva para obtener lista formateada -> PRECAUCIÓN: Esto crea un nuevo contexto de petición/sesión potencialmente.
-        # Mejor devolver la lista que acabamos de procesar, pero formateada correctamente.
-        # Re-consultar la BD es más seguro para asegurar el formato correcto.
+        # Recursively call to get formatted list -> CAUTION: This creates a new request context/session potentially.
+        # Better to return the list we just processed, but formatted correctly.
+        # Re-querying the DB is safer to ensure correct format.
         local_characters = personaje_service.dao.obtener_todos_personajes()
         
-        # Enriquecer manualmente (Copiar-pegar lógica de arriba para evitar recursión, o refactorizar en helper)
-        # Usar un helper sería más limpio, pero para diff mínimo, ¿re-consultamos usando el flujo lógico principal?
-        # La recursión aquí es arriesgada si la transacción no se cometió totalmente o el pool de conexiones está justo.
-        # Pero db.session.commit() fue llamado.
+        # Manually enrich (Copy-paste logic from above to avoid recursion, or refactor into helper)
+        # Using a helper would be cleaner, but for minimal diff, let's re-query using the main logic flow?
+        # Recursion here is risky if the transaction wasn't committed fully or connection pool is tight.
+        # But db.session.commit() was called.
         
-        # Devolvemos la lista guardada recientemente formateada directamente.
+        # Let's return the recently saved list directly formatted.
         results = db.session.query(Character, Favorite.is_favorite).\
                 outerjoin(Favorite, Character.id == Favorite.character_id).all()
             
@@ -209,12 +209,12 @@ def get_characters():
 def add_character():
     try:
         data = request.get_json()
-        if not data: return jsonify({"error": "Sin datos"}), 400
+        if not data: return jsonify({"error": "No data"}), 400
         
-        # Generar ID ÚNICO si falta
+        # Generate UNIQUE ID if missing
         if 'id' not in data:
             data['id'] = generate_id(data.get('name', 'character'), data.get('slug'))
-            # Asegurar que slug coincide con el ID final si faltaba o fue generado
+            # Ensure slug matches the final ID if it was missing or generated
             if 'slug' not in data or not data['slug']:
                 data['slug'] = data['id']
             
