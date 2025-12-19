@@ -14,6 +14,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -128,6 +129,14 @@ public class MainController implements Initializable {
     private MenuItem menuLangEn;
     @FXML
     private MenuItem menuLangEs;
+
+    // Font Size Menu
+    @FXML
+    private RadioMenuItem menuFontSmall;
+    @FXML
+    private RadioMenuItem menuFontMedium;
+    @FXML
+    private RadioMenuItem menuFontLarge;
     @FXML
     private Label lblUsuario;
     @FXML
@@ -147,6 +156,22 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        // Setup Font Size Actions
+        if (menuFontSmall != null) {
+            menuFontSmall.setOnAction(e -> setAppFontSize(12)); // Small
+            menuFontMedium.setOnAction(e -> setAppFontSize(14)); // Normal (Default)
+            menuFontLarge.setOnAction(e -> setAppFontSize(18)); // Large
+
+            // Sync menu with current state
+            int currentSize = App.getFontSize();
+            if (currentSize == 12)
+                menuFontSmall.setSelected(true);
+            else if (currentSize == 18)
+                menuFontLarge.setSelected(true);
+            else
+                menuFontMedium.setSelected(true);
+        }
 
         // Aumentar velocidad de desplazamiento
         if (scrollPane != null) {
@@ -396,6 +421,7 @@ public class MainController implements Initializable {
 
             // Aplicar tema correcto
             App.applyTheme(root, "Login_view");
+            App.applyFontSize(root);
 
             Stage stage = new Stage();
             App.setWindowIcon(stage);
@@ -443,6 +469,12 @@ public class MainController implements Initializable {
                 App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
             }
 
+            // Restore font size if needed (optional, but good for consistency)
+            // For now, simple theme toggle overrides style, so we might need to re-apply
+            // font size logic
+            // But let's wait for user feedback.
+            // Better: update setAppFontSize to store current size
+
             // Fade In
             javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(
                     javafx.util.Duration.millis(300), root);
@@ -452,6 +484,13 @@ public class MainController implements Initializable {
         });
 
         fadeOut.play();
+    }
+
+    private void setAppFontSize(int size) {
+        App.setFontSize(size);
+        if (root != null) {
+            App.applyFontSize(root);
+        }
     }
 
     private void actualizarIconoTema() {

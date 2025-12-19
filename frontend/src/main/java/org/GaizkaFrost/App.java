@@ -49,6 +49,22 @@ public class App extends Application {
         isDarkMode = mode;
     }
 
+    private static int fontSize = 14;
+
+    public static int getFontSize() {
+        return fontSize;
+    }
+
+    public static void setFontSize(int size) {
+        fontSize = size;
+    }
+
+    public static void applyFontSize(Parent root) {
+        if (root != null) {
+            root.setStyle("-fx-font-size: " + fontSize + "px;");
+        }
+    }
+
     /**
      * Punto de entrada principal para la aplicación JavaFX.
      *
@@ -227,6 +243,7 @@ public class App extends Application {
         loader.setResources(getBundle());
         Parent root = loader.load();
         applyTheme(root, fxml);
+        applyFontSize(root);
 
         scene.setRoot(root);
         stage.setTitle(title);
@@ -303,6 +320,7 @@ public class App extends Application {
         fxmlLoader.setResources(getBundle());
         Parent root = fxmlLoader.load();
         applyTheme(root, fxml);
+        applyFontSize(root);
         return root;
     }
 
