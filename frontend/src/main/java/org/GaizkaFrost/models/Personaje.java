@@ -8,9 +8,8 @@ import java.util.List;
 
 /**
  * Modelo de datos que representa un personaje de Harry Potter.
- * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la
- * interfaz.
- *
+ * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la interfaz.
+ * 
  * @author Xiker
  * @author Gaizka
  * @author Diego
@@ -413,5 +412,25 @@ public class Personaje {
             }
         }
         return "";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Personaje p = (Personaje) o;
+        return favorite == p.favorite &&
+                java.util.Objects.equals(apiId, p.apiId) &&
+                java.util.Objects.equals(nombre, p.nombre) &&
+                java.util.Objects.equals(casa, p.casa) &&
+                java.util.Objects.equals(estado, p.estado) &&
+                java.util.Objects.equals(imagenUrl, p.imagenUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(apiId, nombre, casa, estado, imagenUrl, favorite);
     }
 }

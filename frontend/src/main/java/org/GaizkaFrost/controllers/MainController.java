@@ -8,18 +8,34 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Tooltip;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Locale;
 import java.text.MessageFormat;
+
+import com.google.gson.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +78,8 @@ public class MainController implements Initializable {
     private Button btnAnadir;
 
     @FXML
+    private VBox filtersBar;
+    @FXML
     private FlowPane contenedorTarjetas;
 
     @FXML
@@ -78,8 +96,15 @@ public class MainController implements Initializable {
     private Label statusBar;
     @FXML
     private VBox loadingBox;
+    @FXML
+    private Button btnThemeToggle;
+    @FXML
+    private HBox sidebarContainer;
 
     private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
+    @FXML
+    private Button btnSidebarToggle;
+
     private List<Personaje> listaFiltrada = new ArrayList<>();
 
     private int paginaActual = 0;
@@ -251,9 +276,14 @@ public class MainController implements Initializable {
             comboEstado.setValue(savedStatus);
         checkFavoritos.setSelected(savedFavorite);
 
-        // Listener para el menú de tema
-        menuTemaOscuro.setSelected(App.isDarkMode());
-        menuTemaOscuro.setOnAction(e -> toggleTheme());
+        // Listener para el botón de tema
+        actualizarIconoTema();
+        btnThemeToggle.setOnAction(e -> toggleTheme());
+
+        // Sidebar Toggle
+        btnSidebarToggle.setOnAction(e -> toggleSidebar());
+        // Asegurar que el VBox se oculte y no ocupe espacio
+        filtersBar.managedProperty().bind(filtersBar.visibleProperty());
 
         // Listener para el menú de idioma
         if (menuLangEn != null)
@@ -394,20 +424,32 @@ public class MainController implements Initializable {
     private javafx.scene.layout.BorderPane root; // Injected root
 
     // START DARK MODE LOGIC
-    @FXML
-    private javafx.scene.control.CheckMenuItem menuTemaOscuro;
-
     private void toggleTheme() {
-        boolean newMode = menuTemaOscuro.isSelected();
+        boolean newMode = !App.isDarkMode();
         App.setDarkMode(newMode);
+        actualizarIconoTema();
 
         // Apply to current view immediately
         if (root != null) {
             App.applyTheme(root, "Main_view");
         } else if (contenedorTarjetas.getScene() != null) {
-            // Fallback if root not injected for some reason
             App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
         }
+    }
+
+    private void actualizarIconoTema() {
+        if (btnThemeToggle != null) {
+            btnThemeToggle.setText(App.isDarkMode() ? "🌙" : "☀");
+        }
+    }
+
+    private void toggleSidebar() {
+        boolean isVisible = filtersBar.isVisible();
+        filtersBar.setVisible(!isVisible);
+        btnSidebarToggle.setText(isVisible ? "▶" : "◀");
+
+        // Ajustar el margen del botón cuando está oculto para que sea visible
+        StackPane.setMargin(btnSidebarToggle, new javafx.geometry.Insets(10, isVisible ? -25 : -12, 0, 0));
     }
     // END DARK MODE LOGIC
 
@@ -704,7 +746,7 @@ public class MainController implements Initializable {
 
                     while (downloading) {
                         try {
-                            com.google.gson.JsonObject status = HarryPotterAPI.getImageSyncStatus();
+                            JsonObject status = HarryPotterAPI.getImageSyncStatus();
 
                             if (status != null) {
                                 boolean running = status.get("running").getAsBoolean();
@@ -732,14 +774,24 @@ public class MainController implements Initializable {
 
                     // 3. Recarga final tras sincronización
                     List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
-                    Platform.runLater(() -> {
-                        masterData.setAll(freshData);
-                        actualizarComboCasas();
-                        aplicarFiltros();
-                        actualizarPagina();
-                        statusBar.setText(App.getBundle().getString("main.status.ready"));
-                        btnSincronizar.setDisable(false);
-                    });
+
+                    // Comprobar si hay cambios reales para evitar parpadeo
+                    if (!localData.equals(freshData)) {
+                        Platform.runLater(() -> {
+                            masterData.setAll(freshData);
+                            actualizarComboCasas();
+                            aplicarFiltros();
+                            actualizarPagina();
+                            statusBar.setText(App.getBundle().getString("main.status.ready"));
+                            btnSincronizar.setDisable(false);
+                        });
+                    } else {
+                        // Si no hay cambios, solo restaurar estado UI
+                        Platform.runLater(() -> {
+                            statusBar.setText(App.getBundle().getString("main.status.ready"));
+                            btnSincronizar.setDisable(false);
+                        });
+                    }
                 } else {
                     Platform.runLater(() -> {
                         statusBar.setText("Modo Offline (Sincronización fallida)");

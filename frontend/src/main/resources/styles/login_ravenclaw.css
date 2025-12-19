@@ -1,132 +1,70 @@
-/* login_ravenclaw.css - Consistent Dark Ravenclaw Edition */
+/* login_ravenclaw.css - Premium Dark Ravenclaw Glass Login Upgrade */
 
-/* Root Background - Matches estilos_ravenclaw.css */
 .root-pane {
-    -fx-background-color: linear-gradient(to bottom, #0e1a40, #050a1a);
-    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 80%, #0e1a40, #0a122e, #050a1a);
+    -fx-font-family: "Georgia", serif;
 }
 
-/* Background Layer */
 .background-layer {
     -fx-opacity: 0.0;
 }
 
-/* Login Card */
+/* Dark Glass Login Card */
 .login-card {
-    -fx-background-color: rgba(14, 26, 64, 0.95);
-    /* Deep Blue Glass */
-    -fx-background-radius: 8;
-    -fx-border-color: #5d4037;
-    /* Dark Bronze/Brown */
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 0, 4);
-    -fx-padding: 40;
+    -fx-background-color: rgba(14, 26, 64, 0.65);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(192, 160, 96, 0.4);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 40, 0, 0, 20);
+    -fx-padding: 50;
 }
 
-/* Titles */
 .app-title {
     -fx-text-fill: #946b2d;
-    /* Bronze */
     -fx-font-family: "Georgia", serif;
-    -fx-font-size: 28px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 2, 0, 0, 1);
-    -fx-alignment: center;
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 0, 1, 0, 1);
 }
 
 .subtitle-label {
-    -fx-text-fill: #c0c0c0;
-    /* Silver */
-    -fx-font-family: "Georgia", serif;
-    -fx-font-size: 14px;
-    -fx-padding: 0 0 10 0;
-    -fx-alignment: center;
+    -fx-text-fill: #b8c0d0;
+    -fx-font-size: 15px;
 }
 
-/* Labels */
 .input-label {
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: #b8c0d0;
     -fx-font-weight: bold;
-    -fx-font-size: 12px;
-    -fx-padding: 0 0 2 0;
 }
 
-/* Inputs */
 .input-field {
-    -fx-background-color: #0a122e;
-    /* Very Dark Blue */
-    -fx-background-radius: 4;
+    -fx-background-color: rgba(10, 18, 46, 0.8);
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
     -fx-border-color: #5d4037;
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
+    -fx-padding: 10;
     -fx-text-fill: #e0e0e0;
-    -fx-prompt-text-fill: rgba(224, 224, 224, 0.4);
-    -fx-font-size: 14px;
-    -fx-padding: 5 7;
 }
 
 .input-field:focused {
     -fx-border-color: #946b2d;
-    /* Bronze focus */
     -fx-background-color: #0e1a40;
+    -fx-effect: dropshadow(three-pass-box, rgba(148, 107, 45, 0.3), 8, 0, 0, 0);
 }
 
-/* Checkbox */
-.custom-checkbox {
-    -fx-text-fill: #946b2d;
-    /* Bronze */
-    -fx-font-size: 13px;
-    -fx-cursor: hand;
-}
-
-.custom-checkbox .box {
-    -fx-background-color: #0a122e;
-    -fx-border-color: #5d4037;
-    -fx-background-radius: 3;
-}
-
-.custom-checkbox:selected .mark {
-    -fx-background-color: #946b2d;
-}
-
-/* Primary Button */
 .primary-button {
     -fx-background-color: #946b2d;
-    /* Bronze */
     -fx-text-fill: #0e1a40;
-    /* Dark Blue */
-    -fx-font-family: "Georgia", serif;
     -fx-font-weight: bold;
-    -fx-font-size: 15px;
-    -fx-background-radius: 4;
-    -fx-border-radius: 4;
-    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-padding: 12 30;
     -fx-cursor: hand;
-    -fx-border-color: #0e1a40;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 4, 0, 0, 1);
 }
 
 .primary-button:hover {
-    -fx-background-color: #c0a060;
-    /* Lighter Bronze */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 6, 0, 0, 2);
-}
-
-.primary-button:pressed {
-    -fx-background-color: #7a5825;
-    /* Darker Bronze */
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
-}
-
-/* Status Label */
-.status-label {
-    -fx-text-fill: #ff6b6b;
-    /* Light Red for visibility */
-    -fx-font-family: "Georgia", serif;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 5 0 0 0;
+    -fx-background-color: #b8863b;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(148, 107, 45, 0.4), 12, 0, 0, 0);
 }
