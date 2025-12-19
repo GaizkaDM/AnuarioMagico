@@ -38,8 +38,8 @@ graph TD
     end
     
     subgraph "Nube / Red (Opcional)"
-        EXE <-->|3. Sync (Si hay .env)| MySQL[(Servidor MySQL)]
-        EXE <-->|4. Fallback (Si vacío)| API[PotterDB API Pública]
+        EXE <-->|3. Sync si existe .env| MySQL[(Servidor MySQL)]
+        EXE <-->|4. Fallback si DB vacia| API[PotterDB API Pública]
     end
     
     Client -->|Genera| PDF[Informes PDF]
