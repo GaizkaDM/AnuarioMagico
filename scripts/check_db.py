@@ -1,3 +1,10 @@
+"""
+Script de Verificación de Base de Datos Local.
+Comprueba la existencia del archivo de base de datos SQLite 'anuario.db'
+y lista las tablas que contiene para verificar su integridad.
+
+Autores: Gaizka, Xiker, Diego
+"""
 import sqlite3
 import os
 

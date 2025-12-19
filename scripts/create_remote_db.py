@@ -1,3 +1,10 @@
+"""
+Script de Creación de Base de Datos Remota.
+Intenta conectar al servidor MySQL especificado en el archivo .env y crear
+la base de datos (schema) vacía si aún no existe.
+
+Autores: Gaizka, Xiker, Diego
+"""
 import os
 import pymysql
 from dotenv import load_dotenv

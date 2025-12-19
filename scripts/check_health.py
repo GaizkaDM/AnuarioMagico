@@ -1,3 +1,10 @@
+"""
+Script de Verificación de Salud del Backend.
+Realiza peticiones repetidas al endpoint /health del backend local (port 8000)
+para asegurar que el servicio está levantado y respondiendo correctamente.
+
+Autores: Gaizka, Xiker, Diego
+"""
 import requests
 import time
 import sys
