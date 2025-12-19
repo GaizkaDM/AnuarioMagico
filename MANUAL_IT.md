@@ -47,15 +47,20 @@ Requisitos: Python 3.10+, `pip`, `virtualenv`.
     ```powershell
     python -m venv .venv
     ```
-2.  Activar entorno virtual:
+2. Habilitar scripts en powershell(si no lo tienes ya):
+    ```powershell
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+    ```
+
+3.  Activar entorno virtual:
     ```powershell
     .venv\Scripts\activate
     ```
-3.  Instalar dependencias:
+4.  Instalar dependencias:
     ```powershell
     pip install -r backend/requirements.txt
     ```
-4.  Generar ejecutable (usando `.spec`):
+5.  Generar ejecutable (usando `.spec`):
     ```powershell
     pyinstaller --clean --noconfirm backend_server.spec
     ```
