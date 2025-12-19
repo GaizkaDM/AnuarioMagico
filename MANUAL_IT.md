@@ -43,15 +43,19 @@ Si necesitas regenerar los ejecutables desde el código fuente.
 ### 3.1. Compilar Backend (Python)
 Requisitos: Python 3.10+, `pip`, `virtualenv`.
 
-1.  Activar entorno virtual:
+1.  Crear entorno virtual:
+    ```powershell
+    python -m venv .venv
+    ```
+2.  Activar entorno virtual:
     ```powershell
     .venv\Scripts\activate
     ```
-2.  Instalar dependencias:
+3.  Instalar dependencias:
     ```powershell
     pip install -r backend/requirements.txt
     ```
-3.  Generar ejecutable (usando `.spec`):
+4.  Generar ejecutable (usando `.spec`):
     ```powershell
     pyinstaller --clean --noconfirm backend_server.spec
     ```
