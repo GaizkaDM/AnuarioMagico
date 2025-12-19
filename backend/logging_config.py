@@ -27,7 +27,7 @@ def setup_backend_logging():
 
     # Max size and backup count
     max_bytes = 5 * 1024 * 1024  # 5 MB
-    backup_count = 5
+    backup_count = 1
 
     # 1. backend-all.log (INFO and above)
     all_log_path = os.path.join(log_dir, 'backend-all.log')
