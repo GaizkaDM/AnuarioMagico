@@ -130,6 +130,26 @@ MASTER_PASSWORD=HogwartsMaster
 *   Si la base de datos MySQL remota no tiene los BLOBs sincronizados, al hacer "Pull" pueden faltar imágenes.
 *   Asegurar hacer "Push" desde una máquina con las imágenes completas primero.
 
+### E. La sincronización solo descarga datos, no sube cambios
+*   **Problema**: Al pulsar "Sincronizar", los datos locales se actualizan con los del servidor, pero los cambios hechos en local no aparecen en MySQL.
+*   **Causa**: La aplicación estaba configurada en modo "Solo Lectura" (Pull Only) para evitar conflictos accidentales.
+*   **Solución**: Se ha actualizado el controlador principal (`MainController.java`) para usar `fullSync()` en lugar de `syncPull()`. Esto activa el modo bidireccional (Push & Pull). Asegúrese de tener la última versión del JAR.
+
+### F. Error de conexión con MySQL (Timeout)
+*   **Síntoma**: La aplicación tarda mucho en iniciar y el log muestra `TimeoutError` o `Can't connect to MySQL server`.
+*   **Causa**:
+    1.  La IP del servidor (`DB_HOST` en `.env`) es incorrecta o inaccesible desde la red actual (ej: estar fuera de la VPN).
+    2.  El servidor MySQL está apagado o bloqueando conexiones externas.
+*   **Diagnóstico**:
+    *   Ejecutar el script de diagnóstico: `python scripts/check_mysql_conn.py`.
+    *   Verificar ping a la IP del servidor.
+*   **Solución Temporal**: Renombrar el archivo `.env` para desactivar MySQL y trabajar en modo Local (SQLite) hasta restablecer la conexión.
+
+### G. Logs para Diagnóstico
+*   Si la aplicación falla silenciosamente, consultar los logs detallados en:
+    *   `logs/backend/backend-all.log`: Traza completa de operaciones del servidor Python.
+    *   `logs/backend/backend-error.log`: Solo errores críticos.
+
 ---
 
 ## 7. Scripts de Base de Datos
