@@ -238,22 +238,22 @@ def sync_sqlite_to_mysql():
             
         logger_backend.info(f"  [OK] Synced {count} characters to MySQL.")
         
-        # 3. Sincronizar Favoritos
-        logger_backend.debug("  Syncing favorites...")
-        sqlite_cursor.execute("SELECT * FROM favorites")
-        favorites = sqlite_cursor.fetchall()
+        # 3. Sincronizar Favoritos (DESACTIVADO: Local Only)
+        # logger_backend.debug("  Syncing favorites...")
+        # sqlite_cursor.execute("SELECT * FROM favorites")
+        # favorites = sqlite_cursor.fetchall()
         
-        fav_count = 0
-        for fav in favorites:
-            c_id, is_fav = fav
-            mysql_cursor.execute("""
-                INSERT INTO favorites (character_id, is_favorite) 
-                VALUES (%s, %s) AS new
-                ON DUPLICATE KEY UPDATE is_favorite=new.is_favorite
-            """, (c_id, is_fav))
-            fav_count += 1
+        # fav_count = 0
+        # for fav in favorites:
+        #     c_id, is_fav = fav
+        #     mysql_cursor.execute("""
+        #         INSERT INTO favorites (character_id, is_favorite) 
+        #         VALUES (%s, %s) AS new
+        #         ON DUPLICATE KEY UPDATE is_favorite=new.is_favorite
+        #     """, (c_id, is_fav))
+        #     fav_count += 1
             
-        logger_backend.info(f"  [OK] Synced {fav_count} favorites to MySQL.")
+        # logger_backend.info(f"  [OK] Synced {fav_count} favorites to MySQL.")
         
         mysql_conn.commit()
         logger_backend.info("[OK] Synchronization complete!")
@@ -300,25 +300,25 @@ def sync_mysql_to_sqlite():
             
         logger_backend.info(f"  [OK] Pulled {len(users)} users.")
 
-        # 2. Pull Favorites
-        logger_backend.debug("  Pulling favorites...")
-        mysql_cursor.execute("SELECT * FROM favorites")
-        favorites = mysql_cursor.fetchall()
+        # 2. Pull Favorites (DESACTIVADO: Local Only)
+        # logger_backend.debug("  Pulling favorites...")
+        # mysql_cursor.execute("SELECT * FROM favorites")
+        # favorites = mysql_cursor.fetchall()
         
-        for fav in favorites:
-            char_id = fav['character_id']
-            is_fav = fav['is_favorite'] # 1 or 0
+        # for fav in favorites:
+        #     char_id = fav['character_id']
+        #     is_fav = fav['is_favorite'] # 1 or 0
             
-            if is_fav:
-                sqlite_cursor.execute("""
-                    INSERT OR REPLACE INTO favorites (character_id, is_favorite)
-                    VALUES (?, 1)
-                """, (char_id,))
-            else:
-                # Si en MySQL dice que no es favorito, lo quitamos de local
-                sqlite_cursor.execute("DELETE FROM favorites WHERE character_id = ?", (char_id,))
+        #     if is_fav:
+        #         sqlite_cursor.execute("""
+        #             INSERT OR REPLACE INTO favorites (character_id, is_favorite)
+        #             VALUES (?, 1)
+        #         """, (char_id,))
+        #     else:
+        #         # Si en MySQL dice que no es favorito, lo quitamos de local
+        #         sqlite_cursor.execute("DELETE FROM favorites WHERE character_id = ?", (char_id,))
                 
-        logger_backend.info(f"  [OK] Pulled {len(favorites)} favorites.")
+        # logger_backend.info(f"  [OK] Pulled {len(favorites)} favorites.")
 
         # 3. Pull Characters
         # Solo actualizamos metadatos para no machacar BLOBs locales si en la nube están vacíos
