@@ -17,6 +17,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import DB_FILE
 
+import concurrent.futures
+import time
+
 class ImageService:
     # Store sync status in memory
     sync_status = {
@@ -111,7 +114,7 @@ class ImageService:
 
     @staticmethod
     def cache_all_images_background():
-        print("⚡ Starting background image sync...")
+        print("⚡ Starting background image sync (Parallel)...")
         ImageService.sync_status["running"] = True
         ImageService.sync_status["current"] = 0
         ImageService.sync_status["errors"] = 0
@@ -126,37 +129,57 @@ class ImageService:
         ImageService.sync_status["total"] = total
         print(f"⚡ Found {total} images to cache.")
         
+        # Close main connection to avoid locking if we use other connections
+        conn.close()
+
         count = 0
         errors = 0
         
-        for row in rows:
-            # Update status
-            ImageService.sync_status["current"] = count
-            ImageService.sync_status["errors"] = errors
-            
-            char_id, original_url = row
-            if not original_url: continue
-                
+        # Helper function for parallel execution
+        def download_task(row_data):
+            c_id, url = row_data
+            if not url: return None
             try:
-                processed_data = ImageService.download_and_process_image(original_url)
-                if processed_data:
-                    t_conn = sqlite3.connect(DB_FILE)
-                    t_cur = t_conn.cursor()
-                    t_cur.execute("UPDATE characters SET image_blob = ? WHERE id = ?", (processed_data, char_id))
-                    t_conn.commit()
-                    t_conn.close()
-                    count += 1
-                    if count % 10 == 0:
-                        print(f"  ⚡ Cached {count}/{total} images...")
+                processed = ImageService.download_and_process_image(url)
+                return (c_id, processed) if processed else None
+            except Exception as ex:
+                print(f"Error downloading {c_id}: {ex}")
+                return None
+
+        # Use ThreadPoolExecutor for parallel downloads
+        max_workers = 10
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            future_to_char = {executor.submit(download_task, row): row for row in rows}
+            
+            # Process as they complete
+            for future in concurrent.futures.as_completed(future_to_char):
+                result = future.result()
+                
+                if result:
+                    char_id, blob = result
+                    try:
+                        # Quick update in DB
+                        # Re-open connection for this write to be safe/simple
+                        # (Ideally we could batch updates, but immediate feedback is nice)
+                        t_conn = sqlite3.connect(DB_FILE)
+                        t_cur = t_conn.cursor()
+                        t_cur.execute("UPDATE characters SET image_blob = ? WHERE id = ?", (blob, char_id))
+                        t_conn.commit()
+                        t_conn.close()
+                        count += 1
+                    except Exception as db_err:
+                        print(f"DB Error saving image {char_id}: {db_err}")
+                        errors += 1
                 else:
                     errors += 1
-            except Exception as e:
-                errors += 1
-                print(f"  ✗ Failed to download {char_id}: {e}")
                 
-        conn.close()
-        
-        ImageService.sync_status["current"] = count
-        ImageService.sync_status["errors"] = errors
+                # Update status
+                ImageService.sync_status["current"] = count
+                ImageService.sync_status["errors"] = errors
+                
+                if count % 5 == 0:
+                    print(f"  ⚡ PROGRESS: {count}/{total} (Errors: {errors})")
+
         ImageService.sync_status["running"] = False
         print(f"⚡ Background sync complete. Cached: {count}, Errors: {errors}")

@@ -8,7 +8,8 @@ import java.util.List;
 
 /**
  * Modelo de datos que representa un personaje de Harry Potter.
- * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la interfaz.
+ * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la
+ * interfaz.
  *
  * @author Xiker
  * @author Gaizka
@@ -353,7 +354,7 @@ public class Personaje {
         String nombre = getStringOrEmpty(obj, "name");
         String casa = getStringOrEmpty(obj, "house");
         String died = getStringOrEmpty(obj, "died");
-        String estado = (died != null && !died.isEmpty()) ? "Fallecido" : "Vivo";
+        String estado = (died != null && !died.isEmpty()) ? "Deceased" : "Alive";
         String patronus = getStringOrEmpty(obj, "patronus");
         String imagen = getStringOrEmpty(obj, "image");
 

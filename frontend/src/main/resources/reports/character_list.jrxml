@@ -6,6 +6,7 @@
     <field name="casa" class="java.lang.String"/>
     <field name="estado" class="java.lang.String"/>
     <field name="patronus" class="java.lang.String"/>
+    <field name="imagenUrl" class="java.lang.String"/>
     <background>
         <band splitType="Stretch"/>
     </background>
@@ -30,7 +31,7 @@
                 <textElement verticalAlignment="Middle">
                     <font isBold="true"/>
                 </textElement>
-                <text><![CDATA[Nombre]]></text>
+                <text><![CDATA[Name]]></text>
             </staticText>
             <staticText>
                 <reportElement x="200" y="0" width="120" height="30"/>
@@ -40,7 +41,7 @@
                 <textElement verticalAlignment="Middle">
                     <font isBold="true"/>
                 </textElement>
-                <text><![CDATA[Casa]]></text>
+                <text><![CDATA[House]]></text>
             </staticText>
             <staticText>
                 <reportElement x="320" y="0" width="100" height="30"/>
@@ -50,7 +51,7 @@
                 <textElement verticalAlignment="Middle">
                     <font isBold="true"/>
                 </textElement>
-                <text><![CDATA[Estado]]></text>
+                <text><![CDATA[Status]]></text>
             </staticText>
             <staticText>
                 <reportElement x="420" y="0" width="135" height="30"/>
@@ -84,7 +85,7 @@
             </textField>
             <image onErrorType="Blank">
                  <reportElement x="-10" y="15" width="50" height="50"/>
-                 <imageExpression><![CDATA[""]]></imageExpression>
+                 <imageExpression><![CDATA[$F{imagenUrl}]]></imageExpression>
             </image>
         </band>
     </detail>

@@ -40,19 +40,19 @@ public class ReportService {
     public static void generateCharacterReport(Personaje p, Stage owner) {
         if (p == null)
             return;
-        generateReport(Collections.singletonList(p), "character_detail.jrxml", "Ficha de Personaje", owner);
+        generateReport(Collections.singletonList(p), "character_detail.jrxml", "Character Sheet", owner);
     }
 
     public static void generateListReport(List<Personaje> list, Stage owner) {
         if (list == null || list.isEmpty())
             return;
-        generateReport(list, "character_list.jrxml", "Listado de Personajes", owner);
+        generateReport(list, "character_list.jrxml", "Character List", owner);
     }
 
     private static void generateReport(List<Personaje> data, String templateName, String title, Stage owner) {
         // 1. File Chooser (Main Thread)
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar PDF");
+        fileChooser.setTitle("Save PDF");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
         fileChooser.setInitialFileName(title.replace(" ", "_") + ".pdf");
 
@@ -60,6 +60,27 @@ public class ReportService {
 
         if (file == null)
             return;
+
+        // Show Loading Dialog
+        Alert loadingAlert = new Alert(Alert.AlertType.NONE);
+        loadingAlert.setTitle("Generating PDF");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Please wait, creating report...");
+
+        javafx.scene.control.ProgressIndicator progressIndicator = new javafx.scene.control.ProgressIndicator();
+        progressIndicator.setMaxSize(50, 50);
+        loadingAlert.setGraphic(progressIndicator);
+
+        // Prevent closing by user and remove buttons to make it look like a pure
+        // waiting dialog
+        loadingAlert.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.CLOSE);
+        javafx.scene.Node closeButton = loadingAlert.getDialogPane()
+                .lookupButton(javafx.scene.control.ButtonType.CLOSE);
+        closeButton.managedProperty().bind(closeButton.visibleProperty());
+        closeButton.setVisible(false);
+
+        loadingAlert.initOwner(owner);
+        loadingAlert.show(); // Non-blocking show
 
         // 2. Background Processing
         new Thread(() -> {
@@ -70,8 +91,11 @@ public class ReportService {
                 // 1. Load Template
                 InputStream reportStream = ReportService.class.getResourceAsStream(REPORT_DIR + templateName);
                 if (reportStream == null) {
-                    javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error",
-                            "No se encuentra la plantilla del reporte: " + templateName));
+                    javafx.application.Platform.runLater(() -> {
+                        loadingAlert.close();
+                        showAlert(Alert.AlertType.ERROR, "Error",
+                                "Report template not found: " + templateName);
+                    });
                     return;
                 }
 
@@ -85,20 +109,20 @@ public class ReportService {
                 // 4. Parameters
                 Map<String, Object> parameters = new HashMap<>();
                 parameters.put("REPORT_TITLE", title);
-                parameters.put("LABEL_NAME", App.getBundle().getString("detail.name"));
-                parameters.put("LABEL_HOUSE", App.getBundle().getString("detail.house"));
-                parameters.put("LABEL_STATUS", App.getBundle().getString("edit.label.status"));
-                parameters.put("LABEL_PATRONUS", App.getBundle().getString("detail.patronus"));
+                parameters.put("LABEL_NAME", "Name");
+                parameters.put("LABEL_HOUSE", "House");
+                parameters.put("LABEL_STATUS", "Status");
+                parameters.put("LABEL_PATRONUS", "Patronus");
                 // Add extended fields
-                parameters.put("LABEL_BORN", App.getBundle().getString("detail.born"));
-                parameters.put("LABEL_DIED", App.getBundle().getString("detail.died"));
-                parameters.put("LABEL_GENDER", App.getBundle().getString("detail.gender"));
-                parameters.put("LABEL_SPECIES", App.getBundle().getString("detail.species"));
-                parameters.put("LABEL_ANIMAGUS", App.getBundle().getString("detail.animagus"));
-                parameters.put("LABEL_NATIONALITY", App.getBundle().getString("detail.nationality"));
-                parameters.put("LABEL_ALIAS", App.getBundle().getString("detail.alias"));
-                parameters.put("LABEL_TITLES", App.getBundle().getString("detail.titles"));
-                parameters.put("LABEL_WAND", App.getBundle().getString("detail.wand"));
+                parameters.put("LABEL_BORN", "Born");
+                parameters.put("LABEL_DIED", "Died");
+                parameters.put("LABEL_GENDER", "Gender");
+                parameters.put("LABEL_SPECIES", "Species");
+                parameters.put("LABEL_ANIMAGUS", "Animagus");
+                parameters.put("LABEL_NATIONALITY", "Nationality");
+                parameters.put("LABEL_ALIAS", "Alias");
+                parameters.put("LABEL_TITLES", "Titles");
+                parameters.put("LABEL_WAND", "Wand");
 
                 // 5. Fill Report (Heavy Lifting - fetching images etc)
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
@@ -107,17 +131,25 @@ public class ReportService {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getAbsolutePath());
 
                 // Success Callback
-                javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.INFORMATION, "Éxito",
-                        "PDF generado correctamente:\n" + file.getAbsolutePath()));
+                javafx.application.Platform.runLater(() -> {
+                    loadingAlert.close();
+                    showAlert(Alert.AlertType.INFORMATION, "Success",
+                            "PDF generated successfully:\n" + file.getAbsolutePath());
+                });
 
             } catch (JRException e) {
                 logger.error("Error generating report: {}", e.getMessage(), e);
-                javafx.application.Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error JasperReports",
-                        "Error al generar el reporte: " + e.getMessage()));
+                javafx.application.Platform.runLater(() -> {
+                    loadingAlert.close();
+                    showAlert(Alert.AlertType.ERROR, "Error JasperReports",
+                            "Error generating report: " + e.getMessage());
+                });
             } catch (Exception e) {
                 logger.error("Unexpected error during report generation: {}", e.getMessage(), e);
-                javafx.application.Platform.runLater(
-                        () -> showAlert(Alert.AlertType.ERROR, "Error", "Error inesperado: " + e.getMessage()));
+                javafx.application.Platform.runLater(() -> {
+                    loadingAlert.close();
+                    showAlert(Alert.AlertType.ERROR, "Error", "Unexpected error: " + e.getMessage());
+                });
             }
         }).start();
     }
