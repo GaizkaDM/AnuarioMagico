@@ -456,7 +456,11 @@ public class MainController implements Initializable {
 
     private void actualizarIconoTema() {
         if (btnThemeToggle != null) {
-            btnThemeToggle.setText(App.isDarkMode() ? "🌙" : "☀");
+            boolean isDark = App.isDarkMode();
+            btnThemeToggle.setText(isDark ? "🌙" : "☀");
+
+            String tooltipKey = isDark ? "main.theme.dark" : "main.theme.light";
+            btnThemeToggle.setTooltip(new Tooltip(App.getBundle().getString(tooltipKey)));
         }
     }
 
