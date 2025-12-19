@@ -425,16 +425,33 @@ public class MainController implements Initializable {
 
     // START DARK MODE LOGIC
     private void toggleTheme() {
-        boolean newMode = !App.isDarkMode();
-        App.setDarkMode(newMode);
-        actualizarIconoTema();
+        // Animación de transición (Fade Out -> Cambio -> Fade In)
+        javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300),
+                root);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
 
-        // Apply to current view immediately
-        if (root != null) {
-            App.applyTheme(root, "Main_view");
-        } else if (contenedorTarjetas.getScene() != null) {
-            App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
-        }
+        fadeOut.setOnFinished(e -> {
+            boolean newMode = !App.isDarkMode();
+            App.setDarkMode(newMode);
+            actualizarIconoTema();
+
+            // Apply to current view immediately
+            if (root != null) {
+                App.applyTheme(root, "Main_view");
+            } else if (contenedorTarjetas.getScene() != null) {
+                App.applyTheme(contenedorTarjetas.getScene().getRoot(), "Main_view");
+            }
+
+            // Fade In
+            javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(
+                    javafx.util.Duration.millis(300), root);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     private void actualizarIconoTema() {
@@ -655,6 +672,31 @@ public class MainController implements Initializable {
         javafx.scene.layout.VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
         tarjeta.getChildren().addAll(img, lblNombre, lblCasa, lblEstado, lblPatronus, spacer, btnDetalles);
+
+        // --- MICRO-ANIMACIÓN HOVER ---
+        // Escala suave al pasar el ratón (1.0 -> 1.05)
+        javafx.animation.ScaleTransition scaleIn = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(200), tarjeta);
+        scaleIn.setToX(1.05);
+        scaleIn.setToY(1.05);
+
+        javafx.animation.ScaleTransition scaleOut = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(200), tarjeta);
+        scaleOut.setToX(1.0);
+        scaleOut.setToY(1.0);
+
+        tarjeta.setOnMouseEntered(e -> {
+            scaleOut.stop();
+            scaleIn.playFromStart();
+            tarjeta.setStyle("-fx-cursor: hand;"); // Cambiar cursor
+        });
+
+        tarjeta.setOnMouseExited(e -> {
+            scaleIn.stop();
+            scaleOut.playFromStart();
+        });
+        // -----------------------------
+
         return tarjeta;
     }
 
