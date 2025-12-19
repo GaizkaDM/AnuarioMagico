@@ -20,6 +20,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Tooltip;
 
@@ -76,6 +78,8 @@ public class MainController implements Initializable {
     private Button btnAnadir;
 
     @FXML
+    private VBox filtersBar;
+    @FXML
     private FlowPane contenedorTarjetas;
 
     @FXML
@@ -94,8 +98,13 @@ public class MainController implements Initializable {
     private VBox loadingBox;
     @FXML
     private Button btnThemeToggle;
+    @FXML
+    private HBox sidebarContainer;
 
     private final ObservableList<Personaje> masterData = FXCollections.observableArrayList();
+    @FXML
+    private Button btnSidebarToggle;
+
     private List<Personaje> listaFiltrada = new ArrayList<>();
 
     private int paginaActual = 0;
@@ -247,6 +256,11 @@ public class MainController implements Initializable {
         // Listener para el botón de tema
         actualizarIconoTema();
         btnThemeToggle.setOnAction(e -> toggleTheme());
+
+        // Sidebar Toggle
+        btnSidebarToggle.setOnAction(e -> toggleSidebar());
+        // Asegurar que el VBox se oculte y no ocupe espacio
+        filtersBar.managedProperty().bind(filtersBar.visibleProperty());
 
         // Listener para el menú de idioma
         if (menuLangEn != null)
@@ -404,6 +418,15 @@ public class MainController implements Initializable {
         if (btnThemeToggle != null) {
             btnThemeToggle.setText(App.isDarkMode() ? "🌙" : "☀");
         }
+    }
+
+    private void toggleSidebar() {
+        boolean isVisible = filtersBar.isVisible();
+        filtersBar.setVisible(!isVisible);
+        btnSidebarToggle.setText(isVisible ? "▶" : "◀");
+
+        // Ajustar el margen del botón cuando está oculto para que sea visible
+        StackPane.setMargin(btnSidebarToggle, new javafx.geometry.Insets(10, isVisible ? -25 : -12, 0, 0));
     }
     // END DARK MODE LOGIC
 

@@ -9,8 +9,8 @@
 /* Contenedor lateral - Glassmorphism Light with High Contrast Border */
 #filtersBar {
     -fx-background-color: rgba(255, 255, 255, 0.45);
-    -fx-background-radius: 0 24 24 0;
-    -fx-border-radius: 0 24 24 0;
+    -fx-background-radius: 0 0 24 0;
+    -fx-border-radius: 0 0 24 0;
     -fx-border-color: rgba(255, 255, 255, 0.7) rgba(236, 185, 57, 0.4) rgba(255, 255, 255, 0.7) transparent;
     -fx-border-width: 1 1 1 0;
     -fx-padding: 20 15 20 15;
@@ -34,6 +34,31 @@
     -fx-font-family: "Georgia", serif;
     -fx-padding: 5 10;
     /* Increase interaction area */
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle-btn {
+    -fx-background-color: #fbecce;
+    /* Opaque background matching sidebar/parchment */
+    -fx-background-radius: 0 8 8 0;
+    -fx-min-width: 24px;
+    -fx-min-height: 60px;
+    /* Larger height for better grip */
+    -fx-max-width: 24px;
+    -fx-max-height: 60px;
+    -fx-text-fill: #b38600;
+    -fx-font-size: 14px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(236, 185, 57, 0.4);
+    -fx-border-width: 1 1 1 0;
+    -fx-border-radius: 0 8 8 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 2, 0);
+}
+
+.sidebar-toggle-btn:hover {
+    -fx-background-color: #fff8e1;
+    -fx-text-fill: #ecb939;
 }
 
 .theme-toggle-btn {
