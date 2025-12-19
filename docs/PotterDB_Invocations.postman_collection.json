@@ -1,0 +1,91 @@
+{
+    "info": {
+        "_postman_id": "potterdb-invocations-collection",
+        "name": "PotterDB External Invocations",
+        "description": "Colección de endpoints de la API externa PotterDB utilizados en el proyecto Anuario Mágico para la extracción inicial y sincronización de datos.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Characters",
+            "item": [
+                {
+                    "name": "Get All Characters (First Page)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://api.potterdb.com/v1/characters",
+                            "protocol": "https",
+                            "host": [
+                                "api",
+                                "potterdb",
+                                "com"
+                            ],
+                            "path": [
+                                "v1",
+                                "characters"
+                            ]
+                        },
+                        "description": "Petición base utilizada por el backend para iniciar la recolección de datos. Devuelve los primeros 25 personajes por defecto."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Characters (Specific Page)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://api.potterdb.com/v1/characters?page[number]=2",
+                            "protocol": "https",
+                            "host": [
+                                "api",
+                                "potterdb",
+                                "com"
+                            ],
+                            "path": [
+                                "v1",
+                                "characters"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page[number]",
+                                    "value": "2",
+                                    "description": "Número de página para la extracción iterativa."
+                                }
+                            ]
+                        },
+                        "description": "Endpoint invocado dentro del bucle de sincronización del backend para navegar por la paginación de PotterDB hasta completar el censo."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Character (Metadata)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://api.potterdb.com/v1/characters/harry-potter",
+                            "protocol": "https",
+                            "host": [
+                                "api",
+                                "potterdb",
+                                "com"
+                            ],
+                            "path": [
+                                "v1",
+                                "characters",
+                                "harry-potter"
+                            ]
+                        },
+                        "description": "Permite visualizar la estructura detallada de atributos (name, jobs, romances, house) que el backend parsea para guardar en la base de datos SQLite."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoints relativos a las criaturas y magos del universo Harry Potter."
+        }
+    ],
+    "protocolProfileBehavior": {}
+}
