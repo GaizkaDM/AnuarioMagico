@@ -3,7 +3,7 @@
 Configuración global de la aplicación Flask.
 Define rutas de base de datos, claves secretas y URLs de APIs externas.
 
-Autores: Gaizka, Diego
+Autores: Gaizka, Diego, Xiker
 """
 import os
 

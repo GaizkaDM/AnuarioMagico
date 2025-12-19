@@ -67,7 +67,7 @@ public class Lanzador {
                             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                                 long pid = backendProcess.pid();
                                 System.out.println("Matando proceso backend PID: " + pid);
-                                Runtime.getRuntime().exec("taskkill /F /T /PID " + pid);
+                                new ProcessBuilder("taskkill", "/F", "/T", "/PID", String.valueOf(pid)).start();
                             }
                             // Fallback estándar (kill -9 o SIGKILL)
                             backendProcess.destroyForcibly();

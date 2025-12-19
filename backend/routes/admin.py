@@ -2,7 +2,7 @@
 Rutas de administración del sistema.
 Gestiona sincronizaciones, importaciones y tareas en segundo plano.
 
-Autor: Gaizka
+Autor: Gaizka, Diego, Xiker
 """
 from flask import Blueprint, jsonify, request
 import threading

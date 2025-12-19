@@ -2,7 +2,7 @@
 Servicio de gestión de imágenes.
 Se encarga de descargar, procesar y almacenar imágenes de personajes en formato binario (BLOB).
 
-Autores: Gaizka, Xiker
+Autores: Gaizka, Xiker, Diego
 """
 import requests
 import io

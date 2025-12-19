@@ -1,3 +1,10 @@
+"""
+Rutas principais de gestión de personajes (CRUD).
+Maneja listado, filtrado, creación, edición y borrado de personajes.
+Incluye lógica de fallback a la API de PotterDB.
+
+Autores: Gaizka, Diego, Xiker
+"""
 from flask import Blueprint, request, jsonify, Response
 import requests
 import hashlib

@@ -8,7 +8,7 @@ import os
 Módulo de sincronización con MySQL.
 Permite volcar los datos locales (SQLite) a una base de datos MySQL remota o local para respaldo.
 
-Autores: Diego, Gaizka
+Autores: Diego, Gaizka, Xiker
 """
 
 from datetime import datetime

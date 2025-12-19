@@ -3,7 +3,7 @@ PersonajeService.py
 Servicio para la lógica de negocio relacionada con Personajes.
 Gestiona la obtención de datos desde la API externa y la sincronización con la base de datos local.
 
-Autores: Xiker
+Autores: Xiker, Gaizka, Diego
 """
 
 from typing import Dict, Optional

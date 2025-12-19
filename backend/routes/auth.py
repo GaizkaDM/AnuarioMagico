@@ -1,3 +1,9 @@
+"""
+Rutas de autenticación (Login/Register).
+Maneja el registro de usuarios con clave maestra y la generación de tokens de sesión.
+
+Autores: Xiker, Gaizka, Diego
+"""
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3

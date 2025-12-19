@@ -2,7 +2,7 @@
 Punto de entrada principal de la aplicación Flask.
 Configura la aplicación, registra blueprints y gestiona el contexto global.
 
-Autores: Xiker, Gaizka
+Autores: Xiker, Gaizka, Diego
 """
 from flask import Flask, jsonify
 from flask_cors import CORS

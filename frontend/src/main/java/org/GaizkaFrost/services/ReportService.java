@@ -24,6 +24,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Servicio encargado de la generación de informes PDF utilizando JasperReports.
+ * Maneja la compilación y rellenado de plantillas .jrxml en un hilo secundario.
+ *
+ * @author Diego
+ * @author Gaizka
+ * @author Xiker
+ */
 public class ReportService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportService.class);

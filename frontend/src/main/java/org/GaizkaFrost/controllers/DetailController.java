@@ -17,18 +17,10 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 /**
- * Controlador para la vista de detalle de un personaje.
- * Muestra información extendida y permite marcar como favorito.
- *
- * @author Gaizka
- * @version 1.0
- * @since 2025-12-14
- */
-/**
  * Controlador de la vista de detalles.
  * Muestra la información completa de un personaje, incluyendo imagen, ficha
  * biográfica y opciones de exportación.
- * 
+ *
  * @author Diego
  * @author Gaizka
  * @author Xiker
