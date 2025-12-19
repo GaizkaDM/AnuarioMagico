@@ -60,9 +60,9 @@ graph LR
     Export -->|Genera| CSV[datos.csv]
     Export -->|Genera| BIN[datos.bin]
     
-    style XML fill:#e1f5fe,stroke:#01579b
-    style CSV fill:#e8f5e9,stroke:#2e7d32
-    style BIN fill:#fff3e0,stroke:#ef6c00
+    style XML fill:#0277bd,stroke:#01579b,color:#ffffff
+    style CSV fill:#2e7d32,stroke:#1b5e20,color:#ffffff
+    style BIN fill:#ff8f00,stroke:#e65100,color:#ffffff
 ```
 
 ### 🛠️ Funcionalidades Core
