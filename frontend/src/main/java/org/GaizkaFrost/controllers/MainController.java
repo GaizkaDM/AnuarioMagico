@@ -246,7 +246,8 @@ public class MainController implements Initializable {
         // House and Status combos will be populated dynamically or locally
         comboEstado.getItems().addAll(
                 App.getBundle().getString("combo.status.alive"),
-                App.getBundle().getString("combo.status.deceased"));
+                App.getBundle().getString("combo.status.deceased"),
+                App.getBundle().getString("combo.house.unknown"));
 
         // Intentar sincronizar datos de la nube al inicio (Pull)
         setCargando(true); // Mostrar spinner mientras se intenta el pull
@@ -626,19 +627,22 @@ public class MainController implements Initializable {
                 }
             }
 
-            String estadoFiltro = null;
-            if (estado != null) {
+            boolean coincideEstado = true;
+            if (estado != null && !estado.isEmpty()) {
                 if (estado.equals(App.getBundle().getString("combo.status.alive"))) {
-                    estadoFiltro = "Alive";
+                    coincideEstado = "Alive".equalsIgnoreCase(p.getEstado());
                 } else if (estado.equals(App.getBundle().getString("combo.status.deceased"))) {
-                    estadoFiltro = "Deceased";
+                    coincideEstado = "Deceased".equalsIgnoreCase(p.getEstado());
+                } else if (estado.equals(App.getBundle().getString("combo.house.unknown"))) {
+                    // Coincide con null, vacío, "unknown" o "desconocido"
+                    String s = p.getEstado();
+                    coincideEstado = (s == null || s.trim().isEmpty() || "unknown".equalsIgnoreCase(s)
+                            || "desconocido".equalsIgnoreCase(s));
                 } else {
-                    estadoFiltro = estado;
+                    // Fallback
+                    coincideEstado = estado.equalsIgnoreCase(p.getEstado());
                 }
             }
-
-            boolean coincideEstado = estadoFiltro == null || estadoFiltro.isEmpty()
-                    || (p.getEstado() != null && p.getEstado().equalsIgnoreCase(estadoFiltro));
 
             boolean coincideFavorito = !soloFavoritos || p.isFavorite();
 
@@ -1026,13 +1030,10 @@ public class MainController implements Initializable {
 
         // Usar un Set para evitar duplicados y ordenar alfabéticamente
         Set<String> casas = new TreeSet<>();
-        boolean hasNone = false;
-        boolean hasUnknownExplicit = false;
 
         for (Personaje p : masterData) {
             String rawCasa = p.getCasa();
             if (rawCasa == null || rawCasa.trim().isEmpty()) {
-                hasNone = true;
                 continue;
             }
 
@@ -1059,29 +1060,21 @@ public class MainController implements Initializable {
 
                 if (!cleanCasa.isEmpty()) {
                     String lower = cleanCasa.toLowerCase();
-                    if (lower.equals("unknown") || lower.equals("desconocido")) {
-                        hasUnknownExplicit = true;
-                    } else {
+                    if (!lower.equals("unknown") && !lower.equals("desconocido")) {
                         casas.add(cleanCasa);
                     }
                 }
             }
         }
 
-        final boolean finalHasNone = hasNone;
-        final boolean finalHasUnknown = hasUnknownExplicit;
         String unknownLabel = App.getBundle().getString("combo.house.unknown");
         String noneLabel = App.getBundle().getString("combo.house.none");
 
         Platform.runLater(() -> {
             comboCasa.getItems().clear();
             comboCasa.getItems().addAll(casas);
-            if (finalHasUnknown) {
-                comboCasa.getItems().add(unknownLabel);
-            }
-            if (finalHasNone) {
-                comboCasa.getItems().add(noneLabel);
-            }
+            comboCasa.getItems().add(unknownLabel);
+            comboCasa.getItems().add(noneLabel);
             // Save houses to shared state
             App.setAvailableHouses(new java.util.ArrayList<>(comboCasa.getItems()));
 
