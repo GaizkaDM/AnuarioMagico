@@ -1,198 +1,130 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="character_detail" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
-    <style name="Title" mode="Opaque" forecolor="#FFFFFF" backcolor="#333333" hTextAlign="Center" vTextAlign="Middle" fontSize="24" isBold="true"/>
-    <style name="Label" forecolor="#555555" fontSize="12" isBold="true"/>
-    <style name="Value" forecolor="#000000" fontSize="12" isBold="false"/>
-    <parameter name="REPORT_TITLE" class="java.lang.String"/>
-    <parameter name="LABEL_NAME" class="java.lang.String"/>
-    <parameter name="LABEL_HOUSE" class="java.lang.String"/>
-    <parameter name="LABEL_STATUS" class="java.lang.String"/>
-    <parameter name="LABEL_PATRONUS" class="java.lang.String"/>
-    <parameter name="LABEL_BORN" class="java.lang.String"/>
-    <parameter name="LABEL_DIED" class="java.lang.String"/>
-    <parameter name="LABEL_GENDER" class="java.lang.String"/>
-    <parameter name="LABEL_SPECIES" class="java.lang.String"/>
-    <parameter name="LABEL_ANIMAGUS" class="java.lang.String"/>
-    <parameter name="LABEL_NATIONALITY" class="java.lang.String"/>
-    <parameter name="LABEL_WAND" class="java.lang.String"/>
-    <parameter name="LABEL_ALIAS" class="java.lang.String"/>
-    <parameter name="LABEL_TITLES" class="java.lang.String"/>
-    <field name="nombre" class="java.lang.String"/>
-    <field name="casa" class="java.lang.String"/>
-    <field name="estado" class="java.lang.String"/>
-    <field name="patronus" class="java.lang.String"/>
-    <field name="imagenUrl" class="java.lang.String"/>
-    <field name="born" class="java.lang.String"/>
-    <field name="died" class="java.lang.String"/>
-    <field name="gender" class="java.lang.String"/>
-    <field name="species" class="java.lang.String"/>
-    <field name="animagus" class="java.lang.String"/>
-    <field name="nationality" class="java.lang.String"/>
-    <field name="wand" class="java.lang.String"/>
-    <field name="alias" class="java.lang.String"/>
-    <field name="titles" class="java.lang.String"/>
-    
-    <background>
-        <band splitType="Stretch"/>
-    </background>
-    <title>
-        <band height="80" splitType="Stretch">
-            <rectangle>
-                <reportElement x="0" y="0" width="555" height="80" backcolor="#333333"/>
-                <graphicElement>
-                    <pen lineWidth="0.0"/>
-                </graphicElement>
-            </rectangle>
-            <textField>
-                <reportElement style="Title" x="0" y="20" width="555" height="40" backcolor="#333333"/>
-                <textElement/>
-                <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
-            </textField>
-        </band>
-    </title>
-    <detail>
-        <band height="600" splitType="Stretch">
-            <image onErrorType="Blank">
-                <reportElement x="20" y="20" width="200" height="300"/>
-                <box>
-                    <pen lineWidth="1.0" lineColor="#CCCCCC"/>
-                </box>
-                <imageExpression><![CDATA[$F{imagenUrl}]]></imageExpression>
-            </image>
-            <textField>
-                <reportElement style="Value" x="240" y="20" width="300" height="30"/>
-                <textElement>
-                    <font size="18" isBold="true"/>
-                </textElement>
-                <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
-            </textField>
-            
-            <!-- House -->
-            <textField>
-                <reportElement style="Label" x="240" y="60" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_HOUSE}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="60" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{casa} == null ? "-" : $F{casa}]]></textFieldExpression>
-            </textField>
-
-            <!-- Status -->
-            <textField>
-                <reportElement style="Label" x="240" y="90" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_STATUS}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="90" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{estado} == null ? "-" : $F{estado}]]></textFieldExpression>
-            </textField>
-
-            <!-- Patronus -->
-            <textField>
-                <reportElement style="Label" x="240" y="120" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_PATRONUS}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="120" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{patronus} == null ? "-" : $F{patronus}]]></textFieldExpression>
-            </textField>
-
-            <!-- Species -->
-            <textField>
-                <reportElement style="Label" x="240" y="150" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_SPECIES}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="150" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{species} == null ? "-" : $F{species}]]></textFieldExpression>
-            </textField>
-
-            <!-- Gender -->
-            <textField>
-                <reportElement style="Label" x="240" y="180" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_GENDER}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="180" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{gender} == null ? "-" : $F{gender}]]></textFieldExpression>
-            </textField>
-
-             <!-- Nationality -->
-            <textField>
-                <reportElement style="Label" x="240" y="210" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_NATIONALITY}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="210" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{nationality} == null ? "-" : $F{nationality}]]></textFieldExpression>
-            </textField>
-
-            <!-- Born -->
-            <textField>
-                <reportElement style="Label" x="240" y="240" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_BORN}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="240" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{born} == null ? "-" : $F{born}]]></textFieldExpression>
-            </textField>
-
-            <!-- Died -->
-            <textField>
-                <reportElement style="Label" x="240" y="270" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_DIED}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="270" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{died} == null ? "-" : $F{died}]]></textFieldExpression>
-            </textField>
-            
-            <!-- Animagus -->
-            <textField>
-                <reportElement style="Label" x="240" y="300" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_ANIMAGUS}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="300" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{animagus} == null ? "-" : $F{animagus}]]></textFieldExpression>
-            </textField>
-
-            <!-- Wand -->
-            <textField>
-                <reportElement style="Label" x="240" y="330" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_WAND}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement style="Value" x="350" y="330" width="200" height="20"/>
-                <textFieldExpression><![CDATA[$F{wand} == null ? "-" : $F{wand}]]></textFieldExpression>
-            </textField>
-
-            <!-- Divider -->
-            <line>
-                <reportElement x="20" y="360" width="515" height="1" forecolor="#CCCCCC"/>
-            </line>
-
-             <!-- Alias -->
-            <textField>
-                <reportElement style="Label" x="20" y="370" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_ALIAS}]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Value" x="130" y="370" width="405" height="20"/>
-                <textFieldExpression><![CDATA[$F{alias} == null ? "-" : $F{alias}]]></textFieldExpression>
-            </textField>
-
-            <!-- Titles -->
-            <textField>
-                <reportElement style="Label" x="20" y="440" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$P{LABEL_TITLES}]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true">
-                <reportElement x="130" y="440" width="405" height="20"/>
-                <textFieldExpression><![CDATA[$F{titles} == null ? "-" : $F{titles}]]></textFieldExpression>
-            </textField>
-
-        </band>
-    </detail>
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="character_detail" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="621bc9a4-6955-4412-8f03-51d5a1a0fb91">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<style name="Title" mode="Opaque" forecolor="#FFFFFF" backcolor="#333333" hTextAlign="Center" vTextAlign="Middle" fontSize="24.0" bold="true"/>
+	<style name="Label" forecolor="#555555" fontSize="12.0" bold="true"/>
+	<style name="Value" forecolor="#000000" fontSize="12.0" bold="false"/>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<parameter name="LABEL_NAME" class="java.lang.String"/>
+	<parameter name="LABEL_HOUSE" class="java.lang.String"/>
+	<parameter name="LABEL_STATUS" class="java.lang.String"/>
+	<parameter name="LABEL_PATRONUS" class="java.lang.String"/>
+	<parameter name="LABEL_BORN" class="java.lang.String"/>
+	<parameter name="LABEL_DIED" class="java.lang.String"/>
+	<parameter name="LABEL_GENDER" class="java.lang.String"/>
+	<parameter name="LABEL_SPECIES" class="java.lang.String"/>
+	<parameter name="LABEL_ANIMAGUS" class="java.lang.String"/>
+	<parameter name="LABEL_NATIONALITY" class="java.lang.String"/>
+	<parameter name="LABEL_WAND" class="java.lang.String"/>
+	<parameter name="LABEL_ALIAS" class="java.lang.String"/>
+	<parameter name="LABEL_TITLES" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="casa" class="java.lang.String"/>
+	<field name="estado" class="java.lang.String"/>
+	<field name="patronus" class="java.lang.String"/>
+	<field name="imagenUrl" class="java.lang.String"/>
+	<field name="born" class="java.lang.String"/>
+	<field name="died" class="java.lang.String"/>
+	<field name="gender" class="java.lang.String"/>
+	<field name="species" class="java.lang.String"/>
+	<field name="animagus" class="java.lang.String"/>
+	<field name="nationality" class="java.lang.String"/>
+	<field name="wand" class="java.lang.String"/>
+	<field name="alias" class="java.lang.String"/>
+	<field name="titles" class="java.lang.String"/>
+	<background splitType="Stretch"/>
+	<title height="80" splitType="Stretch">
+		<element kind="rectangle" uuid="d49165fd-a360-45b9-a2fc-dc4b60676368" x="0" y="0" width="555" height="80" backcolor="#333333">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="textField" uuid="2f45c3e9-bbed-4f28-9526-9a77fc74891e" x="0" y="20" width="555" height="40" backcolor="#333333" style="Title">
+			<expression><![CDATA[$P{REPORT_TITLE}]]></expression>
+		</element>
+	</title>
+	<detail>
+		<band height="600" splitType="Stretch">
+			<element kind="image" uuid="38ab2a17-904a-4264-8119-90367dad63f2" x="20" y="20" width="200" height="300" onErrorType="Blank">
+				<expression><![CDATA[$F{imagenUrl}]]></expression>
+				<box>
+					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="e07c9882-e154-4b3f-a0dc-4ef916ecabb9" x="240" y="20" width="300" height="30" fontSize="18.0" bold="true" style="Value">
+				<expression><![CDATA[$F{nombre}]]></expression>
+			</element>
+			<element kind="textField" uuid="47c52ea5-f70e-41fc-ac3e-d2d21f0f69a3" x="240" y="60" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_HOUSE}]]></expression>
+			</element>
+			<element kind="textField" uuid="3e2194f7-437a-4ccc-a2e5-4df70006ca58" x="350" y="60" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{casa} == null ? "-" : $F{casa}]]></expression>
+			</element>
+			<element kind="textField" uuid="2393dc2c-0d84-4774-8e92-1e66aae503fc" x="240" y="90" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_STATUS}]]></expression>
+			</element>
+			<element kind="textField" uuid="7c5b6d0e-fca1-4abd-945f-a06477e23232" x="350" y="90" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{estado} == null ? "-" : $F{estado}]]></expression>
+			</element>
+			<element kind="textField" uuid="5d64d715-eda2-4765-885b-2a990266431d" x="240" y="120" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_PATRONUS}]]></expression>
+			</element>
+			<element kind="textField" uuid="47cae63b-74f3-4028-9812-f8dcfcde8a9b" x="350" y="120" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{patronus} == null ? "-" : $F{patronus}]]></expression>
+			</element>
+			<element kind="textField" uuid="d3b66eaa-68ea-4038-b573-630f9e0ef3b5" x="240" y="150" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_SPECIES}]]></expression>
+			</element>
+			<element kind="textField" uuid="2a11ab3d-79a5-4edd-b74c-33c3a1288fa6" x="350" y="150" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{species} == null ? "-" : $F{species}]]></expression>
+			</element>
+			<element kind="textField" uuid="88e1e227-63c1-4abf-9a9b-9f82065ee36d" x="240" y="180" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_GENDER}]]></expression>
+			</element>
+			<element kind="textField" uuid="f9915422-7353-4086-b4f2-ab21c10ef0cf" x="350" y="180" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{gender} == null ? "-" : $F{gender}]]></expression>
+			</element>
+			<element kind="textField" uuid="ad2bd252-0e2e-492c-baf2-9cf0bee0c385" x="240" y="210" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_NATIONALITY}]]></expression>
+			</element>
+			<element kind="textField" uuid="0018154b-2d7b-44e0-8aa3-fd282292bf9c" x="350" y="210" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{nationality} == null ? "-" : $F{nationality}]]></expression>
+			</element>
+			<element kind="textField" uuid="c9937c14-e6d0-4b1a-a49c-787b35e6a8be" x="240" y="240" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_BORN}]]></expression>
+			</element>
+			<element kind="textField" uuid="14894a14-6b25-4022-8b4f-06c03b2f29de" x="350" y="240" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{born} == null ? "-" : $F{born}]]></expression>
+			</element>
+			<element kind="textField" uuid="0b95ea83-6edf-43c9-965c-d9e677fbea10" x="240" y="270" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_DIED}]]></expression>
+			</element>
+			<element kind="textField" uuid="864612eb-bfcd-427b-a119-ddc1c549c41c" x="350" y="270" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{died} == null ? "-" : $F{died}]]></expression>
+			</element>
+			<element kind="textField" uuid="7d8e7f1d-5201-4150-a865-a536f4009402" x="240" y="300" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_ANIMAGUS}]]></expression>
+			</element>
+			<element kind="textField" uuid="6dc21135-8162-43ea-aefd-6c083c9ac1f9" x="350" y="300" width="200" height="20" style="Value">
+				<expression><![CDATA[$F{animagus} == null ? "-" : $F{animagus}]]></expression>
+			</element>
+			<element kind="textField" uuid="8e23ed3d-d5a0-4a03-90d8-4e39745b7483" x="20" y="350" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_WAND}]]></expression>
+			</element>
+			<element kind="textField" uuid="67e44200-82bb-44d9-9adf-69913ee63951" x="130" y="350" width="405" height="20" style="Value">
+				<expression><![CDATA[$F{wand} == null ? "-" : $F{wand}]]></expression>
+			</element>
+			<element kind="line" uuid="904d510b-958d-4333-a878-323a6c3cea3a" x="20" y="340" width="515" height="1" forecolor="#CCCCCC"/>
+			<element kind="textField" uuid="57ca9f3e-dd09-4905-a7ed-3b1a8d7f5332" x="20" y="420" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_ALIAS}]]></expression>
+			</element>
+			<element kind="textField" uuid="07bf76a8-37e7-4187-bdb5-b98745efe7e4" x="130" y="420" width="405" height="20" textAdjust="StretchHeight" style="Value">
+				<expression><![CDATA[$F{alias} == null ? "-" : $F{alias}]]></expression>
+			</element>
+			<element kind="textField" uuid="a7405784-60b3-4934-bfab-4496f3fb20e6" x="20" y="530" width="100" height="20" style="Label">
+				<expression><![CDATA[$P{LABEL_TITLES}]]></expression>
+			</element>
+			<element kind="textField" uuid="ec287b47-64de-4b73-b2fa-14e67f5db216" x="130" y="530" width="405" height="20" textAdjust="StretchHeight">
+				<expression><![CDATA[$F{titles} == null ? "-" : $F{titles}]]></expression>
+			</element>
+		</band>
+	</detail>
 </jasperReport>
