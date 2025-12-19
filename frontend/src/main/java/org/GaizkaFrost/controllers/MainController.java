@@ -316,14 +316,7 @@ public class MainController implements Initializable {
         if (menuLangEs != null)
             menuLangEs.setOnAction(e -> changeLanguage(java.util.Locale.forLanguageTag("es")));
 
-        btnLimpiar.setOnAction(e -> {
-            txtBuscar.clear();
-            comboCasa.getSelectionModel().clearSelection();
-            comboEstado.getSelectionModel().clearSelection();
-            txtPatronus.clear();
-            checkFavoritos.setSelected(false);
-            aplicarFiltros();
-        });
+        btnLimpiar.setOnAction(e -> limpiarFiltros());
 
         // Paginación
         btnPaginaAnterior.setOnAction(e -> {
@@ -554,11 +547,33 @@ public class MainController implements Initializable {
     }
 
     /**
+     * Limpia todos los filtros activos y reinicia la lista.
+     */
+    @FXML
+    private void limpiarFiltros() {
+        txtBuscar.clear();
+        comboCasa.getSelectionModel().clearSelection();
+        comboEstado.getSelectionModel().clearSelection();
+        txtPatronus.clear();
+        checkFavoritos.setSelected(false);
+
+        // Reset page history
+        App.setLastPage(0);
+        paginaActual = 0;
+
+        aplicarFiltros();
+    }
+
+    /**
      * Aplica los filtros (búsqueda, casa, estado, favoritos) a la lista maestra de
      * personajes.
-     * Actualiza `listaFiltrada` y reinicia la paginación.
+     * Actualiza `listaFiltrada` y la paginación.
      */
     private void aplicarFiltros() {
+        aplicarFiltros(true);
+    }
+
+    private void aplicarFiltros(boolean resetPage) {
         String texto = txtBuscar.getText() != null ? txtBuscar.getText().toLowerCase().trim() : "";
         String casa = comboCasa.getValue();
         String unknownLabel = App.getBundle().getString("combo.house.unknown");
@@ -613,7 +628,11 @@ public class MainController implements Initializable {
         }
 
         listaFiltrada = filtrados;
-        paginaActual = 0;
+
+        if (resetPage) {
+            paginaActual = 0;
+        }
+
         actualizarPagina();
     }
 
@@ -753,17 +772,13 @@ public class MainController implements Initializable {
      * @param p El personaje cuyos detalles se mostrarán.
      */
     private void abrirDetalles(Personaje p) {
-        // Guardar estado
-        savedSearch = txtBuscar.getText();
-        savedHouse = comboCasa.getValue();
-        savedStatus = comboEstado.getValue();
-        savedFavorite = checkFavoritos.isSelected();
-
         try {
-            DetailController controller = App.setRootAndGetController("Detail_view", p.getNombre());
+            App.setLastPage(paginaActual); // Guardar página antes de ir a detalles
+            DetailController controller = App.setRootAndGetController("Detail_view", "Detalles del Personaje");
             controller.setPersonaje(p);
         } catch (IOException e) {
-            logger.error("Error opening character details for {}: {}", p.getNombre(), e.getMessage(), e);
+            logger.error("Error opening detail view", e);
+            statusBar.setText("Error al abrir detalles.");
         }
     }
 
@@ -815,16 +830,20 @@ public class MainController implements Initializable {
         new Thread(() -> {
             try {
                 // Fetch fast
-                List<Personaje> localData = HarryPotterAPI.fetchCharacters();
-
-                Platform.runLater(() -> {
-                    masterData.setAll(localData);
-                    actualizarComboCasas();
-                    aplicarFiltros();
-                    actualizarPagina();
-                    setCargando(false); // Desbloquear UI inmediatamente
-                    statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
-                });
+                List<Personaje> cachedData = HarryPotterAPI.fetchCharacters();
+                if (cachedData.isEmpty()) {
+                    // First run ever?
+                } else {
+                    Platform.runLater(() -> {
+                        masterData.setAll(cachedData);
+                        actualizarComboCasas();
+                        // Restore page immediately for initial view
+                        paginaActual = App.getLastPage();
+                        aplicarFiltros(false);
+                        setCargando(false); // Desbloquear UI inmediatamente
+                        statusBar.setText("Datos locales cargados. Buscando actualizaciones...");
+                    });
+                }
 
                 // 2. Sincronización en segundo plano (Lento)
                 boolean pullSuccess = HarryPotterAPI.syncPull();
@@ -865,22 +884,25 @@ public class MainController implements Initializable {
                     List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
 
                     // Comprobar si hay cambios reales para evitar parpadeo
-                    if (!localData.equals(freshData)) {
-                        Platform.runLater(() -> {
+                    Platform.runLater(() -> {
+                        boolean hasChanges = !cachedData.equals(freshData);
+
+                        // Si hay cambios, actualizar datos
+                        if (hasChanges) {
                             masterData.setAll(freshData);
                             actualizarComboCasas();
-                            aplicarFiltros();
-                            actualizarPagina();
-                            statusBar.setText(App.getBundle().getString("main.status.ready"));
-                            btnSincronizar.setDisable(false);
-                        });
-                    } else {
-                        // Si no hay cambios, solo restaurar estado UI
-                        Platform.runLater(() -> {
-                            statusBar.setText(App.getBundle().getString("main.status.ready"));
-                            btnSincronizar.setDisable(false);
-                        });
-                    }
+                        }
+
+                        // Restaurar última página global
+                        paginaActual = App.getLastPage();
+
+                        // Aplicar filtros SIN reiniciar la página (false)
+                        // Esto también llama a actualizarPagina() una sola vez.
+                        aplicarFiltros(false);
+
+                        statusBar.setText(App.getBundle().getString("main.status.ready"));
+                        btnSincronizar.setDisable(false);
+                    });
                 } else {
                     Platform.runLater(() -> {
                         statusBar.setText("Modo Offline (Sincronización fallida)");

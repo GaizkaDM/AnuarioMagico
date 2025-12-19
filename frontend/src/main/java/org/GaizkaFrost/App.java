@@ -59,6 +59,16 @@ public class App extends Application {
         fontSize = size;
     }
 
+    private static int lastPage = 0;
+
+    public static int getLastPage() {
+        return lastPage;
+    }
+
+    public static void setLastPage(int page) {
+        lastPage = page;
+    }
+
     public static void applyFontSize(Parent root) {
         if (root != null) {
             root.setStyle("-fx-font-size: " + fontSize + "px;");
