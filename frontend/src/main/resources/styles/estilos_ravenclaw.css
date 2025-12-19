@@ -62,7 +62,8 @@
 }
 
 .theme-toggle-btn {
-    -fx-background-color: rgba(14, 26, 64, 0.6);
+    -fx-background-color: rgba(14, 26, 64, 0.4);
+    /* More transparent for glass effect */
     -fx-background-radius: 50%;
     -fx-min-width: 34px;
     -fx-min-height: 34px;
@@ -71,10 +72,12 @@
     -fx-text-fill: #946b2d;
     -fx-font-size: 18px;
     -fx-cursor: hand;
-    -fx-border-color: #946b2d;
+    -fx-border-color: rgba(192, 160, 96, 0.5);
+    /* Bronze Glass Border */
     -fx-border-width: 1.5;
     -fx-border-radius: 50%;
     -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 2);
 }
 
 .theme-toggle-btn:hover {
