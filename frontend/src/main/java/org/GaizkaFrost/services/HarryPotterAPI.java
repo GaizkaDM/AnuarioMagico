@@ -29,8 +29,9 @@ import java.util.List;
 public class HarryPotterAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(HarryPotterAPI.class);
-    private static final String API_URL = "http://127.0.0.1:8000/characters";
-    private static final String AUTH_URL = "http://127.0.0.1:8000/auth";
+    private static final String BASE_URL = "http://127.0.0.1:8000";
+    private static final String API_URL = BASE_URL + "/characters";
+    private static final String AUTH_URL = BASE_URL + "/auth";
 
     // Token de sesión para autenticación
     private static String currentToken = null;
@@ -96,7 +97,7 @@ public class HarryPotterAPI {
      */
     public static boolean isBackendReady() {
         try {
-            HttpURLConnection conn = createConnection("http://127.0.0.1:8000/health", "GET");
+            HttpURLConnection conn = createConnection(BASE_URL + "/health", "GET");
             conn.setConnectTimeout(2000); // 2 segundos máx para este chequeo
             conn.setReadTimeout(2000);
             int code = conn.getResponseCode();
@@ -148,7 +149,7 @@ public class HarryPotterAPI {
      * Alterna el estado de favorito de un personaje.
      */
     public static boolean toggleFavorite(String characterId) throws Exception {
-        HttpURLConnection conn = createConnection("http://localhost:8000/characters/" + characterId + "/favorite",
+        HttpURLConnection conn = createConnection(API_URL + "/" + characterId + "/favorite",
                 "POST");
         return conn.getResponseCode() == 200;
     }
@@ -157,14 +158,14 @@ public class HarryPotterAPI {
      * Sincroniza datos desde MySQL (Pull).
      */
     public static boolean syncPull() {
-        return executeSyncRequest("http://localhost:8000/admin/sync-pull");
+        return executeSyncRequest(BASE_URL + "/admin/sync-pull");
     }
 
     /**
      * Sincroniza datos hacia MySQL (Push).
      */
     public static boolean syncPush() {
-        return executeSyncRequest("http://localhost:8000/admin/sync-mysql");
+        return executeSyncRequest(BASE_URL + "/admin/sync-mysql");
     }
 
     private static boolean executeSyncRequest(String url) {
@@ -194,7 +195,7 @@ public class HarryPotterAPI {
      */
     public static JsonObject getImageSyncStatus() {
         try {
-            HttpURLConnection conn = createConnection("http://localhost:8000/admin/sync-images/status", "GET");
+            HttpURLConnection conn = createConnection(BASE_URL + "/admin/sync-images/status", "GET");
             if (conn.getResponseCode() == 200) {
                 String response = readResponse(conn);
                 return new Gson().fromJson(response, JsonObject.class);
