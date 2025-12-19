@@ -49,6 +49,8 @@ graph TD
 
 Cada vez que se modifica un dato, el sistema garantiza la persistencia en múltiples formatos:
 
+Vista para GitHub
+
 ```mermaid
 graph LR
     User[Usuario] -- "1. Guardar/Editar" --> API[API Backend]
@@ -63,6 +65,24 @@ graph LR
     style XML fill:#0277bd,stroke:#01579b,color:#ffffff
     style CSV fill:#2e7d32,stroke:#1b5e20,color:#ffffff
     style BIN fill:#ff8f00,stroke:#e65100,color:#ffffff
+```
+Vista alternativa
+
+
+```text
+[ API EXTERNA: PotterDB ]
+           |
+           v
+[ FLASK BACKEND: Puertas del Castillo ] <---- [ POSTMAN: El Grimorio de Pruebas ]
+           |
+    +------+------+
+    |             |
+[ SQLite/MySQL: [ SERVICIOS: Salas de Hechizos ]
+  Mazmorras ]         | (Exporta a...)
+    |           +-----+-----+-----+
+    |           |     |     |     |
+    v           v     v     v     v
+[ UI: Torre ] [CSV] [XML] [BIN] [BLOBs]
 ```
 
 ### 🛠️ Funcionalidades Core

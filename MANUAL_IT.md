@@ -216,14 +216,14 @@ Este informe detalla la travesía de la información desde los mundos externos h
 #### Plano del Castillo de Datos (Diagrama Conceptual)
 
 ```text
-[ API EXTERNA: Bosque Prohibido ]
+[ API EXTERNA: PotterDB ]
            |
            v
 [ FLASK BACKEND: Puertas del Castillo ] <---- [ POSTMAN: El Grimorio de Pruebas ]
            |
     +------+------+
     |             |
-[ SQLite:      [ SERVICIOS: Salas de Hechizos ]
+[ SQLite/MySQL: [ SERVICIOS: Salas de Hechizos ]
   Mazmorras ]         | (Exporta a...)
     |           +-----+-----+-----+
     |           |     |     |     |
