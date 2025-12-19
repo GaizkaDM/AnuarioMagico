@@ -1,92 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="character_list" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+    <style name="Title" mode="Opaque" forecolor="#FFFFFF" backcolor="#333333" hTextAlign="Center" vTextAlign="Middle" fontSize="24" isBold="true"/>
+    <style name="ColumnHeader" mode="Opaque" forecolor="#FFFFFF" backcolor="#555555" hTextAlign="Center" vTextAlign="Middle" fontSize="12" isBold="true"/>
+    <style name="Detail" mode="Opaque" backcolor="#FFFFFF" vTextAlign="Middle" fontSize="10">
+        <box leftPadding="5" rightPadding="5"/>
+    </style>
+    <style name="Row" mode="Opaque">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></conditionExpression>
+            <style backcolor="#F2F2F2"/>
+        </conditionalStyle>
+    </style>
     <parameter name="REPORT_TITLE" class="java.lang.String"/>
     <field name="nombre" class="java.lang.String"/>
     <field name="casa" class="java.lang.String"/>
     <field name="estado" class="java.lang.String"/>
     <field name="patronus" class="java.lang.String"/>
     <field name="imagenUrl" class="java.lang.String"/>
+
     <background>
         <band splitType="Stretch"/>
     </background>
+
     <title>
-        <band height="60" splitType="Stretch">
+        <band height="70" splitType="Stretch">
             <textField>
-                <reportElement x="0" y="10" width="555" height="40"/>
-                <textElement textAlignment="Center">
-                    <font size="24" isBold="true"/>
-                </textElement>
+                <reportElement style="Title" x="0" y="0" width="555" height="60"/>
+                <textElement/>
                 <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
             </textField>
         </band>
     </title>
+
     <columnHeader>
         <band height="30" splitType="Stretch">
             <staticText>
-                <reportElement x="0" y="0" width="200" height="30"/>
-                <box>
-                    <bottomPen lineWidth="1.0"/>
-                </box>
-                <textElement verticalAlignment="Middle">
-                    <font isBold="true"/>
-                </textElement>
+                <reportElement style="ColumnHeader" x="0" y="0" width="200" height="30"/>
                 <text><![CDATA[Name]]></text>
             </staticText>
             <staticText>
-                <reportElement x="200" y="0" width="120" height="30"/>
-                <box>
-                    <bottomPen lineWidth="1.0"/>
-                </box>
-                <textElement verticalAlignment="Middle">
-                    <font isBold="true"/>
-                </textElement>
+                <reportElement style="ColumnHeader" x="200" y="0" width="120" height="30"/>
                 <text><![CDATA[House]]></text>
             </staticText>
             <staticText>
-                <reportElement x="320" y="0" width="100" height="30"/>
-                <box>
-                    <bottomPen lineWidth="1.0"/>
-                </box>
-                <textElement verticalAlignment="Middle">
-                    <font isBold="true"/>
-                </textElement>
+                <reportElement style="ColumnHeader" x="320" y="0" width="100" height="30"/>
                 <text><![CDATA[Status]]></text>
             </staticText>
             <staticText>
-                <reportElement x="420" y="0" width="135" height="30"/>
-                <box>
-                    <bottomPen lineWidth="1.0"/>
-                </box>
-                <textElement verticalAlignment="Middle">
-                    <font isBold="true"/>
-                </textElement>
+                <reportElement style="ColumnHeader" x="420" y="0" width="135" height="30"/>
                 <text><![CDATA[Patronus]]></text>
             </staticText>
         </band>
     </columnHeader>
+
     <detail>
-        <band height="65" splitType="Stretch">
-            <textField>
-                <reportElement x="50" y="30" width="150" height="20"/>
-                <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="200" y="30" width="120" height="20"/>
-                <textFieldExpression><![CDATA[$F{casa} == null ? "-" : $F{casa}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="320" y="30" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$F{estado} == null ? "-" : $F{estado}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="420" y="30" width="135" height="20"/>
-                <textFieldExpression><![CDATA[$F{patronus} == null ? "-" : $F{patronus}]]></textFieldExpression>
-            </textField>
-            <image onErrorType="Blank">
-                 <reportElement x="-10" y="15" width="50" height="50"/>
-                 <imageExpression><![CDATA[$F{imagenUrl}]]></imageExpression>
-            </image>
+        <band height="55" splitType="Stretch">
+            <!-- Background Row Style -->
+            <frame>
+                <reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="55"/>
+                
+                <image onErrorType="Blank" hAlign="Center" vAlign="Middle">
+                     <reportElement x="5" y="2" width="50" height="50"/>
+                     <box>
+                         <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                     </box>
+                     <imageExpression><![CDATA[$F{imagenUrl}]]></imageExpression>
+                </image>
+
+                <textField>
+                    <reportElement style="Detail" x="60" y="0" width="140" height="55"/>
+                    <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+                </textField>
+                <textField>
+                    <reportElement style="Detail" x="200" y="0" width="120" height="55"/>
+                    <textFieldExpression><![CDATA[$F{casa} == null ? "-" : $F{casa}]]></textFieldExpression>
+                </textField>
+                <textField>
+                    <reportElement style="Detail" x="320" y="0" width="100" height="55"/>
+                    <textFieldExpression><![CDATA[$F{estado} == null ? "-" : $F{estado}]]></textFieldExpression>
+                </textField>
+                <textField>
+                    <reportElement style="Detail" x="420" y="0" width="135" height="55"/>
+                    <textFieldExpression><![CDATA[$F{patronus} == null ? "-" : $F{patronus}]]></textFieldExpression>
+                </textField>
+            </frame>
         </band>
     </detail>
 </jasperReport>
