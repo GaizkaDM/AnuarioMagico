@@ -5,6 +5,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
+import org.GaizkaFrost.services.HarryPotterAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +94,9 @@ public class App extends Application {
 
         setWindowIcon(stage);
         stage.setTitle("Anuario Hogwarts");
+
+        // Interceptar cierre de ventana
+        stage.setOnCloseRequest(this::handleExitRequest);
 
         // Mostrar portada (Splash Screen) antes de la app principal
         showSplashScreen();
@@ -347,5 +355,72 @@ public class App extends Application {
     public static void main(String[] args) {
         java.util.Locale.setDefault(java.util.Locale.ENGLISH); // Force English default
         launch(args);
+    }
+
+    /**
+     * Maneja la solicitud de cierre de la ventana principal.
+     */
+    private void handleExitRequest(javafx.stage.WindowEvent event) {
+        event.consume(); // Cancelar cierre inmediato
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        setIcon(alert);
+        alert.setTitle("Salir");
+        alert.setHeaderText("¿Desea sincronizar antes de salir?");
+        alert.setContentText("Sincronizar guardará sus cambios locales en la base de datos remota.");
+        if (isDarkMode) {
+            alert.getDialogPane().getStylesheets()
+                    .add(getClass().getResource("/styles/estilos_ravenclaw.css").toExternalForm());
+        }
+
+        ButtonType btnSync = new ButtonType("Sincronizar y Salir", ButtonBar.ButtonData.YES);
+        ButtonType btnExit = new ButtonType("Salir sin Sincronizar", ButtonBar.ButtonData.NO);
+        ButtonType btnCancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(btnSync, btnExit, btnCancel);
+
+        java.util.Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent()) {
+            if (result.get() == btnSync) {
+                performSyncAndExit();
+            } else if (result.get() == btnExit) {
+                Platform.exit();
+            }
+        }
+    }
+
+    private void performSyncAndExit() {
+        Alert progress = new Alert(Alert.AlertType.INFORMATION);
+        setIcon(progress);
+        progress.setTitle("Sincronizando");
+        progress.setHeaderText("Sincronizando datos con la nube...");
+        progress.setContentText("Por favor espere, no cierre la aplicación.");
+        progress.getDialogPane().lookupButton(ButtonType.OK).setVisible(false); // Ocultar botón OK
+        if (isDarkMode) {
+            progress.getDialogPane().getStylesheets()
+                    .add(getClass().getResource("/styles/estilos_ravenclaw.css").toExternalForm());
+        }
+        progress.show();
+
+        new Thread(() -> {
+            boolean success = HarryPotterAPI.fullSync();
+            Platform.runLater(() -> {
+                progress.close();
+                if (!success) {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    setIcon(error);
+                    error.setTitle("Error");
+                    error.setHeaderText("Falló la sincronización");
+                    error.setContentText("No se pudo conectar con el servidor. Se cerrará la aplicación.");
+                    if (isDarkMode) {
+                        error.getDialogPane().getStylesheets()
+                                .add(getClass().getResource("/styles/estilos_ravenclaw.css").toExternalForm());
+                    }
+                    error.showAndWait();
+                }
+                Platform.exit();
+            });
+        }).start();
     }
 }
