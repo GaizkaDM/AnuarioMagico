@@ -195,6 +195,17 @@ def sync_sqlite_to_mysql():
         # 1. Crear Tablas
         create_mysql_tables(mysql_cursor)
         
+        # VERIFICACIÓN DE INTEGRIDAD DE IMÁGENES
+        # No subir a MySQL si las imágenes locales aún no se han descargado completamente.
+        # Esto evita subir registros con BLOBs nulos a la nube.
+        sqlite_cursor.execute("SELECT COUNT(*) FROM characters WHERE image IS NOT NULL AND image != '' AND image_blob IS NULL")
+        pending_images = sqlite_cursor.fetchone()[0]
+        
+        if pending_images > 0:
+            logger_backend.error(f"🛑 SYNC ABORTED: Found {pending_images} pending images download locally.")
+            logger_backend.error("Please wait until all images are cached locally before pushing to MySQL.")
+            return
+
         # 2. Sincronizar Personajes
         logger_backend.debug("  Syncing characters...")
         sqlite_cursor.execute("SELECT * FROM characters")
