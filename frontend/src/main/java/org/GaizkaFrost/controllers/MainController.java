@@ -383,22 +383,37 @@ public class MainController implements Initializable {
      * Maneja el cambio manual de página desde el TextField.
      */
     private void manejarCambioPagina(TextField source) {
+        if (source == null)
+            return;
+
         try {
-            int targetPage = Integer.parseInt(source.getText());
-            int total = listaFiltrada.size();
-            int totalPaginas = (int) Math.ceil(total / (double) PERSONAJES_POR_PAGINA);
-            if (totalPaginas == 0)
-                totalPaginas = 1;
+            int nuevaPagina = Integer.parseInt(source.getText()) - 1;
+            int totalPaginas = (int) Math.ceil(listaFiltrada.size() / (double) PERSONAJES_POR_PAGINA);
 
-            if (targetPage < 1)
-                targetPage = 1;
-            if (targetPage > totalPaginas)
-                targetPage = totalPaginas;
+            if (nuevaPagina < 0)
+                nuevaPagina = 0;
+            if (nuevaPagina >= totalPaginas)
+                nuevaPagina = totalPaginas - 1;
 
-            paginaActual = targetPage - 1;
-            actualizarPagina();
+            if (nuevaPagina != paginaActual) {
+                paginaActual = nuevaPagina;
+                actualizarPagina();
+            } else {
+                // Even if page didn't change, we might want to restore the text field value
+                // in case user typed "999" and we clamped it to "10",
+                // but we DON'T want to re-render the whole page (flicker).
+                source.setText(String.valueOf(paginaActual + 1));
+            }
+
+            // Sync the other text field
+            if (source == txtPagina && txtPaginaSidebar != null) {
+                txtPaginaSidebar.setText(String.valueOf(paginaActual + 1));
+            } else if (source == txtPaginaSidebar && txtPagina != null) {
+                txtPagina.setText(String.valueOf(paginaActual + 1));
+            }
+
         } catch (NumberFormatException e) {
-            // Restore previous valid page
+            // Restore current page if invalid input
             source.setText(String.valueOf(paginaActual + 1));
         }
     }
@@ -891,14 +906,13 @@ public class MainController implements Initializable {
                         if (hasChanges) {
                             masterData.setAll(freshData);
                             actualizarComboCasas();
+
+                            // Restaurar última página global (o mantenerla si ya es correcta)
+                            paginaActual = App.getLastPage();
+
+                            // Aplicar filtros SIN reiniciar la página (false)
+                            aplicarFiltros(false);
                         }
-
-                        // Restaurar última página global
-                        paginaActual = App.getLastPage();
-
-                        // Aplicar filtros SIN reiniciar la página (false)
-                        // Esto también llama a actualizarPagina() una sola vez.
-                        aplicarFiltros(false);
 
                         statusBar.setText(App.getBundle().getString("main.status.ready"));
                         btnSincronizar.setDisable(false);
