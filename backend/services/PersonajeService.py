@@ -53,23 +53,29 @@ class PersonajeService:
         if not self.dao.añadir_personaje(personaje):
             logger_backend.error("✗ Error al añadir personaje a SQLite. Operación cancelada.")
             return False
+            
+        # Lanzar exportaciones en segundo plano para no bloquear al usuario
+        def realizar_exportaciones():
+            logger_backend.debug("🔄 Iniciando exportaciones en segundo plano...")
+            # 2. Exportar a CSV
+            if not self.export_service.exportar_a_csv():
+                logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
+            
+            # 3. Exportar a XML
+            if not self.export_service.exportar_a_xml():
+                logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
+            
+            # 4. Exportar a Binario
+            if not self.export_service.exportar_a_binario():
+                logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
+            logger_backend.debug("✅ Exportaciones completadas en segundo plano.")
+
+        import threading
+        export_thread = threading.Thread(target=realizar_exportaciones)
+        export_thread.daemon = True
+        export_thread.start()
         
-        # 2. Exportar a CSV
-        logger_backend.debug("[2/4] Exportando a CSV...")
-        if not self.export_service.exportar_a_csv():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
-        
-        # 3. Exportar a XML
-        logger_backend.debug("[3/4] Exportando a XML...")
-        if not self.export_service.exportar_a_xml():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
-        
-        # 4. Exportar a Binario
-        logger_backend.debug("[4/4] Exportando a Binario...")
-        if not self.export_service.exportar_a_binario():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
-        
-        logger_backend.info(f"✓ PERSONAJE AÑADIDO EXITOSAMENTE: {personaje.get('name')}")
+        logger_backend.info(f"✓ PERSONAJE AÑADIDO (Persistencia local OK): {personaje.get('name')}")
         
         return True
     
@@ -100,22 +106,13 @@ class PersonajeService:
             logger_backend.error(f"✗ Error al editar personaje {personaje_id} en SQLite. Operación cancelada.")
             return False
         
-        # 2. Exportar a CSV
-        logger_backend.debug("[2/4] Exportando a CSV...")
-        if not self.export_service.exportar_a_csv():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
+        # Lanzar exportaciones en segundo plano
+        import threading
+        export_thread = threading.Thread(target=self.export_service.exportar_todo)
+        export_thread.daemon = True
+        export_thread.start()
         
-        # 3. Exportar a XML
-        logger_backend.debug("[3/4] Exportando a XML...")
-        if not self.export_service.exportar_a_xml():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
-        
-        # 4. Exportar a Binario
-        logger_backend.debug("[4/4] Exportando a Binario...")
-        if not self.export_service.exportar_a_binario():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
-        
-        logger_backend.info(f"✓ PERSONAJE EDITADO EXITOSAMENTE: {personaje_id}")
+        logger_backend.info(f"✓ PERSONAJE EDITADO (Persistencia local OK): {personaje_id}")
         
         return True
     
@@ -145,22 +142,13 @@ class PersonajeService:
             logger_backend.error(f"✗ Error al eliminar personaje {personaje_id} de SQLite. Operación cancelada.")
             return False
         
-        # 2. Exportar a CSV
-        logger_backend.debug("[2/4] Exportando a CSV...")
-        if not self.export_service.exportar_a_csv():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a CSV")
+        # Lanzar exportaciones en segundo plano
+        import threading
+        export_thread = threading.Thread(target=self.export_service.exportar_todo)
+        export_thread.daemon = True
+        export_thread.start()
         
-        # 3. Exportar a XML
-        logger_backend.debug("[3/4] Exportando a XML...")
-        if not self.export_service.exportar_a_xml():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a XML")
-        
-        # 4. Exportar a Binario
-        logger_backend.debug("[4/4] Exportando a Binario...")
-        if not self.export_service.exportar_a_binario():
-            logger_backend.warning("⚠ Advertencia: Error al exportar a Binario")
-        
-        logger_backend.info(f"✓ PERSONAJE ELIMINADO EXITOSAMENTE: {personaje_id}")
+        logger_backend.info(f"✓ PERSONAJE ELIMINADO (Persistencia local OK): {personaje_id}")
         
         return True
     
