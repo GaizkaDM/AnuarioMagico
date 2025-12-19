@@ -8,8 +8,10 @@ import java.util.List;
 
 /**
  * Modelo de datos que representa un personaje de Harry Potter.
- * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la interfaz.
- * 
+ * Se utiliza para mapear la respuesta JSON del backend y vincular datos en la
+ * interfaz.
+ *
+
  * @author Xiker
  * @author Gaizka
  * @author Diego
