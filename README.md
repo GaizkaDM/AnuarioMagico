@@ -1,150 +1,152 @@
-# Harry Potter Anuario - Aplicación Completa 🧙‍♂️✨
+# Harry Potter Anuario - Aplicación Híbrida 🧙‍♂️✨
 
-Aplicación de escritorio avanzada para gestionar un Anuario de Harry Potter. Combina una arquitectura moderna con **backend en Python (Flask)** y **frontend en JavaFX**, permitiendo escalar desde una base de datos local SQLite hasta un servidor MySQL remoto en la nube.
-
-## 🎯 Características Principales
-
-### 🔐 Seguridad y Autenticación
-- **Login y Registro Completo:** Sistema seguro con 'Master Password' para nuevos registros.
-- **Sesiones de Usuario:** Gestión de tokens para mantener la sesión activa.
-
-### 💾 Base de Datos Híbrida (Dual DB Support)
-- **Modo Local (SQLite):** Perfecto para desarrollo y pruebas offline. Todo se guarda en `backend/data/anuario.db`.
-- **Modo Remoto (MySQL):** Conexión preparada para servidores de producción (ej. servidores de clase/empresa).
-- **Switch Fácil:** Cambio instantáneo entre Local y Remoto editando una sola línea en el archivo `.env`.
-
-### 🎨 Experiencia de Usuario (UX/UI)
-- **Temas Personalizados:**
-    - ☀️ **Light Mode (Hufflepuff Edition):** Tonos cremas y amarillos.
-    - 🌙 **Dark Mode (Ravenclaw Edition):** Elegante azul noche y bronce.
-- **Diseño Responsivo:** Interfaces cuidadas con CSS moderno (Glassmorphism, sombras, transiciones).
-
-### 🛠️ Funcionalidades Avanzadas
-- **Gestión de Personajes:**
-    - Listado completo con buscador y filtros (Casa, Estado).
-    - Favoritos persistentes en base de datos.
-    - Edición de personajes (rol, estado, etc.).
-- **Generación de Informes PDF:**
-    - Exportación de fichas de personajes individuales.
-    - Listados completos generados con **JasperReports**.
-- **Internacionalización (i18n):** Preparado para múltiples idiomas (Español implementado).
+**Anuario Hogwarts** es una aplicación de escritorio moderna desarrollada en **Java (JavaFX)** y **Python (Flask)**. Utiliza una arquitectura híbrida única donde el frontend Java gestiona un backend Python autocontenido, ofreciendo lo mejor de ambos mundos: una interfaz rica y fluida, con la potencia de procesamiento de datos y librerías de Python.
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## 🌟 Características Destacadas
+
+### 🔄 Arquitectura "Smart Sync" (Offline-First)
+*   **Modo Híbrido Automático**: La aplicación funciona perfectamente sin internet.
+*   **Sincronización Inteligente**:
+    *   **Offline**: Usa una base de datos local **SQLite** (`anuario.db`) optimizada para velocidad.
+    *   **Online**: Si se configura un servidor remoto (**MySQL**), sincroniza datos bidireccionalmente (Push/Pull) bajo demanda.
+    *   **Fallback Automático**: Si la base de datos está vacía, descarga automáticamente miles de personajes desde la API pública **PotterDB**.
+
+### 🎨 Experiencia Visual Premium
+*   **Splash Screen Animada**: Carga inicial con portada inmersiva a pantalla completa.
+*   **Temas Dinámicos**:
+    *   ☀️ **Light Mode (Hufflepuff):** Tonos cálidos y pergamino.
+    *   🌙 **Dark Mode (Ravenclaw):** Interfaz oscura, elegante y cómoda para la vista.
+*   **Diseño Responsivo**: Grid de tarjetas que se adapta a cualquier resolución (mínimo 850x700).
+
+### 🚀 Rendimiento y Gestión
+*   **Backend Autocontenido**: El motor Python se compila en un ejecutable (`backend_server.exe`), eliminando la necesidad de que el usuario final instale Python.
+*   **Gestión de Procesos**: El lanzador (`Lanzador.java` / Frontend) inicia el motor automáticamente y asegura su cierre limpio ("Kill" de procesos zombies) al salir.
+*   **Carga Asíncrona**: Descarga y procesamiento de imágenes en segundo plano sin congelar la interfaz.
+
+## 🏗️ Diagrama de Arquitectura
 
 ```mermaid
 graph TD
-    Client[JavaFX Frontend] <-->|JSON / REST| API[Flask Backend]
-    API <-->|SQLAlchemy| DB[(Base de Datos)]
+    User((Usuario)) -->|Interactúa| Client[Frontend JavaFX .JAR]
     
-    subgraph "Persistencia Dual"
-        DB -.->|Opción A| SQLite[Local: anuario.db]
-        DB -.->|Opción B| MySQL[Remoto: Servidor MySQL]
+    subgraph "Cliente PC (Local)"
+        Client -->|1. Inicia/Mata| EXE[Backend Python .EXE]
+        Client <-->|2. HTTP REST| EXE
+        EXE <-->|Lee/Escribe| SQLite[(Local: anuario.db)]
     end
     
-    API <-->|Sync| PotterDB[PotterDB API Externa]
-    Client -->|Genera| PDF[Informes PDF / JasperReports]
+    subgraph "Nube / Red (Opcional)"
+        EXE <-->|3. Sync (Si hay .env)| MySQL[(Servidor MySQL)]
+        EXE <-->|4. Fallback (Si vacío)| API[PotterDB API Pública]
+    end
+    
+    Client -->|Genera| PDF[Informes PDF]
 ```
 
-## 📁 Estructura del Proyecto
+## 🔄 Flujo de Datos y Exportación
 
-```
-AnuarioMagico/
-├── backend/
-│   ├── app.py               # Punto de entrada Flask
-│   ├── config.py            # Configuración Dual (SQLite/MySQL)
-│   ├── routes/              # Endpoints (auth, characters, admin)
-│   ├── models/              # Modelos SQLAlchemy (User, Character, Favorite)
-│   ├── reports/             # Plantillas .jrxml para JasperReports
-│   └── data/                # Almacenamiento local SQLite
-├── frontend/
-│   ├── src/main/java/org/GaizkaFrost/
-│   │   ├── controllers/     # Lógica de vistas (Login, Main, Detail)
-│   │   ├── services/        # Cliente API (HarryPotterAPI)
-│   │   └── models/          # Objetos de datos Java
-│   └── src/main/resources/
-│       ├── fxml/            # Vistas (Login_view, Main_view...)
-│       ├── styles/          # Temas CSS (estilos.css, login_ravenclaw.css...)
-│       └── i18n/            # Archivos de traducción
-├── .env                     # 🔑 Configuración Sensible (DB Switch)
-├── .gitignore               # Ignora .env y datos locales
-└── README.md
+Cada vez que se modifica un dato, el sistema garantiza la persistencia en múltiples formatos:
+
+```mermaid
+graph LR
+    User[Usuario] -- "1. Guardar/Editar" --> API[API Backend]
+    API -- "2. Persistir" --> DB[(SQLite Local)]
+    
+    API -- "3. Trigger Automático" --> Export[Servicio de Exportación]
+    
+    Export -->|Genera| XML[datos.xml]
+    Export -->|Genera| CSV[datos.csv]
+    Export -->|Genera| BIN[datos.bin]
+    
+    style XML fill:#e1f5fe,stroke:#01579b
+    style CSV fill:#e8f5e9,stroke:#2e7d32
+    style BIN fill:#fff3e0,stroke:#ef6c00
 ```
 
-## 🚀 Instalación y Puesta en Marcha
+### 🛠️ Funcionalidades Core
+*   **CRUD Completo**: Crear, Leer, Editar y Borrar personajes.
+*   **Búsqueda Avanzada**: Filtrado por Nombre, Casa, Estado (Vivo/Fallecido), Patronus y Favoritos.
+*   **Seguridad**: Login y Registro con "Master Password" para administradores.
+*   **Informes PDF**: Generación profesional de fichas y listados usando **JasperReports**.
 
-### 1️⃣ Configuración del Backend (Python)
+---
 
-Necesitas Python 3.10 o superior.
+## 📦 Instalación y Ejecución (Usuario Final)
 
-```bash
-# Navegar a la carpeta del proyecto
-cd backend
+No requiere instalación de Python ni configuración compleja.
 
-# Crear entorno virtual
-python -m venv .venv
+### Requisitos
+*   **Sistema Operativo**: Windows 10/11 (x64).
+*   **Java**: Tener instalado JRE/JDK 17 o superior.
 
-# Activar entorno
-# Windows:
-.venv\Scripts\activate
-# Mac/Linux:
-source .venv/bin/activate
+### Pasos
+1.  Descomprime la carpeta de la solución (`AnuarioApp`).
+2.  Asegúrate de que los archivos `AnuarioMagico.jar` y `backend_server.exe` estén juntos.
+3.  **Para ejecutar**: Doble clic en `AnuarioMagico.jar` (o ejecutar el acceso directo).
 
-# Instalar dependencias (incluyendo pymysql, flask-sqlalchemy, jasper...)
-pip install -r requirements.txt
-```
+> **Nota para conexión remota**: Si deseas conectarte a la base de datos compartida del servidor, asegúrate de que el archivo `.env` esté presente en la misma carpeta. Si lo borras, la aplicación pasará a **Modo Local Offline**.
 
-#### ⚙️ Configurar Base de Datos (.env)
-El proyecto incluye un archivo `.env` en la raíz para configurar la conexión.
+---
 
-**Para presentar en clase (Modo Seguro - Local):**
-Asegúrate de que `DB_TYPE=sqlite` no esté comentado.
+## ⚙️ Configuración (.env)
+
+El archivo `.env` controla la conexión a la base de datos remota para el trabajo colaborativo.
+
 ```ini
-DB_TYPE=sqlite
-DB_SQLITE_FILE=data/anuario.db
-# MySQL comentado...
-```
-
-**Para conectar al Servidor Remoto:**
-Comenta las líneas de SQLite y descomenta las de MySQL:
-```ini
-# DB_TYPE=sqlite
-DB_TYPE=mysql
-DB_HOST=192.168.39.6
-DB_NAME=usuarioDidaktikapp
-...
-```
-
-### 2️⃣ Ejecutar Backend
-```bash
-python app.py
-```
-Verás un mensaje indicando qué base de datos se está usando: `--> Usando base de datos SQLite Local` o `MySQL Remoto`.
-
-### 3️⃣ Ejecutar Frontend (JavaFX)
-
-Desde tu IDE (VS Code / IntelliJ) o terminal:
-```bash
-cd frontend
-mvn clean javafx:run
+# Configuración MySQL Remoto
+DB_HOST=192.168.39.6      # IP del servidor de clase/empresa
+DB_PORT=3306
+DB_NAME=AnuarioMagico
+DB_USER=tusuario
+DB_PASSWORD=tupassword
 ```
 
 ---
 
-## 🎮 Guía de Usuario
+## 🛠️ Guía para Desarrolladores (Build & Dev)
 
-1.  **Login / Registro:**
-    *   Si es tu primera vez, pulsa el checkbox **"¿No tienes cuenta?"**.
-    *   Introduce un usuario y contraseña.
-    *   **Master Password:** Necesario para registrarse (por defecto: `HogwartsMaster`).
-2.  **Dashboard:**
-    *   Usa los filtros superiores para buscar por casa o nombre.
-    *   Pulsa la **Luna/Sol** arriba a la derecha para cambiar entre tema Ravenclaw (Oscuro) y Hufflepuff (Claro).
-3.  **PDFs:**
-    *   En el detalle de un personaje, pulsa **"Generar PDF"** para obtener su ficha.
-    *   En la vista principal, usa el botón de imprimir para un listado completo.
+Si deseas modificar el código fuente:
 
-## 👨‍💻 Autores
-Proyecto desarrollado por **Gaizka, Xiker y Diego**.
-Diseñado como solución completa para la gestión de datos mágicos.
+### Estructura del Proyecto
+```text
+AnuarioMagico/
+├── backend/                 # Código Fuente Python (API Flask)
+│   ├── app.py               # Entry Point
+│   ├── services/            # Lógica de sincronización y negocio
+│   ├── routes/              # Endpoints REST
+│   └── models/              # Modelos SQLAlchemy
+├── frontend/                # Código Fuente Java (JavaFX)
+│   ├── src/main/java/       # Controladores y Lógica UI
+│   ├── src/main/resources/  # Vistas FXML, CSS, Imágenes
+│   └── pom.xml              # Dependencias Maven
+└── backend_server.spec      # Configuración PyInstaller
+```
+
+### Comandos de Compilación
+
+#### 1. Backend (Generar EXE)
+```powershell
+# Activar entorno virtual
+.venv\Scripts\activate
+# Generar ejecutable en /dist
+pyinstaller --clean --noconfirm backend_server.spec
+```
+
+#### 2. Frontend (Generar JAR)
+```powershell
+# Limpiar y empaquetar
+mvn clean package
+```
+
+---
+
+## 👨‍💻 Equipo de Desarrollo (Equipo Hagrid)
+
+*   **Gaizka**: Arquitectura Híbrida, Integración Java-Python, Sincronización.
+*   **Diego**: Diseño UI/UX, JasperReports, Base de Datos.
+*   **Xiker**: Lógica de Negocio Backend, API REST, Seguridad.
+
+---
+© 2025 Anuario Hogwarts. Desarrollado con ☕ y ⚡.
