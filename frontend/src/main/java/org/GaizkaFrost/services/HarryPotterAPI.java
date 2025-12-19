@@ -90,6 +90,23 @@ public class HarryPotterAPI {
         return currentToken != null && !currentToken.isEmpty();
     }
 
+    /**
+     * Verifica si el backend está en línea y respondiendo.
+     * Consulta el endpoint /health.
+     */
+    public static boolean isBackendReady() {
+        try {
+            HttpURLConnection conn = createConnection("http://127.0.0.1:8000/health", "GET");
+            conn.setConnectTimeout(2000); // 2 segundos máx para este chequeo
+            conn.setReadTimeout(2000);
+            int code = conn.getResponseCode();
+            conn.disconnect();
+            return code == 200;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // ==========================================
     // AUTENTICACIÓN
     // ==========================================
@@ -334,9 +351,10 @@ public class HarryPotterAPI {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
-        // Aumentar timeouts por defecto para evitar problemas en cargas iniciales lentas (EXE)
+        // Aumentar timeouts por defecto para evitar problemas en cargas iniciales
+        // lentas (EXE)
         conn.setConnectTimeout(60000); // 60s
-        conn.setReadTimeout(60000);    // 60s
+        conn.setReadTimeout(60000); // 60s
 
         // Incluir token de autenticación si existe
         if (currentToken != null && !currentToken.isEmpty()) {

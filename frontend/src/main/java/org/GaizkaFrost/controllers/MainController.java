@@ -201,6 +201,29 @@ public class MainController implements Initializable {
         // Intentar sincronizar datos de la nube al inicio (Pull)
         setCargando(true); // Mostrar spinner mientras se intenta el pull
         new Thread(() -> {
+            // 1. Esperar a que el backend esté listo (Max 15 segundos)
+            logger.info("Waiting for backend to be ready...");
+            int retries = 0;
+            boolean backendReady = false;
+            while (retries < 15) {
+                if (HarryPotterAPI.isBackendReady()) {
+                    backendReady = true;
+                    break;
+                }
+                try {
+                    Thread.sleep(1000); // Esperar 1 segundo
+                } catch (InterruptedException ignored) {
+                }
+                retries++;
+            }
+
+            if (!backendReady) {
+                logger.error("Backend not reachable after 15 seconds. Proceeding anyway (might fail).");
+            } else {
+                logger.info("Backend is UP!");
+            }
+
+            // 2. Proceder con el flujo normal de inicio
             logger.info("Attempting initial synchronization (Pull)...");
             boolean synced = HarryPotterAPI.syncPull();
             if (synced) {
