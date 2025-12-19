@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.File;
+
 import java.net.URL;
 
 /**
@@ -75,12 +75,6 @@ public class App extends Application {
         }
     }
 
-    /**
-     * Punto de entrada principal para la aplicación JavaFX.
-     *
-     * @param s El escenario (Stage) inicial.
-     * @throws IOException Si falla la carga del archivo FXML.
-     */
     /**
      * Punto de entrada principal para la aplicación JavaFX.
      *

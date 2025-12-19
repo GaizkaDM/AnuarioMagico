@@ -26,6 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.control.Tooltip;
 
+import java.text.MessageFormat;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Locale;
-import java.text.MessageFormat;
 
 import com.google.gson.JsonObject;
 
