@@ -860,8 +860,8 @@ public class MainController implements Initializable {
                     });
                 }
 
-                // 2. Sincronización en segundo plano (Lento)
-                boolean pullSuccess = HarryPotterAPI.syncPull();
+                // 2. Sincronización completa (Push + Pull)
+                boolean pullSuccess = HarryPotterAPI.fullSync();
 
                 if (pullSuccess) {
                     boolean downloading = true;
