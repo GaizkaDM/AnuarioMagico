@@ -751,14 +751,24 @@ public class MainController implements Initializable {
 
                     // 3. Recarga final tras sincronización
                     List<Personaje> freshData = HarryPotterAPI.fetchCharacters();
-                    Platform.runLater(() -> {
-                        masterData.setAll(freshData);
-                        actualizarComboCasas();
-                        aplicarFiltros();
-                        actualizarPagina();
-                        statusBar.setText(App.getBundle().getString("main.status.ready"));
-                        btnSincronizar.setDisable(false);
-                    });
+
+                    // Comprobar si hay cambios reales para evitar parpadeo
+                    if (!localData.equals(freshData)) {
+                        Platform.runLater(() -> {
+                            masterData.setAll(freshData);
+                            actualizarComboCasas();
+                            aplicarFiltros();
+                            actualizarPagina();
+                            statusBar.setText(App.getBundle().getString("main.status.ready"));
+                            btnSincronizar.setDisable(false);
+                        });
+                    } else {
+                        // Si no hay cambios, solo restaurar estado UI
+                        Platform.runLater(() -> {
+                            statusBar.setText(App.getBundle().getString("main.status.ready"));
+                            btnSincronizar.setDisable(false);
+                        });
+                    }
                 } else {
                     Platform.runLater(() -> {
                         statusBar.setText("Modo Offline (Sincronización fallida)");
