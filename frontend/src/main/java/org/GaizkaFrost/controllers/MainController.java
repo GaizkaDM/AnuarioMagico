@@ -8,7 +8,14 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -18,8 +25,15 @@ import javafx.scene.control.Tooltip;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Locale;
 import java.text.MessageFormat;
+
+import com.google.gson.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -681,7 +695,7 @@ public class MainController implements Initializable {
 
                     while (downloading) {
                         try {
-                            com.google.gson.JsonObject status = HarryPotterAPI.getImageSyncStatus();
+                            JsonObject status = HarryPotterAPI.getImageSyncStatus();
 
                             if (status != null) {
                                 boolean running = status.get("running").getAsBoolean();

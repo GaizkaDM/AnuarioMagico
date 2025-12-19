@@ -1,66 +1,65 @@
-/* estilos_detalles.css - Dark Ravenclaw Edition */
+/* estilos_detalles_ravenclaw.css - Dark Ravenclaw Glassmorphism Edition */
 
-/* Fondo general */
+/* Fondo general - Midnight Dynamic Gradient */
 .root {
-    -fx-background-color: linear-gradient(to bottom, #0e1a40, #050a1a);
-    -fx-font-family: "Georgia", "Palatino Linotype", "Book Antiqua", serif;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 80%, #0e1a40, #0a122e, #050a1a);
+    -fx-font-family: "Georgia", serif;
 }
 
-/* TARJETA CENTRAL DEL DETALLE */
+/* TARJETA CENTRAL DEL DETALLE - Dark Glass */
 .detail-card {
-    -fx-background-color: rgba(14, 26, 64, 0.9);
-    /* Dark Blue Glass */
-    -fx-background-radius: 8;
-    -fx-border-color: #946b2d;
-    /* Bronze */
-    -fx-border-width: 2;
-    -fx-border-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 20, 0, 0, 5);
+    -fx-background-color: rgba(14, 26, 64, 0.6);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(192, 160, 96, 0.4);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 25, 0, 0, 10);
+    -fx-padding: 30;
 }
 
 /* Título de Detalle */
 .titulo-detalle {
     -fx-text-fill: #946b2d;
-    /* Bronze */
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
+    -fx-font-family: "Georgia", serif;
+    -fx-font-size: 34px;
+    -fx-font-weight: 800;
+    -fx-padding: 0 0 15 0;
     -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
-    -fx-padding: 0 0 10 0;
 }
 
 /* Labels generales */
 .label {
-    -fx-text-fill: #e0e0e0;
-    /* Silver */
+    -fx-text-fill: #b8c0d0;
+    -fx-font-family: "Georgia", serif;
 }
 
 /* Labels en negrita */
 .label[style*="bold"] {
     -fx-text-fill: #946b2d;
-    /* Bronze */
     -fx-font-weight: bold;
 }
 
-/* Botones secundarios (Volver, Favoritos) */
+/* Botones secundarios (Volver, Favoritos) - Ravenclaw Style */
 .volver-btn,
 .favorito-btn,
 .secondary-button {
-    -fx-background-color: linear-gradient(to right, #222f5b, #0e1a40);
+    -fx-background-color: rgba(14, 26, 64, 0.8);
     -fx-text-fill: #946b2d;
-    -fx-background-radius: 4;
-    -fx-border-color: #5d4037;
-    -fx-border-width: 1;
-    -fx-padding: 6 14 6 14;
+    -fx-background-radius: 6;
+    -fx-border-color: #946b2d;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-padding: 8 16;
     -fx-font-weight: bold;
     -fx-font-family: "Georgia", serif;
+    -fx-cursor: hand;
 }
 
 .volver-btn:hover,
 .favorito-btn:hover,
 .secondary-button:hover {
-    -fx-background-color: linear-gradient(to right, #2f407a, #222f5b);
-    -fx-border-color: #946b2d;
-    -fx-cursor: hand;
+    -fx-background-color: rgba(148, 107, 45, 0.2);
+    -fx-effect: dropshadow(gaussian, rgba(148, 107, 45, 0.3), 10, 0, 0, 0);
 }
 
 /* ScrollPane */
