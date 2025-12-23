@@ -725,7 +725,8 @@ public class MainController implements Initializable {
 
         try {
             if (p.getImagenUrl() != null && !p.getImagenUrl().isEmpty()) {
-                Image image = new Image(p.getImagenUrl(), true);
+                // Load resized image (320px width) to save memory and avoid D3D crashes
+                Image image = new Image(p.getImagenUrl(), 320, 0, true, true, true);
                 img.setImage(image);
             }
         } catch (Exception e) {
